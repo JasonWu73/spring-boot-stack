@@ -6,7 +6,7 @@ package net.wuxianjie.webkit.common.util;
 public class OSUtils {
 
     // 获取操作系统名称，然后根据名称中包含的关键字来判断具体是哪种操作系统
-    private static final String osName = System.getProperty("os.name").toLowerCase();
+    private static final String OS_NAME = System.getProperty("os.name").toLowerCase();
 
     /**
      * 判断当前系统是否为 Windows。
@@ -14,7 +14,7 @@ public class OSUtils {
      * @return 是否为 Windows 系统
      */
     public static boolean isWindows() {
-        return osName.contains("win");
+        return OS_NAME.contains("win");
     }
 
     /**
@@ -23,7 +23,7 @@ public class OSUtils {
      * @return 是否为 macOS 系统
      */
     public static boolean isMac() {
-        return osName.contains("mac");
+        return OS_NAME.contains("mac");
     }
 
     /**
@@ -32,7 +32,7 @@ public class OSUtils {
      * @return 是否为 Linux 系统
      */
     public static boolean isLinux() {
-        return osName.contains("linux");
+        return OS_NAME.contains("linux");
     }
 
     public static String getOsName() {

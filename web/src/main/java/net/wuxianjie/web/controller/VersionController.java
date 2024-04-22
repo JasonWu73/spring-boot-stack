@@ -2,10 +2,10 @@ package net.wuxianjie.web.controller;
 
 import java.util.Map;
 
-import net.wuxianjie.webkit.common.util.OSUtils;
-
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import net.wuxianjie.webkit.common.util.OSUtils;
 
 /**
  * 版本控制器。
