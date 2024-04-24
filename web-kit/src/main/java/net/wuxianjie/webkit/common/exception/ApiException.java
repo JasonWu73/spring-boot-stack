@@ -9,7 +9,10 @@ import org.springframework.http.HttpStatus;
  */
 public class ApiException extends RuntimeException {
 
-    private static final String MESSAGE_SEPARATOR = "";
+    /**
+     * 多个异常消息之间的分隔符。
+     */
+    public static final String MESSAGE_SEPARATOR = "; ";
 
     private final HttpStatus status;
     private final String error;
@@ -56,7 +59,7 @@ public class ApiException extends RuntimeException {
     private String buildFullMessage() {
         var message = "%s \"%s\"".formatted(status, this.error);
         return getNestedMessage(getCause())
-                .map(m -> message + MESSAGE_SEPARATOR + m)
+                .map(m -> message + ApiException.MESSAGE_SEPARATOR + m)
                 .orElse(message);
     }
 
@@ -69,7 +72,7 @@ public class ApiException extends RuntimeException {
                     .append(c.getMessage())
                     .append("]");
             getNestedMessage(c.getCause())
-                    .ifPresent(m -> sb.append(MESSAGE_SEPARATOR).append(m));
+                    .ifPresent(m -> sb.append(ApiException.MESSAGE_SEPARATOR).append(m));
             return sb.toString();
         });
     }
