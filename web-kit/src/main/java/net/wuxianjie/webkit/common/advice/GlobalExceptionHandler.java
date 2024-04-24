@@ -263,7 +263,7 @@ public class GlobalExceptionHandler {
         log.error("服务异常", e);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(new ApiErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "服务器内部异常"));
+                .body(new ApiErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "服务异常"));
     }
 
     private boolean isJsonRequest(HttpServletRequest req) {
