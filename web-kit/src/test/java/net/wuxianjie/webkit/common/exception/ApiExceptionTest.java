@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.http.HttpStatus;
 
-class APIExceptionTest {
+class ApiExceptionTest {
 
     @Test
     void getMessage_withoutCause() {
@@ -15,7 +15,7 @@ class APIExceptionTest {
         var error = "客户端请求错误";
 
         // Act
-        var exception = new APIException(status, error);
+        var exception = new ApiException(status, error);
 
         // Assert
         Assertions.assertThat(exception.getStatus()).isEqualTo(status);
@@ -32,7 +32,7 @@ class APIExceptionTest {
         var outerCause = new IllegalArgumentException("异常 Outer", innerCause);
 
         // Act
-        var exception = new APIException(status, error, outerCause);
+        var exception = new ApiException(status, error, outerCause);
 
         // Assert
         Assertions.assertThat(exception.getStatus()).isEqualTo(status);

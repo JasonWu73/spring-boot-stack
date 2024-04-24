@@ -14,7 +14,7 @@ import net.wuxianjie.webkit.common.util.WebUtils;
  * @param error 错误原因的简短描述
  * @param path 发生异常的请求路径
  */
-public record APIErrorResponse(LocalDateTime timestamp, int status, String error,
+public record ApiErrorResponse(LocalDateTime timestamp, int status, String error,
                                String path) {
 
     /**
@@ -23,7 +23,7 @@ public record APIErrorResponse(LocalDateTime timestamp, int status, String error
      * @param status HTTP 错误状态码
      * @param error 错误原因的简短描述
      */
-    public APIErrorResponse(HttpStatus status, String error) {
+    public ApiErrorResponse(HttpStatus status, String error) {
         this(LocalDateTime.now(), status.value(), error, getRequestPath());
     }
 

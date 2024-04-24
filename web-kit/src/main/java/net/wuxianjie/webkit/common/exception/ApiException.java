@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 /**
  * API 调用异常。
  */
-public class APIException extends RuntimeException {
+public class ApiException extends RuntimeException {
 
     /**
      * 多个异常消息之间的分隔符。
@@ -25,7 +25,7 @@ public class APIException extends RuntimeException {
      * @param error 错误原因的简短描述
      * @param cause 导致 API 调用失败的异常
      */
-    public APIException(HttpStatus status, String error, Throwable cause) {
+    public ApiException(HttpStatus status, String error, Throwable cause) {
         super(error, cause);
         this.status = status;
         this.error = error;
@@ -38,7 +38,7 @@ public class APIException extends RuntimeException {
      * @param status HTTP 错误状态码
      * @param error 错误原因的简短描述
      */
-    public APIException(HttpStatus status, String error) {
+    public ApiException(HttpStatus status, String error) {
         this(status, error, null);
     }
 

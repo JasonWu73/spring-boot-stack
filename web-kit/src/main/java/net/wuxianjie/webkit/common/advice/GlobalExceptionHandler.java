@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import net.wuxianjie.webkit.domain.vo.APIErrorResponse;
+import net.wuxianjie.webkit.domain.vo.ApiErrorResponse;
 
 /**
  * 全局异常处理。
@@ -51,7 +51,7 @@ public class GlobalExceptionHandler {
         if (isJSONRequest(req)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                    .body(new APIErrorResponse(HttpStatus.NOT_FOUND, "未找到请求的资源"));
+                    .body(new ApiErrorResponse(HttpStatus.NOT_FOUND, "未找到请求的资源"));
         }
         return ResponseEntity.status(HttpStatus.OK)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_HTML_VALUE)

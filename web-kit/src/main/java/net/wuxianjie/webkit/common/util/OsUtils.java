@@ -3,7 +3,7 @@ package net.wuxianjie.webkit.common.util;
 /**
  * 操作系统工具类。
  */
-public class OSUtils {
+public class OsUtils {
 
     /**
      * 判断当前系统是否为 Windows。
