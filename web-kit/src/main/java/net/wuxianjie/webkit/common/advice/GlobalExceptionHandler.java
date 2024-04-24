@@ -28,11 +28,17 @@ import net.wuxianjie.webkit.domain.vo.ApiErrorResponse;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    private static final String API_PATH_PREFIX = "/api/";
-    private static final String SPA_CLASSPATH = "classpath:/static/index.html";
-    private static final String SPA_NOT_FOUND_HTML = "<html><body><h1>未找到页面资源</h1></body></html>";
+    static final String API_PATH_PREFIX = "/api/";
+    static final String SPA_CLASSPATH = "classpath:/static/index.html";
+    static final String SPA_NOT_FOUND_HTML = """
+            <!DOCTYPE html>
+            <html lang="zh-CN">
+                <body>
+                    <h1>未找到页面资源</h1>
+                </body>
+            </html>""";
 
     private final ResourceLoader loader;
 
@@ -48,7 +54,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler({NoResourceFoundException.class, NoHandlerFoundException.class})
     public ResponseEntity<?> handleNoResourceFoundException(HttpServletRequest req) {
-        if (isJSONRequest(req)) {
+        if (isJsonRequest(req)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                     .body(new ApiErrorResponse(HttpStatus.NOT_FOUND, "未找到请求的资源"));
@@ -58,7 +64,7 @@ public class GlobalExceptionHandler {
                 .body(getHtmlText());
     }
 
-    private boolean isJSONRequest(HttpServletRequest req) {
+    private boolean isJsonRequest(HttpServletRequest req) {
         var path = req.getRequestURI();
         var accept = Optional.ofNullable(req.getHeader(HttpHeaders.ACCEPT)).orElse("");
         return path.startsWith(API_PATH_PREFIX) ||
