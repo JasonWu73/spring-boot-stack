@@ -2,6 +2,8 @@ package net.wuxianjie.webkit.domain.vo;
 
 import java.time.LocalDateTime;
 
+import org.springframework.http.HttpStatus;
+
 import net.wuxianjie.webkit.common.util.WebUtils;
 
 /**
@@ -21,8 +23,8 @@ public record APIErrorResponse(LocalDateTime timestamp, int status, String error
      * @param status HTTP 错误状态码
      * @param error 错误原因的简短描述
      */
-    public APIErrorResponse(int status, String error) {
-        this(LocalDateTime.now(), status, error, getRequestPath());
+    public APIErrorResponse(HttpStatus status, String error) {
+        this(LocalDateTime.now(), status.value(), error, getRequestPath());
     }
 
     private static String getRequestPath() {
