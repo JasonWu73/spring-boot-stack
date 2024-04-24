@@ -10,14 +10,10 @@ class ApiExceptionTest {
 
     @Test
     void getMessage_withoutCause() {
-        // Arrange
         var status = HttpStatus.BAD_REQUEST;
         var error = "客户端请求错误";
 
-        // Act
         var exception = new ApiException(status, error);
-
-        // Assert
         Assertions.assertThat(exception.getStatus()).isEqualTo(status);
         Assertions.assertThat(exception.getMessage())
                 .isEqualTo("%s \"%s\"".formatted(status, error));
@@ -25,16 +21,12 @@ class ApiExceptionTest {
 
     @Test
     void getMessage_withCause() {
-        // Arrange
         var status = HttpStatus.BAD_REQUEST;
         var error = "客户端请求错误";
         var innerCause = new IllegalStateException("异常 Inner");
         var outerCause = new IllegalArgumentException("异常 Outer", innerCause);
 
-        // Act
         var exception = new ApiException(status, error, outerCause);
-
-        // Assert
         Assertions.assertThat(exception.getStatus()).isEqualTo(status);
         Assertions.assertThat(exception.getMessage())
                 .isEqualTo("%s \"%s\"; 嵌套异常 [%s: %s]; 嵌套异常 [%s: %s]"
