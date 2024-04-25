@@ -2,6 +2,8 @@ package net.wuxianjie.webkit.common.exception;
 
 import java.util.Optional;
 
+import lombok.Getter;
+
 import org.springframework.http.HttpStatus;
 
 /**
@@ -14,6 +16,7 @@ public class ApiException extends RuntimeException {
      */
     public static final String MESSAGE_SEPARATOR = "; ";
 
+    @Getter
     private final HttpStatus status;
     private final String error;
     private final String fullMessage;
@@ -45,15 +48,6 @@ public class ApiException extends RuntimeException {
     @Override
     public String getMessage() {
         return fullMessage;
-    }
-
-    /**
-     * 获取 HTTP 响应状态码。
-     *
-     * @return HTTP 响应状态码
-     */
-    public HttpStatus getStatus() {
-        return status;
     }
 
     private String buildFullMessage() {

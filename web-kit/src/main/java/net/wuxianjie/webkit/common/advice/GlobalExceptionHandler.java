@@ -7,10 +7,10 @@ import java.util.Optional;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 
-import org.apache.catalina.connector.ClientAbortException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.catalina.connector.ClientAbortException;
 
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpHeaders;
@@ -39,9 +39,9 @@ import net.wuxianjie.webkit.domain.dto.ApiErrorDto;
  * 全局异常处理。
  */
 @ControllerAdvice
+@Slf4j
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
-
-    static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     static final String API_PATH_PREFIX = "/api/";
     static final String SPA_CLASSPATH = "classpath:/static/index.html";
@@ -54,10 +54,6 @@ public class GlobalExceptionHandler {
             </html>""";
 
     private final ResourceLoader loader;
-
-    public GlobalExceptionHandler(ResourceLoader loader) {
-        this.loader = loader;
-    }
 
     /**
      * 处理 404 异常，即返回 JSON 或 HTML 页面（单页应用，SPA）。
