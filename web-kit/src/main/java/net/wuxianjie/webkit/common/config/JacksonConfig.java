@@ -15,6 +15,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 
 import net.wuxianjie.webkit.common.constant.ConfigConstants;
@@ -22,6 +23,7 @@ import net.wuxianjie.webkit.common.constant.ConfigConstants;
 /**
  * Jackson 配置，自定义 Spring Boot 应用程序中的 JSON 序列化/反序列化行为，尤其是日期/时间处理。
  */
+@Configuration
 public class JacksonConfig {
 
     /**
