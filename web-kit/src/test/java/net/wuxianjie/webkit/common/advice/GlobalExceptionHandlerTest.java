@@ -17,7 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 import net.wuxianjie.webkit.common.util.WebUtils;
-import net.wuxianjie.webkit.domain.vo.ApiErrorResponse;
+import net.wuxianjie.webkit.domain.vo.ApiErrorVo;
 
 @ExtendWith(MockitoExtension.class)
 class GlobalExceptionHandlerTest {
@@ -96,8 +96,8 @@ class GlobalExceptionHandlerTest {
             Assertions.assertThat(res.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
             Assertions.assertThat(res.getHeaders().getContentType())
                     .isEqualTo(MediaType.APPLICATION_JSON);
-            Assertions.assertThat(res.getBody()).isInstanceOf(ApiErrorResponse.class);
-            var errRes = (ApiErrorResponse) res.getBody();
+            Assertions.assertThat(res.getBody()).isInstanceOf(ApiErrorVo.class);
+            var errRes = (ApiErrorVo) res.getBody();
             Assertions.assertThat(errRes).isNotNull();
             Assertions.assertThat(errRes.status()).isEqualTo(HttpStatus.NOT_FOUND.value());
             Assertions.assertThat(errRes.error()).isEqualTo("未找到请求的资源");

@@ -19,9 +19,9 @@ spring-boot-project
 │   │   │           │   └── util # 工具类集
 │   │   │           ├── controller # Web 层控制器
 │   │   │           ├── domain # 领域模型实体类
-│   │   │           │   ├── dto # 数据传输对象（Data Transfer Object），关注于在不同层次间高效传输数据
-│   │   │           │   ├── entity # 持久化实体，通常与数据库表结构一一对应
-│   │   │           │   └── vo # 视图对象（View Object），关注于数据在展示层的呈现形式
+│   │   │           │   ├── dto # 数据传输对象（Data Transfer Object），命名应以 `Dto` 作为后缀，关注于在不同层次间高效传输数据
+│   │   │           │   ├── entity # 数据库表的持久化对象，命名通常与数据库表名一致，无需添加后缀
+│   │   │           │   └── vo # 视图对象（View Object），命名应以 `Vo` 作为后缀，关注于数据在展示层的呈现形式
 │   │   │           ├── mapper # MyBatis 的映射器接口
 │   │   │           ├── service # 服务层接口
 │   │   │           │   └── impl # 服务实现类

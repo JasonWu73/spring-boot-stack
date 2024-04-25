@@ -33,7 +33,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import net.wuxianjie.webkit.common.exception.ApiException;
-import net.wuxianjie.webkit.domain.vo.ApiErrorResponse;
+import net.wuxianjie.webkit.domain.vo.ApiErrorVo;
 
 /**
  * 全局异常处理。
@@ -70,7 +70,7 @@ public class GlobalExceptionHandler {
         if (isJsonRequest(req)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(new ApiErrorResponse(HttpStatus.NOT_FOUND, "未找到请求的资源"));
+                    .body(new ApiErrorVo(HttpStatus.NOT_FOUND, "未找到请求的资源"));
         }
         return ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.TEXT_HTML)
@@ -90,7 +90,7 @@ public class GlobalExceptionHandler {
      * @return JSON 响应
      */
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ApiErrorResponse> handleConstraintViolationException(
+    public ResponseEntity<ApiErrorVo> handleConstraintViolationException(
             ConstraintViolationException e) {
         var sb = new StringBuilder();
         Optional.ofNullable(e.getConstraintViolations())
@@ -117,7 +117,7 @@ public class GlobalExceptionHandler {
      * @return JSON 响应
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiErrorResponse> handleMethodArgumentNotValidException(
+    public ResponseEntity<ApiErrorVo> handleMethodArgumentNotValidException(
             MethodArgumentNotValidException e) {
         var sb = new StringBuilder();
         e.getBindingResult().getFieldErrors().forEach(fe -> {
@@ -149,7 +149,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler({MissingServletRequestParameterException.class,
             MissingServletRequestPartException.class})
-    public ResponseEntity<ApiErrorResponse> handleMissingServletRequestParameterException(
+    public ResponseEntity<ApiErrorVo> handleMissingServletRequestParameterException(
             Exception e) {
         return handleApiException(
                 new ApiException(HttpStatus.BAD_REQUEST,
@@ -163,7 +163,7 @@ public class GlobalExceptionHandler {
      * @return JSON 响应
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ApiErrorResponse> handleMethodArgumentTypeMismatchException(
+    public ResponseEntity<ApiErrorVo> handleMethodArgumentTypeMismatchException(
             MethodArgumentTypeMismatchException e) {
         return handleApiException(
                 new ApiException(HttpStatus.BAD_REQUEST,
@@ -178,7 +178,7 @@ public class GlobalExceptionHandler {
      * @return JSON 响应
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ApiErrorResponse> handleHttpMessageNotReadableException(
+    public ResponseEntity<ApiErrorVo> handleHttpMessageNotReadableException(
             HttpMessageNotReadableException e) {
         return handleApiException(
                 new ApiException(HttpStatus.BAD_REQUEST, "请求体不可读", e));
@@ -191,7 +191,7 @@ public class GlobalExceptionHandler {
      * @return JSON 响应
      */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public ResponseEntity<ApiErrorResponse> handleHttpRequestMethodNotSupportedException(
+    public ResponseEntity<ApiErrorVo> handleHttpRequestMethodNotSupportedException(
             HttpRequestMethodNotSupportedException e) {
         return handleApiException(
                 new ApiException(HttpStatus.METHOD_NOT_ALLOWED,
@@ -206,7 +206,7 @@ public class GlobalExceptionHandler {
      * @return JSON 响应
      */
     @ExceptionHandler(HttpMediaTypeException.class)
-    public ResponseEntity<ApiErrorResponse> handleHttpMediaTypeException(
+    public ResponseEntity<ApiErrorVo> handleHttpMediaTypeException(
             HttpMediaTypeException e, HttpServletRequest req) {
         return handleApiException(
                 new ApiException(HttpStatus.UNSUPPORTED_MEDIA_TYPE,
@@ -221,7 +221,7 @@ public class GlobalExceptionHandler {
      * @return JSON 响应
      */
     @ExceptionHandler(MultipartException.class)
-    public ResponseEntity<ApiErrorResponse> handleMultipartException(MultipartException e) {
+    public ResponseEntity<ApiErrorVo> handleMultipartException(MultipartException e) {
         return handleApiException(
                 new ApiException(HttpStatus.BAD_REQUEST, "文件上传失败", e));
     }
@@ -240,11 +240,11 @@ public class GlobalExceptionHandler {
      * @return JSON 响应
      */
     @ExceptionHandler(ApiException.class)
-    public ResponseEntity<ApiErrorResponse> handleApiException(ApiException e) {
+    public ResponseEntity<ApiErrorVo> handleApiException(ApiException e) {
         logApiException(e);
         return ResponseEntity.status(e.getStatus())
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(new ApiErrorResponse(e.getStatus(), e.getMessage()));
+                .body(new ApiErrorVo(e.getStatus(), e.getMessage()));
     }
 
     /**
@@ -254,7 +254,7 @@ public class GlobalExceptionHandler {
      * @return JSON 响应
      */
     @ExceptionHandler(Throwable.class)
-    public ResponseEntity<ApiErrorResponse> handleThrowable(Throwable e) {
+    public ResponseEntity<ApiErrorVo> handleThrowable(Throwable e) {
         // 不要处理 `org.springframework.security.access.AccessDeniedException` 异常，
         // 否则将导致 Spring Security 框架无法处理 403 异常
         if (e instanceof AccessDeniedException ade) {
@@ -263,7 +263,7 @@ public class GlobalExceptionHandler {
         log.error("服务异常", e);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(new ApiErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "服务异常"));
+                .body(new ApiErrorVo(HttpStatus.INTERNAL_SERVER_ERROR, "服务异常"));
     }
 
     private boolean isJsonRequest(HttpServletRequest req) {
