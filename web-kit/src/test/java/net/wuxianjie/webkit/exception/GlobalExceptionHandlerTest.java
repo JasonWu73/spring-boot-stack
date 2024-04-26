@@ -15,9 +15,10 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.context.request.RequestContextHolder;
 
-import net.wuxianjie.webkit.util.WebUtils;
 import net.wuxianjie.webkit.api.ApiError;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 @ExtendWith(MockitoExtension.class)
 class GlobalExceptionHandlerTest {
@@ -89,8 +90,9 @@ class GlobalExceptionHandlerTest {
     }
 
     private void testHandleNoResourceFoundException_returnsJson(MockHttpServletRequest req) {
-        try (var mocked = Mockito.mockStatic(WebUtils.class)) {
-            mocked.when(WebUtils::getCurrentRequest).thenReturn(req);
+        try (var mocked = Mockito.mockStatic(RequestContextHolder.class)) {
+            mocked.when(RequestContextHolder::getRequestAttributes)
+                    .thenReturn(new ServletRequestAttributes(req));
 
             var res = handler.handleNoResourceFoundException(req);
             Assertions.assertThat(res.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);

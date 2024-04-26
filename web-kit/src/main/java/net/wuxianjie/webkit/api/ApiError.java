@@ -3,8 +3,8 @@ package net.wuxianjie.webkit.api;
 import java.time.LocalDateTime;
 
 import org.springframework.http.HttpStatus;
-
-import net.wuxianjie.webkit.util.WebUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
  * API 错误响应结果。
@@ -27,7 +27,11 @@ public record ApiError(LocalDateTime timestamp, int status, String error, String
     }
 
     private static String getRequestPath() {
-        return WebUtils.getCurrentRequest().getRequestURI();
+        var attr = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attr == null) {
+            return null;
+        }
+        return attr.getRequest().getRequestURI();
     }
 
 }
