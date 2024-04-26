@@ -25,7 +25,7 @@ public class PageQueryDto {
 
     /**
      * 偏移量。
-     * <p>
+     *
      * <pre>{@code
      * select * from table_name limit #{offset}, #{pageSize}
      *

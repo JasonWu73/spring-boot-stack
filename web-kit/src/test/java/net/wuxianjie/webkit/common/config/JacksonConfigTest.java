@@ -113,14 +113,14 @@ class JacksonConfigTest {
     }
 
     @Test
-    void httpMessageConverter_shouldNotBeNull() {
-        var converter = jacksonConfig.httpMessageConverter(objectMapper);
+    void httpMessageJsonConverter_shouldNotBeNull() {
+        var converter = jacksonConfig.httpMessageJsonConverter(objectMapper);
         Assertions.assertThat(converter).isNotNull();
     }
 
     @Test
-    void httpMessageConverter_shouldConfiguredCorrectly() {
-        var converter = jacksonConfig.httpMessageConverter(objectMapper);
+    void httpMessageJsonConverter_shouldConfiguredCorrectly() {
+        var converter = jacksonConfig.httpMessageJsonConverter(objectMapper);
         Assertions.assertThat(converter.getObjectMapper()).isEqualTo(objectMapper);
     }
 
