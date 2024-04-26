@@ -19,6 +19,7 @@ public class ApiException extends RuntimeException {
     @Getter
     private final HttpStatus status;
     private final String error;
+    @Getter
     private final String fullMessage;
 
     /**
@@ -47,7 +48,7 @@ public class ApiException extends RuntimeException {
 
     @Override
     public String getMessage() {
-        return fullMessage;
+        return error;
     }
 
     private String buildFullMessage() {

@@ -285,10 +285,10 @@ public class GlobalExceptionHandler {
 
     private void logApiException(ApiException e) {
         if (e.getStatus().is4xxClientError()) {
-            log.warn("客户端请求异常：{}", e.getMessage());
+            log.warn("客户端请求异常：{}", e.getFullMessage());
             return;
         }
-        log.error("服务端处理异常：{}", e.getMessage());
+        log.error("服务端处理异常：{}", e.getFullMessage());
     }
 
     private Object getParameterName(Exception e) {
