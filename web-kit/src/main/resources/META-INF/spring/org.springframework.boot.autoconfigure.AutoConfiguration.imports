@@ -1,3 +1,3 @@
-net.wuxianjie.webkit.common.config.JacksonConfig
-net.wuxianjie.webkit.common.config.ApiClientConfig
-net.wuxianjie.webkit.common.advice.GlobalExceptionHandler
+net.wuxianjie.webkit.json.JacksonConfig
+net.wuxianjie.webkit.api.ApiClientConfig
+net.wuxianjie.webkit.exception.GlobalExceptionHandler
