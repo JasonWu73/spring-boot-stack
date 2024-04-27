@@ -33,6 +33,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import net.wuxianjie.webkit.api.ApiError;
+import net.wuxianjie.webkit.constant.ConfigConstants;
 
 /**
  * 全局异常处理。
@@ -42,7 +43,6 @@ import net.wuxianjie.webkit.api.ApiError;
 @RequiredArgsConstructor
 public class GlobalExceptionHandler {
 
-    static final String API_PATH_PREFIX = "/api/";
     static final String SPA_CLASSPATH = "classpath:/static/index.html";
     static final String SPA_NOT_FOUND_HTML = """
             <!DOCTYPE html>
@@ -264,7 +264,7 @@ public class GlobalExceptionHandler {
     private boolean isJsonRequest(HttpServletRequest req) {
         var path = req.getRequestURI();
         var accept = Optional.ofNullable(req.getHeader(HttpHeaders.ACCEPT)).orElse("");
-        return path.startsWith(API_PATH_PREFIX) ||
+        return path.startsWith(ConfigConstants.API_PATH_PREFIX) ||
                 accept.contains(MediaType.APPLICATION_JSON_VALUE);
     }
 

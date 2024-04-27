@@ -10,4 +10,9 @@ public final class ConfigConstants {
      */
     public static final String DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
+    /**
+     * API 请求路径前缀。
+     */
+    public static final String API_PATH_PREFIX = "/api/";
+
 }
