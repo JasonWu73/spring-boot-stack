@@ -10,11 +10,11 @@ class RsaUtilsTest {
     void generateKeyPair_returnsValidKeyPair() {
         var keyPair = RsaUtils.generateKeyPair();
         System.out.printf("""
-                =========================
+                -------------------------
                 公钥: %s
                 
                 私钥: %s
-                =========================
+                -------------------------
                 """, keyPair.publicKey(), keyPair.privateKey());
         Assertions.assertThat(keyPair.publicKey()).isBase64();
         Assertions.assertThat(keyPair.privateKey()).isBase64();
