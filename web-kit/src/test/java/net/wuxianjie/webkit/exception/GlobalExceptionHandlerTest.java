@@ -16,15 +16,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import net.wuxianjie.webkit.api.ApiError;
-import org.springframework.web.context.request.ServletRequestAttributes;
+import net.wuxianjie.webkit.config.WebKitProperties;
 
 @ExtendWith(MockitoExtension.class)
 class GlobalExceptionHandlerTest {
 
     @Mock
     private ResourceLoader loader;
+
+    @Mock
+    private WebKitProperties prop;
 
     @InjectMocks
     private GlobalExceptionHandler handler;
@@ -59,7 +63,9 @@ class GlobalExceptionHandlerTest {
     void handleNoResourceFoundException_returnsHtml_whenNotRequestJson_whenSpaNotExists() {
         var req = new MockHttpServletRequest();
         req.setRequestURI("/unknown");
-        Mockito.when(loader.getResource(GlobalExceptionHandler.SPA_CLASSPATH))
+        Mockito.when(prop.getSecurity()).thenReturn(new WebKitProperties().getSecurity());
+        Mockito.when(prop.getSpa()).thenReturn(new WebKitProperties().getSpa());
+        Mockito.when(loader.getResource(new WebKitProperties().getSpa().getFilePath()))
                 .thenReturn(new ClassPathResource("static/not-exists.html"));
 
         var res = handler.handleNoResourceFoundException(req);
@@ -76,7 +82,9 @@ class GlobalExceptionHandlerTest {
     void handleNoResourceFoundException_returnsHtml_whenNotRequestJson_whenSpaExists() {
         var req = new MockHttpServletRequest();
         req.setRequestURI("/unknown");
-        Mockito.when(loader.getResource(GlobalExceptionHandler.SPA_CLASSPATH))
+        Mockito.when(prop.getSecurity()).thenReturn(new WebKitProperties().getSecurity());
+        Mockito.when(prop.getSpa()).thenReturn(new WebKitProperties().getSpa());
+        Mockito.when(loader.getResource(new WebKitProperties().getSpa().getFilePath()))
                 .thenReturn(new ClassPathResource("static/index.html"));
 
         var res = handler.handleNoResourceFoundException(req);
@@ -91,6 +99,7 @@ class GlobalExceptionHandlerTest {
 
     private void testHandleNoResourceFoundException_returnsJson(MockHttpServletRequest req) {
         try (var mocked = Mockito.mockStatic(RequestContextHolder.class)) {
+            Mockito.when(prop.getSecurity()).thenReturn(new WebKitProperties().getSecurity());
             mocked.when(RequestContextHolder::getRequestAttributes)
                     .thenReturn(new ServletRequestAttributes(req));
 

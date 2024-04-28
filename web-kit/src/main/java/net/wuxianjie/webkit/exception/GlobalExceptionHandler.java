@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.util.StreamUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.HttpMediaTypeException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -33,7 +34,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import net.wuxianjie.webkit.api.ApiError;
-import net.wuxianjie.webkit.constant.ConfigConstants;
+import net.wuxianjie.webkit.config.WebKitProperties;
 
 /**
  * 全局异常处理。
@@ -43,7 +44,6 @@ import net.wuxianjie.webkit.constant.ConfigConstants;
 @RequiredArgsConstructor
 public class GlobalExceptionHandler {
 
-    static final String SPA_CLASSPATH = "classpath:/static/index.html";
     static final String SPA_NOT_FOUND_HTML = """
             <!DOCTYPE html>
             <html lang="zh-CN">
@@ -53,6 +53,8 @@ public class GlobalExceptionHandler {
             </html>""";
 
     private final ResourceLoader loader;
+
+    private final WebKitProperties prop;
 
     /**
      * 处理 404 异常，即返回 JSON 或 HTML 页面（单页应用，SPA）。
@@ -264,20 +266,24 @@ public class GlobalExceptionHandler {
     private boolean isJsonRequest(HttpServletRequest req) {
         var path = req.getRequestURI();
         var accept = Optional.ofNullable(req.getHeader(HttpHeaders.ACCEPT)).orElse("");
-        return path.startsWith(ConfigConstants.API_PATH_PREFIX) ||
+        return path.startsWith(prop.getSecurity().getApiPathPrefix()) ||
                 accept.contains(MediaType.APPLICATION_JSON_VALUE);
     }
 
     private String getHtmlText() {
-        var res = loader.getResource(SPA_CLASSPATH);
+        var spa = prop.getSpa().getFilePath();
+        if (!StringUtils.hasText(spa)) {
+            return SPA_NOT_FOUND_HTML;
+        }
+        var res = loader.getResource(spa);
         if (!res.exists()) {
-            log.error("未找到 SPA 文件 [{}]", SPA_CLASSPATH);
+            log.error("未找到 SPA 文件 [{}]", spa);
             return SPA_NOT_FOUND_HTML;
         }
         try (var is = res.getInputStream()) {
             return StreamUtils.copyToString(is, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            log.error("读取 SPA 文件 [{}] 失败", SPA_CLASSPATH, e);
+            log.error("读取 SPA 文件 [{}] 失败", spa, e);
             return SPA_NOT_FOUND_HTML;
         }
     }
