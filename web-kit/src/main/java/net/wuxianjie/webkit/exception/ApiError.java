@@ -1,4 +1,4 @@
-package net.wuxianjie.webkit.api;
+package net.wuxianjie.webkit.exception;
 
 import java.time.LocalDateTime;
 

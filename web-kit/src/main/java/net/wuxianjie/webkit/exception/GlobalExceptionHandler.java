@@ -33,8 +33,8 @@ import org.springframework.web.multipart.support.MissingServletRequestPartExcept
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import net.wuxianjie.webkit.api.ApiError;
 import net.wuxianjie.webkit.config.WebKitProperties;
+import net.wuxianjie.webkit.constant.ConfigConstants;
 
 /**
  * 全局异常处理。
@@ -48,40 +48,40 @@ public class GlobalExceptionHandler {
             <!DOCTYPE html>
             <html lang="zh-CN">
                 <body>
-                    <h1>未找到页面资源</h1>
+                    <h1>页面资源不存在</h1>
                 </body>
             </html>""";
 
-    private final ResourceLoader loader;
+    private final ResourceLoader resourceLoader;
 
-    private final WebKitProperties prop;
+    private final WebKitProperties webKitProperties;
 
     /**
-     * 处理 404 异常，即返回 JSON 或 HTML 页面（单页应用，SPA）。
+     * 处理 404 异常，即返回 JSON 或 HTML 页面（SPA，单页应用）。
      *
      * @param req HTTP 请求
      * @return JSON 或 HTML 页面
      */
     @ExceptionHandler({NoResourceFoundException.class, NoHandlerFoundException.class})
-    public ResponseEntity<?> handleNoResourceFoundException(HttpServletRequest req) {
+    public ResponseEntity<?> handleNotFoundException(HttpServletRequest req) {
         if (isJsonRequest(req)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(new ApiError(HttpStatus.NOT_FOUND, "未找到请求的资源"));
+                    .contentType(ConfigConstants.APPLICATION_JSON_UTF8)
+                    .body(new ApiError(HttpStatus.NOT_FOUND, "资源不存在"));
         }
         return ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.TEXT_HTML)
-                .body(getHtmlText());
+                .body(getHtml());
     }
 
     /**
      * 处理当请求参数校验失败时抛出的异常。
-     * <p>
+     *
      * <h3>触发条件</h3>
      *
      * <ol>
-     *     <li>Controller 类上有 `@Validated` 注解</li>
-     *     <li>对 Controller 方法上的单个参数使用校验注解（如 `@NotBlank` 等）</li>
+     *     <li>Controller 类上有 {@code @Validated} 注解</li>
+     *     <li>对 Controller 方法上的单个参数使用校验注解（如 {@code @NotBlank} 等）</li>
      * </ol>
      *
      * @param e 异常
@@ -104,12 +104,12 @@ public class GlobalExceptionHandler {
 
     /**
      * 处理当请求参数校验失败时抛出的异常。
-     * <p>
+     *
      * <h3>触发条件</h3>
      *
      * <ol>
-     *     <li>Controller 方法参数上有 `@Valid` 注解</li>
-     *     <li>方法参数为 POJO 类，这包含在嵌套类的字段上再次使用 `@Valid` 注解的情况</li>
+     *     <li>Controller 方法参数上有 {@code @Valid} 注解</li>
+     *     <li>方法参数为 POJO 类，这里包括在嵌套类的字段上再次使用 {@code @Valid} 注解的情况</li>
      * </ol>
      *
      * @param e 异常
@@ -136,12 +136,12 @@ public class GlobalExceptionHandler {
 
     /**
      * 处理当请求参数缺失时抛出的异常。
-     * <p>
+     *
      * <h3>触发条件</h3>
      *
      * <ul>
-     *     <li>Controller 方法中使用 `@RequestParam`（因为其 `required` 属性默认为 `true`）接收参数</li>
-     *     <li>或使用 `@RequestPart` 接收文件参数</li>
+     *     <li>Controller 方法中使用 {@code @RequestParam} 接收的参数没有被传入</li>
+     *     <li>或使用 {@code @RequestPart} 接收的文件参数</li>
      * </ul>
      *
      * @param e 异常
@@ -167,8 +167,7 @@ public class GlobalExceptionHandler {
             MethodArgumentTypeMismatchException e) {
         return handleApiException(
                 new ApiException(HttpStatus.BAD_REQUEST,
-                        "参数值类型不匹配 [%s=%s]".formatted(
-                                e.getName(), e.getValue()), e));
+                        "参数值类型不匹配 [%s=%s]".formatted(e.getName(), e.getValue()), e));
     }
 
     /**
@@ -206,8 +205,8 @@ public class GlobalExceptionHandler {
      * @return JSON 响应
      */
     @ExceptionHandler(HttpMediaTypeException.class)
-    public ResponseEntity<ApiError> handleHttpMediaTypeException(
-            HttpMediaTypeException e, HttpServletRequest req) {
+    public ResponseEntity<ApiError> handleHttpMediaTypeException(HttpMediaTypeException e,
+                                                                 HttpServletRequest req) {
         return handleApiException(
                 new ApiException(HttpStatus.UNSUPPORTED_MEDIA_TYPE,
                         "不支持的媒体类型 [%s: %s]".formatted(HttpHeaders.CONTENT_TYPE,
@@ -243,7 +242,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> handleApiException(ApiException e) {
         logApiException(e);
         return ResponseEntity.status(e.getStatus())
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(ConfigConstants.APPLICATION_JSON_UTF8)
                 .body(new ApiError(e.getStatus(), e.getMessage()));
     }
 
@@ -262,31 +261,31 @@ public class GlobalExceptionHandler {
         }
         log.error("服务异常", e);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(ConfigConstants.APPLICATION_JSON_UTF8)
                 .body(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, "服务异常"));
     }
 
     private boolean isJsonRequest(HttpServletRequest req) {
         var path = req.getRequestURI();
         var accept = Optional.ofNullable(req.getHeader(HttpHeaders.ACCEPT)).orElse("");
-        return path.startsWith(prop.getSecurity().getApiPathPrefix()) ||
+        return path.startsWith(webKitProperties.getSecurity().getApiPathPrefix()) ||
                 accept.contains(MediaType.APPLICATION_JSON_VALUE);
     }
 
-    private String getHtmlText() {
-        var spa = prop.getSpa().getFilePath();
+    private String getHtml() {
+        var spa = webKitProperties.getSpa().getFilePath();
         if (!StringUtils.hasText(spa)) {
             return SPA_NOT_FOUND_HTML;
         }
-        var res = loader.getResource(spa);
+        var res = resourceLoader.getResource(spa);
         if (!res.exists()) {
-            log.error("未找到 SPA 文件 [{}]", spa);
+            log.error("SPA 文件 [{}] 不存在", spa);
             return SPA_NOT_FOUND_HTML;
         }
         try (var is = res.getInputStream()) {
             return StreamUtils.copyToString(is, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            log.error("读取 SPA 文件 [{}] 失败", spa, e);
+            log.error("SPA 文件 [{}] 读取失败", spa, e);
             return SPA_NOT_FOUND_HTML;
         }
     }

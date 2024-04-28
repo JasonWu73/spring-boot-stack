@@ -14,11 +14,19 @@ public class ApiException extends RuntimeException {
     /**
      * 多个异常消息之间的分隔符。
      */
-    public static final String MESSAGE_SEPARATOR = "; ";
+    static final String MESSAGE_SEPARATOR = "; ";
 
+    /**
+     * HTTP 错误状态码。
+     */
     @Getter
     private final HttpStatus status;
+
     private final String error;
+
+    /**
+     * 完整的异常消息。
+     */
     @Getter
     private final String fullMessage;
 
@@ -52,7 +60,7 @@ public class ApiException extends RuntimeException {
     }
 
     private String buildFullMessage() {
-        var message = "%s \"%s\"".formatted(status, this.error);
+        var message = "%s \"%s\"".formatted(status, error);
         return getNestedMessage(getCause())
                 .map(m -> message + ApiException.MESSAGE_SEPARATOR + m)
                 .orElse(message);

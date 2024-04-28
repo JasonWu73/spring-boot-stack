@@ -2,6 +2,7 @@ package net.wuxianjie.webkit.exception;
 
 import java.time.LocalDateTime;
 
+import net.wuxianjie.webkit.constant.ConfigConstants;
 import org.assertj.core.api.Assertions;
 
 import org.junit.jupiter.api.Test;
@@ -20,7 +21,6 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import net.wuxianjie.webkit.api.ApiError;
 import net.wuxianjie.webkit.config.WebKitProperties;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,33 +36,33 @@ class GlobalExceptionHandlerTest {
     private GlobalExceptionHandler globalExceptionHandler;
 
     @Test
-    void handleNoResourceFoundException_returnsJson_whenRequestApiPath() {
+    void handleNotFoundException_returnsJson_whenRequestApiPath() {
         var req = new MockHttpServletRequest();
         req.setRequestURI("/api/unknown");
 
-        testHandleNoResourceFoundException_returnsJson(req);
+        testHandleNotFoundException_returnsJson(req);
     }
 
     @Test
-    void handleNoResourceFoundException_returnsJson_whenRequestWithJsonHeader() {
+    void handleNotFoundException_returnsJson_whenRequestWithJsonHeader() {
         var req = new MockHttpServletRequest();
         req.setRequestURI("/unknown");
-        req.addHeader("Accept", "application/json");
+        req.addHeader("Accept", ConfigConstants.APPLICATION_JSON_UTF8_VALUE);
 
-        testHandleNoResourceFoundException_returnsJson(req);
+        testHandleNotFoundException_returnsJson(req);
     }
 
     @Test
-    void handleNoResourceFoundException_returnsJson_whenRequestApiPathAndJsonHeader() {
+    void handleNotFoundException_returnsJson_whenRequestApiPathAndJsonHeader() {
         var req = new MockHttpServletRequest();
         req.setRequestURI("/api/unknown");
-        req.addHeader("Accept", "application/json");
+        req.addHeader("Accept", ConfigConstants.APPLICATION_JSON_UTF8_VALUE);
 
-        testHandleNoResourceFoundException_returnsJson(req);
+        testHandleNotFoundException_returnsJson(req);
     }
 
     @Test
-    void handleNoResourceFoundException_returnsHtml_whenNotRequestJson_whenSpaNotExists() {
+    void handleNotFoundException_returnsHtml_whenNotRequestJson_whenSpaNotExists() {
         var req = new MockHttpServletRequest();
         req.setRequestURI("/unknown");
         Mockito.when(webKitProperties.getSecurity()).thenReturn(new WebKitProperties().getSecurity());
@@ -70,18 +70,18 @@ class GlobalExceptionHandlerTest {
         Mockito.when(resourceLoader.getResource(new WebKitProperties().getSpa().getFilePath()))
                 .thenReturn(new ClassPathResource("static/not-exists.html"));
 
-        var res = globalExceptionHandler.handleNoResourceFoundException(req);
+        var res = globalExceptionHandler.handleNotFoundException(req);
         Assertions.assertThat(res.getStatusCode()).isEqualTo(HttpStatus.OK);
         Assertions.assertThat(res.getHeaders().getContentType())
                 .isEqualTo(MediaType.TEXT_HTML);
         Assertions.assertThat(res.getBody()).isInstanceOf(String.class);
         var body = (String) res.getBody();
         Assertions.assertThat(body).isNotNull();
-        Assertions.assertThat(body).contains("<h1>未找到页面资源</h1>");
+        Assertions.assertThat(body).contains("<h1>页面资源不存在</h1>");
     }
 
     @Test
-    void handleNoResourceFoundException_returnsHtml_whenNotRequestJson_whenSpaExists() {
+    void handleNotFoundException_returnsHtml_whenNotRequestJson_whenSpaExists() {
         var req = new MockHttpServletRequest();
         req.setRequestURI("/unknown");
         Mockito.when(webKitProperties.getSecurity()).thenReturn(new WebKitProperties().getSecurity());
@@ -89,7 +89,7 @@ class GlobalExceptionHandlerTest {
         Mockito.when(resourceLoader.getResource(new WebKitProperties().getSpa().getFilePath()))
                 .thenReturn(new ClassPathResource("static/index.html"));
 
-        var res = globalExceptionHandler.handleNoResourceFoundException(req);
+        var res = globalExceptionHandler.handleNotFoundException(req);
         Assertions.assertThat(res.getStatusCode()).isEqualTo(HttpStatus.OK);
         Assertions.assertThat(res.getHeaders().getContentType())
                 .isEqualTo(MediaType.TEXT_HTML);
@@ -99,22 +99,23 @@ class GlobalExceptionHandlerTest {
         Assertions.assertThat(body).contains("<h1>这是一个用于单元测试的 SPA 页面</h1>");
     }
 
-    private void testHandleNoResourceFoundException_returnsJson(MockHttpServletRequest req) {
+    private void testHandleNotFoundException_returnsJson(MockHttpServletRequest req) {
         try (var mocked = Mockito.mockStatic(RequestContextHolder.class)) {
-            Mockito.when(webKitProperties.getSecurity()).thenReturn(new WebKitProperties().getSecurity());
+            Mockito.when(webKitProperties.getSecurity())
+                    .thenReturn(new WebKitProperties().getSecurity());
             mocked.when(RequestContextHolder::getRequestAttributes)
                     .thenReturn(new ServletRequestAttributes(req));
 
-            var res = globalExceptionHandler.handleNoResourceFoundException(req);
+            var res = globalExceptionHandler.handleNotFoundException(req);
             Assertions.assertThat(res.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
             Assertions.assertThat(res.getHeaders().getContentType())
-                    .isEqualTo(MediaType.APPLICATION_JSON);
+                    .isEqualTo(ConfigConstants.APPLICATION_JSON_UTF8);
             Assertions.assertThat(res.getBody()).isInstanceOf(ApiError.class);
             var errRes = (ApiError) res.getBody();
             Assertions.assertThat(errRes).isNotNull();
             Assertions.assertThat(errRes.timestamp()).isBeforeOrEqualTo(LocalDateTime.now());
             Assertions.assertThat(errRes.status()).isEqualTo(HttpStatus.NOT_FOUND.value());
-            Assertions.assertThat(errRes.error()).isEqualTo("未找到请求的资源");
+            Assertions.assertThat(errRes.error()).isEqualTo("资源不存在");
             Assertions.assertThat(errRes.path()).isEqualTo(req.getRequestURI());
         }
     }

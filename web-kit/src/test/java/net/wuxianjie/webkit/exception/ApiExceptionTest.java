@@ -15,7 +15,8 @@ class ApiExceptionTest {
 
         var exception = new ApiException(status, error);
         Assertions.assertThat(exception.getStatus()).isEqualTo(status);
-        Assertions.assertThat(exception.getMessage())
+        Assertions.assertThat(exception.getMessage()).isEqualTo(error);
+        Assertions.assertThat(exception.getFullMessage())
                 .isEqualTo("%s \"%s\"".formatted(status, error));
     }
 
@@ -28,7 +29,8 @@ class ApiExceptionTest {
 
         var exception = new ApiException(status, error, outerCause);
         Assertions.assertThat(exception.getStatus()).isEqualTo(status);
-        Assertions.assertThat(exception.getMessage())
+        Assertions.assertThat(exception.getMessage()).isEqualTo(error);
+        Assertions.assertThat(exception.getFullMessage())
                 .isEqualTo("%s \"%s\"; 嵌套异常 [%s: %s]; 嵌套异常 [%s: %s]"
                         .formatted(status, error,
                                 IllegalArgumentException.class.getName(), "异常 Outer",
