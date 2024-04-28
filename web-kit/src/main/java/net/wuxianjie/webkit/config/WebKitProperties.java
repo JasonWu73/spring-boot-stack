@@ -1,5 +1,6 @@
 package net.wuxianjie.webkit.config;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Getter;
@@ -39,7 +40,7 @@ public class WebKitProperties {
          * <p>
          * 支持通配符 `*`，例如：`/api/v1/public/**`。
          */
-        private List<String> permitAllPaths;
+        private String[] permitAllPaths = {};
 
     }
 
