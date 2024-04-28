@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-class PageController {
+class PageTestController {
 
     @GetMapping("/page")
     PageInfo getPage(@Valid PageQuery page) {

@@ -5,5 +5,5 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import net.wuxianjie.webkit.security.SecurityConfig;
 
 @SpringBootApplication(exclude = SecurityConfig.class)
-public class ConfigApplication {
+class ConfigTestApplication {
 }
