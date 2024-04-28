@@ -54,6 +54,7 @@ public class ApiClientConfig {
      * }</pre>
      *
      * <h3>POST JSON 请求</h3>
+     *
      * <pre>{@code
      * var url = "http://192.168.2.42:8083/api/v1/auth/login";
      * var jsonParam = new Auth("username", "password");
@@ -75,6 +76,7 @@ public class ApiClientConfig {
      * }</pre>
      *
      * <h3>POST 表单编码请求</h3>
+     *
      * <pre>{@code
      * var url = "http://localhost:8080/api/v1/public/params";
      * var formData = new LinkedMultiValueMap<>();
