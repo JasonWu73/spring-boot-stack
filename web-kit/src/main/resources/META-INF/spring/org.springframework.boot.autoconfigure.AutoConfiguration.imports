@@ -1,4 +1,5 @@
 net.wuxianjie.webkit.config.WebKitProperties
+net.wuxianjie.webkit.security.SecurityConfig
 net.wuxianjie.webkit.json.JacksonConfig
 net.wuxianjie.webkit.api.ApiClientConfig
 net.wuxianjie.webkit.exception.GlobalExceptionHandler

@@ -6,7 +6,7 @@ web-kit:
       - /test-api/v1/public/**
     hierarchies:
       - root > admin
-      - admin > user guest
+      - admin > user
     token-expires-in-seconds: 3600
   spa:
     file-path: classpath:/static/test-index.html

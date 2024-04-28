@@ -26,7 +26,7 @@ public class WebKitProperties {
     public static class Security {
 
         /**
-         * API 请求路径前缀（需要身份验证），默认为 `/api/`。
+         * API 请求路径前缀（需要身份验证），默认为 <code>/api/</code>。
          * <p>
          * 用于标识需要身份验证的请求。
          */
@@ -35,7 +35,7 @@ public class WebKitProperties {
         /**
          * 开放的 API 请求路径。
          * <p>
-         * 支持通配符 `*`，例如：`/api/v1/public/**`。
+         * 支持通配符 <code>*</code>，例如：<code>/api/v1/public/**</code>。
          * <p>
          * 注意：顺序很重要，前面的规则先匹配。
          */
@@ -44,12 +44,11 @@ public class WebKitProperties {
         /**
          * 角色层级关系。
          * <p>
-         * 字符串格式：
+         * 字符串格式：使用 <code>></code> 符号创建上下级角色，比如下面代表 <code>root</code> 角色是 <code>admin</code> 的上级：
          *
-         * <ul>
-         *     <li>使用 `>` 符号分隔高级角色和低级角色，示例：`root > admin`</li>
-         *     <li>低级角色之间使用空格分隔，示例 `admin > user guest`</li>
-         * </ul>
+         * <pre><code>
+         * root > admin
+         * </code></pre>
          */
         private String[] hierarchies = {};
 
