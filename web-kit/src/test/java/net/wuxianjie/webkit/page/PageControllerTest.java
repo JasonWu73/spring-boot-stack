@@ -12,7 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-@SpringBootTest(classes = {PageApplication.class, PageController.class})
+@SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
 class PageControllerTest {
 
