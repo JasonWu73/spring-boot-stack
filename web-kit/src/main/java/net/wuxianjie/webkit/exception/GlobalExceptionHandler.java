@@ -78,6 +78,7 @@ public class GlobalExceptionHandler {
      * 处理当请求参数校验失败时抛出的异常。
      * <p>
      * <h3>触发条件</h3>
+     *
      * <ol>
      *     <li>Controller 类上有 `@Validated` 注解</li>
      *     <li>对 Controller 方法上的单个参数使用校验注解（如 `@NotBlank` 等）</li>
@@ -105,6 +106,7 @@ public class GlobalExceptionHandler {
      * 处理当请求参数校验失败时抛出的异常。
      * <p>
      * <h3>触发条件</h3>
+     *
      * <ol>
      *     <li>Controller 方法参数上有 `@Valid` 注解</li>
      *     <li>方法参数为 POJO 类，这包含在嵌套类的字段上再次使用 `@Valid` 注解的情况</li>
@@ -136,6 +138,7 @@ public class GlobalExceptionHandler {
      * 处理当请求参数缺失时抛出的异常。
      * <p>
      * <h3>触发条件</h3>
+     *
      * <ul>
      *     <li>Controller 方法中使用 `@RequestParam`（因为其 `required` 属性默认为 `true`）接收参数</li>
      *     <li>或使用 `@RequestPart` 接收文件参数</li>

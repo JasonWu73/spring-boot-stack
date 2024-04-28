@@ -20,11 +20,12 @@ public class ApiClientConfig {
 
     /**
      * 自定义 HTTP 请求客户端。
-     * <p>
+     *
      * <ul>
      *     <li>默认请求头：`Accept: application/json` 及 `Content-Type: application/json`</li>
      *     <li>自定义 JSON 消息转换器：{@link MappingJackson2HttpMessageConverter}</li>
      * </ul>
+     *
      * <h3>GET 请求</h3>
      *
      * <pre>{@code
