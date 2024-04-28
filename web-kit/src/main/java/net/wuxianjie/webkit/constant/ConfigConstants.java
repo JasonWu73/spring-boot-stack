@@ -10,4 +10,9 @@ public final class ConfigConstants {
      */
     public static final String DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
+    /**
+     * 包含 UTF-8 字符编码的 JSON MIME 类型。
+     */
+    public static final String APPLICATION_JSON_UTF8_VALUE = "application/json;charset=UTF-8";
+
 }

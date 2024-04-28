@@ -5,9 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestClient;
+
+import net.wuxianjie.webkit.constant.ConfigConstants;
 
 /**
  * HTTP API 请求客户端配置。
@@ -16,15 +17,19 @@ import org.springframework.web.client.RestClient;
 @RequiredArgsConstructor
 public class ApiClientConfig {
 
-    private final MappingJackson2HttpMessageConverter converter;
+    private final MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter;
 
     /**
-     * 自定义 HTTP 请求客户端。
+     * 配置 HTTP 请求客户端。
      *
-     * <ul>
-     *     <li>默认请求头：`Accept: application/json` 及 `Content-Type: application/json`</li>
-     *     <li>自定义 JSON 消息转换器：{@link MappingJackson2HttpMessageConverter}</li>
-     * </ul>
+     * <p>1、默认请求头：</p>
+     *
+     * <pre>{@code
+     * "Accept": "application/json;charset=UTF-8"
+     * "Content-Type": "application/json;charset=UTF-8"
+     * }</pre>
+     *
+     * <p>2、自定义 JSON 消息转换器：{@link MappingJackson2HttpMessageConverter}</p>
      *
      * <h3>GET 请求</h3>
      *
@@ -105,9 +110,11 @@ public class ApiClientConfig {
     public RestClient restClient() {
         return RestClient
                 .builder()
-                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .messageConverters(c -> c.addFirst(converter))
+                .defaultHeader(HttpHeaders.ACCEPT,
+                        ConfigConstants.APPLICATION_JSON_UTF8_VALUE)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE,
+                        ConfigConstants.APPLICATION_JSON_UTF8_VALUE)
+                .messageConverters(c -> c.addFirst(mappingJackson2HttpMessageConverter))
                 .build();
     }
 
