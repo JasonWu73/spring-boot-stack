@@ -18,6 +18,9 @@ class WebKitPropertiesDefaultTest {
         Assertions.assertThat(prop.getSecurity().getApiPathPrefix())
                 .isEqualTo("/api/");
         Assertions.assertThat(prop.getSecurity().getPermitAllPaths()).isEmpty();
+        Assertions.assertThat(prop.getSecurity().getHierarchies()).isEmpty();
+        Assertions.assertThat(prop.getSecurity().getTokenExpiresInSeconds())
+                .isEqualTo(1_800);
         Assertions.assertThat(prop.getSpa().getFilePath())
                 .isEqualTo("classpath:/static/index.html");
     }

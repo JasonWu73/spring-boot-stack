@@ -21,6 +21,10 @@ class WebKitPropertiesCustomTest {
                 .isEqualTo("/test-api/");
         Assertions.assertThat(prop.getSecurity().getPermitAllPaths())
                 .containsExactly("/test-api/v1/auth/login", "/test-api/v1/public/**");
+        Assertions.assertThat(String.join("\n", prop.getSecurity().getHierarchies()))
+                .isEqualTo("root > admin\nadmin > user guest");
+        Assertions.assertThat(prop.getSecurity().getTokenExpiresInSeconds())
+                .isEqualTo(3_600);
         Assertions.assertThat(prop.getSpa().getFilePath())
                 .isEqualTo("classpath:/static/test-index.html");
     }

@@ -2,6 +2,8 @@ package net.wuxianjie.webkit.config;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
+import net.wuxianjie.webkit.security.SecurityConfig;
+
+@SpringBootApplication(exclude = SecurityConfig.class)
 public class ConfigApplication {
 }
