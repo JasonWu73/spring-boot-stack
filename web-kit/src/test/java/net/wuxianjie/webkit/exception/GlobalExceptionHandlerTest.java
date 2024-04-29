@@ -74,7 +74,7 @@ class GlobalExceptionHandlerTest {
         var res = globalExceptionHandler.handleNotFoundException(req);
         Assertions.assertThat(res.getStatusCode()).isEqualTo(HttpStatus.OK);
         Assertions.assertThat(res.getHeaders().getContentType())
-                .isEqualTo(MediaType.TEXT_HTML);
+                .isEqualTo(ConfigConstants.TEXT_HTML_UTF8);
         var body = res.getBody();
         Assertions.assertThat(body).isInstanceOf(String.class);
         Assertions.assertThat((String) body).contains("<h1>页面资源不存在</h1>");
@@ -93,7 +93,7 @@ class GlobalExceptionHandlerTest {
         var res = globalExceptionHandler.handleNotFoundException(req);
         Assertions.assertThat(res.getStatusCode()).isEqualTo(HttpStatus.OK);
         Assertions.assertThat(res.getHeaders().getContentType())
-                .isEqualTo(MediaType.TEXT_HTML);
+                .isEqualTo(ConfigConstants.TEXT_HTML_UTF8);
         var body = res.getBody();
         Assertions.assertThat(body).isInstanceOf(String.class);
         Assertions.assertThat((String) body).contains("<h1>单元测试 SPA 页面</h1>");

@@ -23,9 +23,16 @@ class SecurityWebTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/users"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.header().string(
-                        "Content-Type", "text/html"
+                        "Content-Type", "text/html;charset=UTF-8"
                 ))
-                .andExpect(MockMvcResultMatchers.content().contentType("text/html"));
+                .andExpect(MockMvcResultMatchers.content()
+                        .string("""
+            <!DOCTYPE html>
+            <html lang="zh-CN">
+                <body>
+                    <h1>页面资源不存在</h1>
+                </body>
+            </html>"""));
     }
 
     @Test

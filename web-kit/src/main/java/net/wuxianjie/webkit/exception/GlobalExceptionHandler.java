@@ -71,7 +71,7 @@ public class GlobalExceptionHandler {
                     .body(new ApiError(HttpStatus.NOT_FOUND, "资源不存在"));
         }
         return ResponseEntity.status(HttpStatus.OK)
-                .contentType(MediaType.TEXT_HTML)
+                .contentType(ConfigConstants.TEXT_HTML_UTF8)
                 .body(getHtml());
     }
 

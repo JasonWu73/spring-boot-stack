@@ -28,4 +28,16 @@ public final class ConfigConstants {
             "application", "json", StandardCharsets.UTF_8
     );
 
+    /**
+     * 包含 UTF-8 字符编码的 HTML MIME 类型。
+     */
+    public static final String TEXT_HTML_UTF8_VALUE = "text/html;charset=UTF-8";
+
+    /**
+     * HTML MIME 类型字符串 {@value #TEXT_HTML_UTF8_VALUE} 的 {@link MediaType} 对象。
+     */
+    public static final MediaType TEXT_HTML_UTF8 = new MediaType(
+            "text", "html", StandardCharsets.UTF_8
+    );
+
 }
