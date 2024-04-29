@@ -14,7 +14,7 @@ spring-boot-project
 │   │   │           │   └── dto # 数据传输对象（Data Transfer Object）
 │   │   │           └── Application.java # 项目启动入口类
 │   │   └── resources
-│   │       ├── mappers # 对应 MyBatis 映射器接口的 XML 映射文件
+│   │       ├── mapper # 对应 MyBatis 映射器接口的 XML 映射文件
 │   │       ├── static # 静态资源文件如 CSS、JS 等
 │   │       ├── application.yml # 应用配置文件
 │   │       └── logback-spring.xml # 日志配置文件
