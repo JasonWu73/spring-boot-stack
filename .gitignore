@@ -34,3 +34,6 @@ bin/
 
 ### Maven ###
 target/
+
+### 项目自动生成 ###
+logs/
