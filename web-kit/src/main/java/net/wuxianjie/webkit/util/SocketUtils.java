@@ -15,17 +15,17 @@ public class SocketUtils {
 
     /**
      * 缓存区大小，单位：字节。
-     * <p>
-     * 1、TCP 通信时，该值决定了一次读取的最大数据量，且一定会读取完所有数据。
-     * <p>
-     * 2、UDP 通信时，该值决定了读取的最大数据量，因为仅读取一次。
+     *
+     * <p>1、TCP 通信时，该值决定了一次读取的最大数据量，且一定会读取完所有数据。</p>
+     *
+     * <p>2、UDP 通信时，该值决定了读取的最大数据量，因为仅读取一次。</p>
      */
     private static final int BUFFER_SIZE = 1024;
 
     /**
      * 发送 TCP 数据包。
-     * <p>
-     * 默认 2 秒的等待连接时间，5 秒的读取超时时间。
+     *
+     * <p>默认 2 秒的等待连接时间，5 秒的读取超时时间。</p>
      *
      * @param ip TCP 服务端 IP
      * @param port TCP 服务端端口
@@ -46,8 +46,10 @@ public class SocketUtils {
      * @param readTimeout 读取超时时间，单位：毫秒
      * @return TCP 服务端的响应结果
      */
-    public static byte[] sendTcp(String ip, int port, byte[] data,
-                                 int connectTimeout, int readTimeout) {
+    public static byte[] sendTcp(
+            String ip, int port, byte[] data,
+            int connectTimeout, int readTimeout
+    ) {
         try (var client = new Socket()) {
             client.connect(new InetSocketAddress(ip, port), connectTimeout);
 
@@ -66,10 +68,8 @@ public class SocketUtils {
 
     /**
      * 发送 UDP 数据包。
-     * <p>
-     * 默认读取超时时间为 2 秒。
-     * <p>
-     * UDP 是一种面向无连接的协议，故数据包是否发送成功，客户端无从得知（除非服务端有返回数据），这也意味着无法判定 UDP 是否通信成功。
+     *
+     * <p>默认读取超时时间为 2 秒。</p>
      *
      * @param ip UDP 服务端 IP
      * @param port UDP 服务端端口
@@ -82,10 +82,6 @@ public class SocketUtils {
 
     /**
      * 发送 UDP 数据包。
-     * <p>
-     * 当读取超时时，则认为服务端没有响应数据。
-     * <p>
-     * UDP 是一种面向无连接的协议，故数据包是否发送成功，客户端无从得知（除非服务端有返回数据），这也意味着无法判定 UDP 是否通信成功。
      *
      * @param ip UDP 服务端 IP
      * @param port UDP 服务端端口
@@ -93,15 +89,15 @@ public class SocketUtils {
      * @param readTimeout 读取超时时间，单位：毫秒
      * @return UDP 服务端的响应结果
      */
-    public static byte[] sendUdp(String ip, int port, byte[] data,
-                                 int readTimeout) {
+    public static byte[] sendUdp(
+            String ip, int port, byte[] data, int readTimeout
+    ) {
         try (var client = new DatagramSocket()) {
             var addr = InetAddress.getByName(ip);
             var packet = new DatagramPacket(data, data.length, addr, port);
             client.send(packet);
 
             client.setSoTimeout(readTimeout);
-
             return receive(client, packet);
         } catch (IOException e) {
             throw new RuntimeException(

@@ -10,8 +10,8 @@ public interface TokenAuth {
      *
      * @param accessToken 访问令牌
      * @return 身份验证通过后的用户信息
-     * @throws TokenAuthException 令牌验证失败时抛出
+     * @throws AccessTokenAuthException 令牌验证失败时抛出
      */
-    CurrentUserInfo authenticate(String accessToken) throws TokenAuthException;
+    CurrentUserInfo authenticate(String accessToken) throws AccessTokenAuthException;
 
 }

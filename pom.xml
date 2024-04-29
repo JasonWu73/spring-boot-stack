@@ -29,7 +29,7 @@
     <web-kit.version>0.0.1-SNAPSHOT</web-kit.version>
   </properties>
 
-  <!-- 声明多个子模块，定义顺序决定了 Maven 构建多模块项目的顺序 -->
+  <!-- 声明多个子模块，定义的顺序决定了 Maven 构建时的执行顺序 -->
   <modules>
     <module>web-kit</module>
     <module>web</module>

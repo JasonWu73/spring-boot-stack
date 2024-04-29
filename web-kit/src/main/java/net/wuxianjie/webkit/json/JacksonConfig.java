@@ -27,7 +27,7 @@ import net.wuxianjie.webkit.constant.ConfigConstants;
 public class JacksonConfig {
 
     /**
-     * 自定义 JSON 序列化/反序列化规则。
+     * 配置 JSON 解析器，即自定义 JSON 序列化/反序列化规则。
      *
      * <ul>
      *     <li>设置日期格式化规则</li>
@@ -50,23 +50,28 @@ public class JacksonConfig {
     /**
      * 配置 Spring 使用自定义的 JSON 解析器。
      *
-     * @param mapper 自定义的 {@link ObjectMapper} 实例（由 {@link #objectMapper()} 方法提供）
+     * @param objectMapper 自定义的 {@link ObjectMapper} 实例（由 {@link #objectMapper()} 方法提供）
      * @return 自定义的 {@link MappingJackson2HttpMessageConverter} 实例
      */
     @Bean
-    public MappingJackson2HttpMessageConverter httpMessageJsonConverter(ObjectMapper mapper) {
+    public MappingJackson2HttpMessageConverter httpMessageJsonConverter(
+            ObjectMapper objectMapper
+    ) {
         var converter = new MappingJackson2HttpMessageConverter();
-        converter.setObjectMapper(mapper);
+        converter.setObjectMapper(objectMapper);
         return converter;
     }
 
     private JavaTimeModule getDateTimeModule() {
         var module = new JavaTimeModule();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(ConfigConstants.DATE_TIME_PATTERN);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(
+                ConfigConstants.DATE_TIME_PATTERN
+        );
         module.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(formatter));
         module.addDeserializer(LocalDateTime.class, new JsonDeserializer<>() {
             @Override
-            public LocalDateTime deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+            public LocalDateTime deserialize(JsonParser p, DeserializationContext ctxt)
+                    throws IOException {
                 return LocalDateTime.parse(p.getText(), formatter);
             }
         });

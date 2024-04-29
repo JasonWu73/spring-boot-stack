@@ -12,8 +12,9 @@ class PageTestController {
 
     @GetMapping("/page")
     PageInfo getPage(@Valid PageQuery page) {
-        var result = new PageResult<>(page.getPageNum(), page.getPageSize(),
-                50, List.of("a", "b", "c"));
+        var result = new PageResult<>(
+                page.getPageNum(), page.getPageSize(), 50, List.of("a", "b", "c")
+        );
         return new PageInfo(page, result);
     }
 

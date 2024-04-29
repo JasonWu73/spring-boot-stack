@@ -39,7 +39,6 @@ import net.wuxianjie.webkit.exception.ApiException;
 public class SecurityConfig {
 
     private final HandlerExceptionResolver handlerExceptionResolver;
-
     private final WebKitProperties webKitProperties;
     private final TokenAuth tokenAuth;
 
@@ -54,9 +53,9 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         // 以下配置仅对 API 请求生效
         http.securityMatcher(webKitProperties.getSecurity().getApiPathPrefix() + "**")
-                // 注意：顺序很重要，前面的规则先匹配
+                // 注意：顺序很重要，即前面的规则匹配后则不再进行后续比较
                 .authorizeHttpRequests(r -> {
-                    // 开放 API
+                    // 配置公共 API
                     for (var p : webKitProperties.getSecurity().getPermitAllPaths()) {
                         r.requestMatchers(p).permitAll();
                     }
@@ -80,19 +79,21 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 // 允许浏览器在同源策略下使用 `<frame>` 或 `<iframe>`
                 .headers(c -> c.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
-                // 无状态会话，即不向客户端发送 `JSESSIONID` Cookies
+                // 不需要会话状态，即不向客户端发送 `JSESSIONID` Cookies
                 .sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // 身份验证失败和没有访问权限的处理
                 .exceptionHandling(c -> {
                     // 未通过身份验证，对应 401 HTTP 状态码
                     c.authenticationEntryPoint((req, res, e) -> handlerExceptionResolver
-                            .resolveException(req, res, null,
-                                    new ApiException(HttpStatus.UNAUTHORIZED, "身份验证失败", e)));
+                            .resolveException(req, res, null, new ApiException(
+                                    HttpStatus.UNAUTHORIZED, "身份验证失败", e
+                            )));
 
                     // 通过身份验证，但没有访问权限，对应 403 HTTP 状态码
                     c.accessDeniedHandler((req, res, e) -> handlerExceptionResolver
-                            .resolveException(req, res, null,
-                                    new ApiException(HttpStatus.FORBIDDEN, "没有访问权限", e)));
+                            .resolveException(req, res, null, new ApiException(
+                                    HttpStatus.FORBIDDEN, "授权失败", e
+                            )));
                 });
         return http.build();
     }
@@ -129,15 +130,17 @@ public class SecurityConfig {
 
     /**
      * 配置拥有上下级关系的功能权限。
-     * <p>
-     * Spring Boot 3.x（即 Spring Security 6.x）开始，还需要创建 {@link #expressionHandler()}。
+     *
+     * <p>Spring Boot 3.x（即 Spring Security 6.x）开始，还需要创建 {@link #expressionHandler()}。</p>
      *
      * @return 拥有上下级关系的功能权限
      */
     @Bean
     public RoleHierarchy roleHierarchy() {
         var hierarchy = new RoleHierarchyImpl();
-        hierarchy.setHierarchy(String.join("\n", webKitProperties.getSecurity().getHierarchies()));
+        hierarchy.setHierarchy(String.join(
+                "\n", webKitProperties.getSecurity().getHierarchies()
+        ));
         return hierarchy;
     }
 

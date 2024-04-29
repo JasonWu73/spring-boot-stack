@@ -12,7 +12,9 @@ import java.util.List;
  * @param accessToken 访问令牌，用于访问接口时的身份验证
  * @param refreshToken 刷新令牌，用于刷新身份验证信息
  */
-public record CurrentUserInfo(long userId, String username, String nickname,
-                              List<String> authorities,
-                              String accessToken, String refreshToken) {
+public record CurrentUserInfo(
+        long userId, String username, String nickname,
+        List<String> authorities,
+        String accessToken, String refreshToken
+) {
 }

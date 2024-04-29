@@ -53,12 +53,12 @@ public class PageQuery {
      * @param sortColumn 排序列
      * @param desc 是否降序
      */
-    public PageQuery(int pageNum, int pageSize, String sortColumn, boolean desc) {
+    public PageQuery(int pageNum, int pageSize, String sortColumn, Boolean desc) {
         this.pageNum = pageNum;
         this.pageSize = pageSize;
         this.offset = (pageNum - 1) * pageSize;
         this.sortColumn = sortColumn;
-        this.desc = desc;
+        this.desc = desc != null && desc;
     }
 
 }

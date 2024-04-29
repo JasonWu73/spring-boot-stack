@@ -27,7 +27,9 @@ public class SpringUtils implements ApplicationContextAware {
     }
 
     @Override
-    public void setApplicationContext(@NonNull ApplicationContext ctx) throws BeansException {
+    public void setApplicationContext(@NonNull ApplicationContext ctx)
+            throws BeansException {
         SpringUtils.context = ctx;
     }
+
 }

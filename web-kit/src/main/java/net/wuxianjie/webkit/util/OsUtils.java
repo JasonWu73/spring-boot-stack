@@ -33,7 +33,7 @@ public class OsUtils {
     }
 
     /**
-     * 获取当前系统的名称。可能的值有：`Windows`、`macOS`、`Linux`、`Other`。
+     * 获取当前系统的名称。可能的值有：{@code Windows}、{@code macOS}、{@code Linux}、{@code Other}。
      *
      * @return 当前系统的名称
      */

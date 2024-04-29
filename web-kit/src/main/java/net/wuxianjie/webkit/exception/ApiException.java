@@ -22,6 +22,11 @@ public class ApiException extends RuntimeException {
     @Getter
     private final HttpStatus status;
 
+    /**
+     * 错误原因的简短描述。这用于返回给前端作为用户友好的错误提示。
+     *
+     * <p>无需再为此字段生成 {@code getter} 方法，调用 {@link #getMessage()} 即可获取该值。</p>
+     */
     private final String error;
 
     /**
@@ -60,10 +65,10 @@ public class ApiException extends RuntimeException {
     }
 
     private String buildFullMessage() {
-        var message = "%s \"%s\"".formatted(status, error);
+        var msg = "%s \"%s\"".formatted(status, error);
         return getNestedMessage(getCause())
-                .map(m -> message + ApiException.MESSAGE_SEPARATOR + m)
-                .orElse(message);
+                .map(m -> msg + ApiException.MESSAGE_SEPARATOR + m)
+                .orElse(msg);
     }
 
     private Optional<String> getNestedMessage(Throwable cause) {

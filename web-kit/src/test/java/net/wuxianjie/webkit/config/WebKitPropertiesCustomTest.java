@@ -13,19 +13,24 @@ import org.springframework.boot.test.context.SpringBootTest;
 class WebKitPropertiesCustomTest {
 
     @Autowired
-    private WebKitProperties prop;
+    private WebKitProperties webKitProperties;
 
     @Test
     void testPropertiesLoading() {
-        Assertions.assertThat(prop.getSecurity().getApiPathPrefix())
+        Assertions.assertThat(webKitProperties.getSecurity().getApiPathPrefix())
                 .isEqualTo("/test-api/");
-        Assertions.assertThat(prop.getSecurity().getPermitAllPaths())
-                .containsExactly("/test-api/v1/auth/login", "/test-api/v1/public/**");
-        Assertions.assertThat(String.join("\n", prop.getSecurity().getHierarchies()))
+        Assertions.assertThat(webKitProperties.getSecurity().getPermitAllPaths())
+                .isEqualTo(new String[]{
+                        "/test-api/v1/auth/login",
+                        "/test-api/v1/public/**"
+                });
+        Assertions.assertThat(String.join(
+                "\n", webKitProperties.getSecurity().getHierarchies()
+                ))
                 .isEqualTo("root > admin\nadmin > user");
-        Assertions.assertThat(prop.getSecurity().getTokenExpiresInSeconds())
+        Assertions.assertThat(webKitProperties.getSecurity().getTokenExpiresInSeconds())
                 .isEqualTo(3_600);
-        Assertions.assertThat(prop.getSpa().getFilePath())
+        Assertions.assertThat(webKitProperties.getSpa().getFilePath())
                 .isEqualTo("classpath:/static/test-index.html");
     }
 

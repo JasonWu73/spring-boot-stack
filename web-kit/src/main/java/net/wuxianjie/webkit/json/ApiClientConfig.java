@@ -1,4 +1,4 @@
-package net.wuxianjie.webkit.api;
+package net.wuxianjie.webkit.json;
 
 import lombok.RequiredArgsConstructor;
 
@@ -110,10 +110,14 @@ public class ApiClientConfig {
     public RestClient restClient() {
         return RestClient
                 .builder()
-                .defaultHeader(HttpHeaders.ACCEPT,
-                        ConfigConstants.APPLICATION_JSON_UTF8_VALUE)
-                .defaultHeader(HttpHeaders.CONTENT_TYPE,
-                        ConfigConstants.APPLICATION_JSON_UTF8_VALUE)
+                .defaultHeader(
+                        HttpHeaders.ACCEPT,
+                        ConfigConstants.APPLICATION_JSON_UTF8_VALUE
+                )
+                .defaultHeader(
+                        HttpHeaders.CONTENT_TYPE,
+                        ConfigConstants.APPLICATION_JSON_UTF8_VALUE
+                )
                 .messageConverters(c -> c.addFirst(mappingJackson2HttpMessageConverter))
                 .build();
     }

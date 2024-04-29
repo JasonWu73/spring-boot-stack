@@ -22,11 +22,9 @@ public class AuthUtils {
      * @return 当前登录用户信息
      */
     public static Optional<CurrentUserInfo> getCurrentUser() {
-        var user = SecurityContextHolder.getContext().getAuthentication();
-        if (user == null || user instanceof AnonymousAuthenticationToken) {
-            return Optional.empty();
-        }
-        return Optional.of((CurrentUserInfo) user.getPrincipal());
+        return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
+                .filter(a -> !(a instanceof AnonymousAuthenticationToken))
+                .map(a -> (CurrentUserInfo) a.getPrincipal());
     }
 
     /**
@@ -35,8 +33,9 @@ public class AuthUtils {
      * @param user 已通过身份验证的用户信息
      * @param req HTTP 请求对象
      */
-    public static void setAuthenticatedContext(CurrentUserInfo user,
-                                               HttpServletRequest req) {
+    public static void setAuthenticatedContext(
+            CurrentUserInfo user, HttpServletRequest req
+    ) {
         var authorities = user.authorities()
                 .stream()
                 .filter(StringUtils::hasText)

@@ -26,27 +26,29 @@ public class TokenAuthFilter extends OncePerRequestFilter {
     /**
      * 携带访问令牌（Access Token）的请求头值前缀：
      *
-     * <pre>{@code "Authorization: Bearer {{accessToken}}" }</pre>
+     * <pre>{@code
+     * "Authorization: Bearer {{accessToken}}"
+     * }</pre>
      */
     private static final String BEARER_PREFIX = "Bearer ";
 
     private final HandlerExceptionResolver handlerExceptionResolver;
-
     private final TokenAuth tokenAuth;
 
     @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest req,
-                                    @NonNull HttpServletResponse res,
-                                    @NonNull FilterChain chain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(
+            @NonNull HttpServletRequest req, @NonNull HttpServletResponse res,
+            @NonNull FilterChain chain
+    ) throws ServletException, IOException {
         var bearer = req.getHeader(HttpHeaders.AUTHORIZATION);
         if (bearer == null) {
             chain.doFilter(req, res);
             return;
         }
         if (!bearer.startsWith(BEARER_PREFIX)) {
-            handlerExceptionResolver.resolveException(req, res, null,
-                    new ApiException(HttpStatus.UNAUTHORIZED, "accessToken 格式错误"));
+            handlerExceptionResolver.resolveException(req, res, null, new ApiException(
+                    HttpStatus.UNAUTHORIZED, "accessToken 格式错误"
+            ));
             return;
         }
         var accessToken = bearer.substring(BEARER_PREFIX.length());
@@ -54,9 +56,10 @@ public class TokenAuthFilter extends OncePerRequestFilter {
         CurrentUserInfo user;
         try {
             user = tokenAuth.authenticate(accessToken);
-        } catch (TokenAuthException e) {
-            handlerExceptionResolver.resolveException(req, res, null,
-                    new ApiException(HttpStatus.UNAUTHORIZED, "Token 身份验证失败", e));
+        } catch (AccessTokenAuthException e) {
+            handlerExceptionResolver.resolveException(req, res, null, new ApiException(
+                    HttpStatus.UNAUTHORIZED, "accessToken 验证失败", e
+            ));
             return;
         }
 

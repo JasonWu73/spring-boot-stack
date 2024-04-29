@@ -9,18 +9,30 @@ import org.springframework.stereotype.Service;
 class TokenAuthTestImpl implements TokenAuth {
 
     static final Map<String, CurrentUserInfo> users = Map.of(
-            "root", new CurrentUserInfo(1, "root", "超级管理员", List.of("root"), "root-token", "root-refresh-token"),
-            "admin", new CurrentUserInfo(2, "admin", "管理员", List.of("admin"), "admin-token", "admin-refresh-token"),
-            "user", new CurrentUserInfo(3, "user", "用户", List.of("user"), "user-token", "user-refresh-token"),
-            "guest", new CurrentUserInfo(4, "guest", "游客", List.of("guest"), "guest-token", "guest-refresh-token")
+            "root", new CurrentUserInfo(
+                    1, "root", "超级管理员", List.of("root"),
+                    "root-token", "root-refresh-token"
+            ),
+            "admin", new CurrentUserInfo(
+                    2, "admin", "管理员", List.of("admin"),
+                    "admin-token", "admin-refresh-token"
+            ),
+            "user", new CurrentUserInfo(
+                    3, "user", "用户", List.of("user"),
+                    "user-token", "user-refresh-token"
+            ),
+            "guest", new CurrentUserInfo(
+                    4, "guest", "游客", List.of("guest"),
+                    "guest-token", "guest-refresh-token"
+            )
     );
 
     @Override
-    public CurrentUserInfo authenticate(String accessToken) throws TokenAuthException {
+    public CurrentUserInfo authenticate(String accessToken) throws AccessTokenAuthException {
         return users.values().stream()
                 .filter(u -> u.accessToken().equals(accessToken))
                 .findFirst()
-                .orElseThrow(() -> new TokenAuthException("Token 无效"));
+                .orElseThrow(() -> new AccessTokenAuthException("Token 无效"));
     }
 
 }

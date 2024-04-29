@@ -15,7 +15,14 @@ import org.springframework.stereotype.Component;
 @Setter
 public class WebKitProperties {
 
+    /**
+     * Web 安全配置。
+     */
     private Security security = new Security();
+
+    /**
+     * SPA 应用配置。
+     */
     private Spa spa = new Spa();
 
     /**
@@ -26,25 +33,27 @@ public class WebKitProperties {
     public static class Security {
 
         /**
-         * API 请求路径前缀（需要身份验证），默认为 <code>/api/</code>。
-         * <p>
-         * 用于标识需要身份验证的请求。
+         * API 请求路径前缀，默认为 <code>/api/</code>。
+         *
+         * <p>用于标识需要身份验证的请求。</p>
          */
         private String apiPathPrefix = "/api/";
 
         /**
-         * 开放的 API 请求路径。
-         * <p>
-         * 支持通配符 <code>*</code>，例如：<code>/api/v1/public/**</code>。
-         * <p>
-         * 注意：顺序很重要，前面的规则先匹配。
+         * 公共（不需要身份验证）API 请求路径。
+         *
+         * <p>支持通配符 <code>*</code>，例如：<code>/api/v1/public/**</code>。</p>
+         *
+         * <p>注意：顺序很重要，即前面的规则匹配后则不再进行后续比较。</p>
          */
         private String[] permitAllPaths = {};
 
         /**
-         * 角色层级关系。
-         * <p>
-         * 字符串格式：使用 <code>></code> 符号创建上下级角色，比如下面代表 <code>root</code> 角色是 <code>admin</code> 的上级：
+         * 拥有上下级关系的功能权限（角色）。
+         *
+         * <p>使用 <code>></code> 符号创建上下级权限（角色）。</p>
+         *
+         * <p>比如下面字符串代表 <code>root</code> 拥有所有 <code>admin</code> 的所有权限：</p>
          *
          * <pre><code>
          * root > admin
@@ -53,7 +62,7 @@ public class WebKitProperties {
         private String[] hierarchies = {};
 
         /**
-         * 访问令牌的过期时间，单位为：秒，默认为 30 分钟。
+         * 访问令牌的过期时间，单位：秒，默认为 30 分钟。
          */
         private Integer tokenExpiresInSeconds = 30 * 60;
 
@@ -67,9 +76,9 @@ public class WebKitProperties {
     public static class Spa {
 
         /**
-         * SPA 应用的前端资源路径，默认为 `classpath:/static/index.html`。
-         * <p>
-         * 设置为空字符串时，表示禁用 SPA 应用。
+         * SPA 应用的前端资源路径，默认为 <code>classpath:/static/index.html</code>。
+         *
+         * <p>设置为空字符串时，表示禁用 SPA 应用。</p>
          */
         private String filePath = "classpath:/static/index.html";
 

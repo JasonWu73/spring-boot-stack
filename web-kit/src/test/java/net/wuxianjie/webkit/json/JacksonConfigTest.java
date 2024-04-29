@@ -65,8 +65,9 @@ class JacksonConfigTest {
         var dateTime = "2024-04-23 14:33:45";
         var formatter = new SimpleDateFormat(ConfigConstants.DATE_TIME_PATTERN);
         var date = formatter.parse(dateTime);
-        var deserialized = objectMapper.readValue(objectMapper.writeValueAsString(date),
-                date.getClass());
+        var deserialized = objectMapper.readValue(
+                objectMapper.writeValueAsString(date), date.getClass()
+        );
         Assertions.assertThat(deserialized).isEqualTo(date);
     }
 
@@ -88,7 +89,8 @@ class JacksonConfigTest {
         var formatter = DateTimeFormatter.ofPattern(ConfigConstants.DATE_TIME_PATTERN);
         var localDateTime = LocalDateTime.parse(dateTime, formatter);
         var deserialized = objectMapper.readValue(
-                objectMapper.writeValueAsString(localDateTime), localDateTime.getClass());
+                objectMapper.writeValueAsString(localDateTime), localDateTime.getClass()
+        );
         Assertions.assertThat(deserialized).isEqualTo(localDateTime);
     }
 
@@ -98,8 +100,7 @@ class JacksonConfigTest {
         var date = "2024-04-23";
         var localDate = LocalDate.parse(date);
         String serialized = objectMapper.writeValueAsString(localDate);
-        Assertions.assertThat(serialized)
-                .isEqualTo(objectMapper.writeValueAsString(date));
+        Assertions.assertThat(serialized).isEqualTo(objectMapper.writeValueAsString(date));
     }
 
     @Test
@@ -108,7 +109,8 @@ class JacksonConfigTest {
         var date = "2024-04-23";
         var localDate = LocalDate.parse(date);
         var deserialized = objectMapper.readValue(
-                objectMapper.writeValueAsString(localDate), localDate.getClass());
+                objectMapper.writeValueAsString(localDate), localDate.getClass()
+        );
         Assertions.assertThat(deserialized).isEqualTo(localDate);
     }
 
