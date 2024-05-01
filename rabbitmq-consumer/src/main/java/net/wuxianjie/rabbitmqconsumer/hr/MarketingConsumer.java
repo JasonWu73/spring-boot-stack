@@ -8,7 +8,7 @@ import net.wuxianjie.rabbitmqconsumer.employee.Employee;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 
-@Service
+//@Service
 @RequiredArgsConstructor
 @Slf4j
 public class MarketingConsumer {

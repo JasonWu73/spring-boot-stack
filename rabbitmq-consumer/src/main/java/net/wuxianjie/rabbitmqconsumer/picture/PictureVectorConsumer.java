@@ -1,27 +1,23 @@
-package net.wuxianjie.rabbitmqconsumer.hr;
+package net.wuxianjie.rabbitmqconsumer.picture;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import lombok.RequiredArgsConstructor;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 
-import net.wuxianjie.rabbitmqconsumer.employee.Employee;
-
-//@Service
+@Service
 @RequiredArgsConstructor
 @Slf4j
-public class AccountingConsumer {
+public class PictureVectorConsumer {
 
     private final ObjectMapper objectMapper;
 
-    @RabbitListener(queues = "q.hr.accounting")
+    @RabbitListener(queues = "q.picture.vector")
     public void listen(String message) throws JsonProcessingException {
-        var emp = objectMapper.readValue(message, Employee.class);
-        log.info("会计部门收到消息: {}", emp);
+        var picture = objectMapper.readValue(message, Picture.class);
+        log.info("处理矢量: {}", picture);
     }
 
 }
