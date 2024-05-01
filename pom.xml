@@ -33,6 +33,8 @@
   <modules>
     <module>web-kit</module>
     <module>web</module>
+    <module>rabbitmq-producer</module>
+    <module>rabbitmq-consumer</module>
   </modules>
 
   <!-- 统一管理依赖的版本号 -->
