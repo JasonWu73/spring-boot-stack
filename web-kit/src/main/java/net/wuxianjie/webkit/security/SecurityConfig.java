@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -154,6 +155,24 @@ public class SecurityConfig {
         var handler = new DefaultMethodSecurityExpressionHandler();
         handler.setRoleHierarchy(roleHierarchy());
         return handler;
+    }
+
+    /**
+     * 没有实际作用，仅为了避免打印警告信息：
+     *
+     * <pre>{@code
+     * 2024-05-01T13:19:01.973+08:00  WARN 63739 --- [           main] .s.s.UserDetailsServiceAutoConfiguration :
+     *
+     * Using generated security password: d2bdf20a-33b7-4578-b939-2692580def92
+     *
+     * This generated password is for development use only. Your security configuration must be updated before running your application in production.
+     * }</pre>
+     *
+     * @return 身份验证管理器
+     */
+    @Bean
+    public AuthenticationManager authenticationManager() {
+        return authentication -> authentication;
     }
 
 }
