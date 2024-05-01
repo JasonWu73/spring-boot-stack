@@ -5,14 +5,17 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,11 +43,14 @@ public class JacksonConfig {
     @Bean
     public ObjectMapper objectMapper() {
         var timeModule = getDateTimeModule();
-        return new ObjectMapper()
-                .setDateFormat(new SimpleDateFormat(ConfigConstants.DATE_TIME_PATTERN))
-                .registerModule(timeModule)
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        return JsonMapper.builder()
+                .addModule(timeModule)
+                .defaultDateFormat(new SimpleDateFormat(ConfigConstants.DATE_TIME_PATTERN))
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .findAndAddModules()
+                .build();
+
     }
 
     /**
@@ -67,13 +73,25 @@ public class JacksonConfig {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(
                 ConfigConstants.DATE_TIME_PATTERN
         );
-        module.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(formatter));
-        module.addDeserializer(LocalDateTime.class, new JsonDeserializer<>() {
+        module.addSerializer(LocalDateTime.class, new JsonSerializer<>() {
+
             @Override
-            public LocalDateTime deserialize(JsonParser p, DeserializationContext ctxt)
-                    throws IOException {
+            public void serialize(
+                    LocalDateTime value, JsonGenerator gen, SerializerProvider serializers
+            ) throws IOException {
+                gen.writeString(formatter.format(value));
+            }
+
+        });
+        module.addDeserializer(LocalDateTime.class, new JsonDeserializer<>() {
+
+            @Override
+            public LocalDateTime deserialize(
+                    JsonParser p, DeserializationContext ctxt
+            ) throws IOException {
                 return LocalDateTime.parse(p.getText(), formatter);
             }
+
         });
         return module;
     }
