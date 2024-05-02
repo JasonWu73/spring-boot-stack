@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/mypicture")
 @RequiredArgsConstructor
+@Slf4j
 public class MyPictureProducer {
 
     private final List<String> types = List.of("jpg", "png", "svg");
@@ -26,7 +28,7 @@ public class MyPictureProducer {
 
     @GetMapping
     public String sendMessage() throws JsonProcessingException {
-        for (var i = 1; i <= 10; i++) {
+        for (var i = 1; i <= 1; i++) {
             var picture = new Picture(
                     "pic-" + i,
                     types.get(i % types.size()),
@@ -37,6 +39,7 @@ public class MyPictureProducer {
                     "x.mypicture", picture.getType(),
                     objectMapper.writeValueAsString(picture)
             );
+            log.info("发送图片数据: {}", picture);
         }
         return "发送图片数据成功";
     }

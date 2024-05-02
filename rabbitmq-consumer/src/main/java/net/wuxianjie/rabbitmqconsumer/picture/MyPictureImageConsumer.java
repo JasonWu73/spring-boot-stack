@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.amqp.AmqpRejectAndDontRequeueException;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +21,7 @@ public class MyPictureImageConsumer {
     public void listen(String message) throws JsonProcessingException {
         var picture = objectMapper.readValue(message, Picture.class);
         if (picture.getSize() > 9_000) {
-            throw new IllegalArgumentException("图片太大: " + picture);
+            throw new AmqpRejectAndDontRequeueException("图片太大: " + picture);
         }
         log.info("处理图片: {}", picture);
     }
