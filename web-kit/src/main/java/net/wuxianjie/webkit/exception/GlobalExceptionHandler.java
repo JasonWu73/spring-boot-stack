@@ -36,7 +36,6 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import net.wuxianjie.webkit.config.WebKitProperties;
-import net.wuxianjie.webkit.constant.ConfigConstants;
 
 /**
  * 全局异常处理。
@@ -49,6 +48,10 @@ public class GlobalExceptionHandler {
     static final String SPA_NOT_FOUND_HTML = """
             <!DOCTYPE html>
             <html lang="zh-CN">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>404 页面不存在</title>
+                </head>
                 <body>
                     <h1>页面资源不存在</h1>
                 </body>
@@ -67,11 +70,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleNotFoundException(HttpServletRequest req) {
         if (isJsonRequest(req)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .contentType(ConfigConstants.APPLICATION_JSON_UTF8)
+                    .contentType(MediaType.APPLICATION_JSON)
                     .body(new ApiError(HttpStatus.NOT_FOUND, "资源不存在"));
         }
         return ResponseEntity.status(HttpStatus.OK)
-                .contentType(ConfigConstants.TEXT_HTML_UTF8)
+                .contentType(MediaType.TEXT_HTML)
                 .body(getHtml());
     }
 
@@ -273,7 +276,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> handleApiException(ApiException e) {
         logApiException(e);
         return ResponseEntity.status(e.getStatus())
-                .contentType(ConfigConstants.APPLICATION_JSON_UTF8)
+                .contentType(MediaType.APPLICATION_JSON)
                 .body(new ApiError(e.getStatus(), e.getMessage()));
     }
 
@@ -293,7 +296,7 @@ public class GlobalExceptionHandler {
         var msg = "服务异常";
         log.error(msg, e);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .contentType(ConfigConstants.APPLICATION_JSON_UTF8)
+                .contentType(MediaType.APPLICATION_JSON)
                 .body(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, msg));
     }
 

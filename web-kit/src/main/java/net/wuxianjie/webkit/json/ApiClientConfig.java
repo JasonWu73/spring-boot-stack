@@ -5,10 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestClient;
-
-import net.wuxianjie.webkit.constant.ConfigConstants;
 
 /**
  * HTTP API 请求客户端配置。
@@ -110,14 +109,8 @@ public class ApiClientConfig {
     public RestClient restClient() {
         return RestClient
                 .builder()
-                .defaultHeader(
-                        HttpHeaders.ACCEPT,
-                        ConfigConstants.APPLICATION_JSON_UTF8_VALUE
-                )
-                .defaultHeader(
-                        HttpHeaders.CONTENT_TYPE,
-                        ConfigConstants.APPLICATION_JSON_UTF8_VALUE
-                )
+                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .messageConverters(c -> c.addFirst(mappingJackson2HttpMessageConverter))
                 .build();
     }
