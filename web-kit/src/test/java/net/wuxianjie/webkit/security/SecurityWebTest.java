@@ -1,5 +1,9 @@
 package net.wuxianjie.webkit.security;
 
+import java.nio.charset.StandardCharsets;
+
+import net.wuxianjie.webkit.exception.GlobalExceptionHandler;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,19 +24,23 @@ class SecurityWebTest {
 
     @Test
     void shouldReturnsHtml_whenRequestWebRootNoToken() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/users"))
+        var resHtml = mockMvc.perform(MockMvcRequestBuilders.get("/users"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.header().string(
-                        "Content-Type", "text/html;charset=UTF-8"
+                        "Content-Type", "text/html"
                 ))
-                .andExpect(MockMvcResultMatchers.content()
-                        .string("""
-            <!DOCTYPE html>
-            <html lang="zh-CN">
-                <body>
-                    <h1>页面资源不存在</h1>
-                </body>
-            </html>"""));
+                .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+        Assertions.assertThat(resHtml).isEqualTo("""
+                <!DOCTYPE html>
+                <html lang="zh-CN">
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>404 页面不存在</title>
+                    </head>
+                    <body>
+                        <h1>页面资源不存在</h1>
+                    </body>
+                </html>""");
     }
 
     @Test
@@ -51,7 +59,7 @@ class SecurityWebTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/test-api/v1/root"))
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized())
                 .andExpect(MockMvcResultMatchers.header().string(
-                        "Content-Type", "application/json;charset=UTF-8"
+                        "Content-Type", "application/json"
                 ))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status")
                         .value(401))
@@ -67,7 +75,7 @@ class SecurityWebTest {
                         .header("Authorization", "Bearerinvalid-token"))
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized())
                 .andExpect(MockMvcResultMatchers.header().string(
-                        "Content-Type", "application/json;charset=UTF-8"
+                        "Content-Type", "application/json"
                 ))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status")
                         .value(401))
@@ -83,7 +91,7 @@ class SecurityWebTest {
                         .header("Authorization", "Bearer invalid-token"))
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized())
                 .andExpect(MockMvcResultMatchers.header().string(
-                        "Content-Type", "application/json;charset=UTF-8"
+                        "Content-Type", "application/json"
                 ))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status")
                         .value(401))
@@ -110,7 +118,7 @@ class SecurityWebTest {
                         .header("Authorization", "Bearer admin-token"))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.header().string(
-                        "Content-Type", "application/json;charset=UTF-8"
+                        "Content-Type", "application/json"
                 ))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status")
                         .value(403))

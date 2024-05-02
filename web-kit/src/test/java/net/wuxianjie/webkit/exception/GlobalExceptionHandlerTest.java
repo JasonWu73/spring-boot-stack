@@ -21,7 +21,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import net.wuxianjie.webkit.config.WebKitProperties;
-import net.wuxianjie.webkit.constant.ConfigConstants;
 
 @ExtendWith(MockitoExtension.class)
 class GlobalExceptionHandlerTest {
@@ -74,7 +73,7 @@ class GlobalExceptionHandlerTest {
         var res = globalExceptionHandler.handleNotFoundException(req);
         Assertions.assertThat(res.getStatusCode()).isEqualTo(HttpStatus.OK);
         Assertions.assertThat(res.getHeaders().getContentType())
-                .isEqualTo(ConfigConstants.TEXT_HTML_UTF8);
+                .isEqualTo(MediaType.TEXT_HTML);
         var body = res.getBody();
         Assertions.assertThat(body).isInstanceOf(String.class);
         Assertions.assertThat((String) body).contains("<h1>页面资源不存在</h1>");
@@ -93,7 +92,7 @@ class GlobalExceptionHandlerTest {
         var res = globalExceptionHandler.handleNotFoundException(req);
         Assertions.assertThat(res.getStatusCode()).isEqualTo(HttpStatus.OK);
         Assertions.assertThat(res.getHeaders().getContentType())
-                .isEqualTo(ConfigConstants.TEXT_HTML_UTF8);
+                .isEqualTo(MediaType.TEXT_HTML);
         var body = res.getBody();
         Assertions.assertThat(body).isInstanceOf(String.class);
         Assertions.assertThat((String) body).contains("<h1>单元测试 SPA 页面</h1>");
@@ -109,7 +108,7 @@ class GlobalExceptionHandlerTest {
             var res = globalExceptionHandler.handleNotFoundException(req);
             Assertions.assertThat(res.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
             Assertions.assertThat(res.getHeaders().getContentType())
-                    .isEqualTo(ConfigConstants.APPLICATION_JSON_UTF8);
+                    .isEqualTo(MediaType.APPLICATION_JSON);
             var body = res.getBody();
             Assertions.assertThat(body).isInstanceOf(ApiError.class);
             var errRes = (ApiError) body;

@@ -27,10 +27,10 @@ class PageControllerTest {
                         .param("pageSize", String.valueOf(query.getPageSize()))
                         .param("sortColumn", query.getSortColumn())
                         .param("desc", String.valueOf(query.isDesc()))
-                        .accept("application/json;charset=UTF-8"))
+                        .accept("application/json"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.header().string(
-                        "Content-Type", "application/json;charset=UTF-8"
+                        "Content-Type", "application/json"
                 ))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.query.pageNum")
                         .value(query.getPageNum()))
@@ -65,7 +65,7 @@ class PageControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/page"))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.header().string(
-                        "Content-Type", "application/json;charset=UTF-8"
+                        "Content-Type", "application/json"
                 ))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status")
                         .value(400))
@@ -81,7 +81,7 @@ class PageControllerTest {
                         .param("pageNum", "1"))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.header().string(
-                        "Content-Type", "application/json;charset=UTF-8"
+                        "Content-Type", "application/json"
                 ))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status")
                         .value(400))
@@ -99,7 +99,7 @@ class PageControllerTest {
                         .param("sortColumn", "invalid+column"))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.header().string(
-                        "Content-Type", "application/json;charset=UTF-8"
+                        "Content-Type", "application/json"
                 ))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status")
                         .value(400))
