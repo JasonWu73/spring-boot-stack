@@ -15,7 +15,7 @@ import org.springframework.amqp.support.AmqpHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
 
-@Service
+//@Service
 @RequiredArgsConstructor
 @Slf4j
 public class MyPictureImageConsumer {

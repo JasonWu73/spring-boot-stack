@@ -6,9 +6,6 @@ spring:
     port: 5672
     username: admin
     password: qwe@123
-    listener:
-      simple:
-        acknowledge-mode: manual
 web-kit:
   security:
     permit-all-paths: /api/v1/**
