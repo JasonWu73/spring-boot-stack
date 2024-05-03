@@ -2,8 +2,8 @@ package net.wuxianjie.webkit.security;
 
 import java.nio.charset.StandardCharsets;
 
-import net.wuxianjie.webkit.exception.GlobalExceptionHandler;
 import org.assertj.core.api.Assertions;
+
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,8 @@ class SecurityWebTest {
 
     @Test
     void shouldReturnsHtml_whenRequestWebRootNoToken() throws Exception {
-        var resHtml = mockMvc.perform(MockMvcRequestBuilders.get("/users"))
+        var path = "/users";
+        var resHtml = mockMvc.perform(MockMvcRequestBuilders.get(path))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.header().string(
                         "Content-Type", "text/html"
@@ -38,9 +39,9 @@ class SecurityWebTest {
                         <title>404 页面不存在</title>
                     </head>
                     <body>
-                        <h1>页面资源不存在</h1>
+                        <h1>页面资源 [%s] 不存在</h1>
                     </body>
-                </html>""");
+                </html>""".formatted(path));
     }
 
     @Test
