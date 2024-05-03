@@ -15,49 +15,49 @@ public class PageQuery {
      * 页码。
      */
     @Min(value = 1, message = "页码不能小于 1")
-    private int pageNum;
+    private int page;
 
     /**
-     * 每页条数。
+     * 每页的结果数量。
      */
-    @Min(value = 1, message = "每页条数不能小于 1")
-    private int pageSize;
+    @Min(value = 1, message = "每页的结果数量不能小于 1")
+    private int size;
 
     /**
-     * 偏移量。
+     * 偏移量，从数据集的哪个位置开始返回结果。
      *
      * <pre>{@code
-     * select * from table_name limit #{offset}, #{pageSize}
+     * select * from table_name limit #{offset}, #{size}
      *
-     * select * from table_name limit #{pageSize} offset #{offset}
+     * select * from table_name limit #{size} offset #{offset}
      * }</pre>
      */
     private int offset;
 
     /**
-     * 排序列。
+     * 按照哪个列排序。
      */
     @Pattern(regexp = "^[a-zA-Z0-9_]+$", message = "列名只能包含字母、数字和下划线")
-    private String sortColumn;
+    private String sortBy;
 
     /**
-     * 是否降序。
+     * 是否降序排序。
      */
     private boolean desc;
 
     /**
      * 构造分页查询参数。
      *
-     * @param pageNum 页码
-     * @param pageSize 每页条数
-     * @param sortColumn 排序列
-     * @param desc 是否降序
+     * @param page 页码
+     * @param size 每页的结果数量
+     * @param sortBy 按照哪个列排序
+     * @param desc 是否降序排序
      */
-    public PageQuery(int pageNum, int pageSize, String sortColumn, Boolean desc) {
-        this.pageNum = pageNum;
-        this.pageSize = pageSize;
-        this.offset = (pageNum - 1) * pageSize;
-        this.sortColumn = sortColumn;
+    public PageQuery(int page, int size, String sortBy, Boolean desc) {
+        this.page = page;
+        this.size = size;
+        this.offset = (page - 1) * size;
+        this.sortBy = sortBy;
         this.desc = desc != null && desc;
     }
 
