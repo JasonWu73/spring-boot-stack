@@ -297,7 +297,7 @@ public class GlobalExceptionHandler {
         if (e instanceof AccessDeniedException ex) {
             throw ex;
         }
-        var msg = "服务异常";
+        var msg = "服务器发生未知错误";
         log.error(msg, e);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -331,10 +331,10 @@ public class GlobalExceptionHandler {
 
     private void logApiException(ApiException e) {
         if (e.getStatus().is4xxClientError()) {
-            log.warn("客户端请求异常: {}", e.getFullMessage());
+            log.warn("客户端错误: {}", e.getFullMessage());
             return;
         }
-        log.error("服务端处理异常: {}", e.getFullMessage());
+        log.error("服务器错误: {}", e.getFullMessage());
     }
 
     private Object getParameterName(Exception e) {

@@ -93,7 +93,7 @@ public class SecurityConfig {
                     // 通过身份验证，但没有访问权限，对应 403 HTTP 状态码
                     c.accessDeniedHandler((req, res, e) -> handlerExceptionResolver
                             .resolveException(req, res, null, new ApiException(
-                                    HttpStatus.FORBIDDEN, "授权失败", e
+                                    HttpStatus.FORBIDDEN, "没有访问权限", e
                             )));
                 });
         return http.build();
