@@ -1,5 +1,17 @@
 # Spring Boot 项目
 
+## RESTful API Endpoints
+
+```text
+GET    /api/v1/orders         <---> orders
+POST   /api/v1/orders         <---> orders.push(data)
+GET    /api/v1/orders/1       <---> orders[1]
+PUT    /api/v1/orders/1       <---> orders[1] = data
+DELETE /api/v1/orders/1       <---> orders.splice(1, 1)
+GET    /api/v1/orders/1/lines <---> orders[1].lines
+POST   /api/v1/orders/1/lines <---> orders[1].lines.push(data)
+```
+
 ## 目录结构
 
 ```bash
