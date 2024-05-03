@@ -124,7 +124,7 @@ class SecurityWebTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status")
                         .value(403))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.error")
-                        .value("授权失败"))
+                        .value("没有访问权限"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.path")
                         .value("/test-api/v1/root"));
     }
