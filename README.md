@@ -3,12 +3,13 @@
 ## RESTful API Endpoints
 
 ```text
-GET  /orders          <---> orders
-POST /orders          <---> orders.push(data)
-GET  /orders/1        <---> orders[1]
-PUT  /orders/1        <---> orders[1] = data
-GET  /orders/1/lines  <---> orders[1].lines
-POST /orders/1/lines  <---> orders[1].lines.push(data)
+GET    /api/v1/orders         <---> orders
+POST   /api/v1/orders         <---> orders.push(data)
+GET    /api/v1/orders/1       <---> orders[1]
+PUT    /api/v1/orders/1       <---> orders[1] = data
+DELETE /api/v1/orders/1       <---> orders.splice(1, 1)
+GET    /api/v1/orders/1/lines <---> orders[1].lines
+POST   /api/v1/orders/1/lines <---> orders[1].lines.push(data)
 ```
 
 ## 目录结构
