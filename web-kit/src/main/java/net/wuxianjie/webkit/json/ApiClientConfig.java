@@ -24,8 +24,8 @@ public class ApiClientConfig {
      * <p>1、默认请求头：</p>
      *
      * <pre>{@code
-     * "Accept": "application/json;charset=UTF-8"
-     * "Content-Type": "application/json;charset=UTF-8"
+     * "Accept": "application/json"
+     * "Content-Type": "application/json"
      * }</pre>
      *
      * <p>2、自定义 JSON 消息转换器：{@link MappingJackson2HttpMessageConverter}</p>
