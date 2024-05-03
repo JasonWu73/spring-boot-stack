@@ -38,8 +38,8 @@ public class ApiClientConfig {
      *     var res = client
      *             .get()
      *             .uri(url, b -> {
-     *                 b.queryParam("pageNum", 2);
-     *                 b.queryParam("pageSize", 3);
+     *                 b.queryParam("page", 2);
+     *                 b.queryParam("size", 3);
      *                 return b.build();
      *             })
      *             .headers(h -> {

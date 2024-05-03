@@ -23,29 +23,29 @@ class PageControllerTest {
     void shouldReturnsPage_whenValidPageQuery() throws Exception {
         var query = new PageQuery(3, 2, "title", true);
         mockMvc.perform(MockMvcRequestBuilders.get("/page")
-                        .param("pageNum", String.valueOf(query.getPageNum()))
-                        .param("pageSize", String.valueOf(query.getPageSize()))
-                        .param("sortColumn", query.getSortColumn())
+                        .param("page", String.valueOf(query.getPage()))
+                        .param("size", String.valueOf(query.getSize()))
+                        .param("sortBy", query.getSortBy())
                         .param("desc", String.valueOf(query.isDesc()))
                         .accept("application/json"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.header().string(
                         "Content-Type", "application/json"
                 ))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.query.pageNum")
-                        .value(query.getPageNum()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.query.pageSize")
-                        .value(query.getPageSize()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.query.page")
+                        .value(query.getPage()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.query.size")
+                        .value(query.getSize()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.query.offset")
                         .value(4))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.query.sortColumn")
-                        .value(query.getSortColumn()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.query.sortBy")
+                        .value(query.getSortBy()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.query.desc")
                         .value(query.isDesc()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result.pageNum")
-                        .value(query.getPageNum()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result.pageSize")
-                        .value(query.getPageSize()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result.page")
+                        .value(query.getPage()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result.size")
+                        .value(query.getSize()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.result.total")
                         .value(50))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.result.list")
@@ -70,15 +70,15 @@ class PageControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status")
                         .value(400))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.error")
-                        .value("参数值类型不匹配 [pageNum=null]"))
+                        .value("参数值类型不匹配 [page=null]"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.path")
                         .value("/page"));
     }
 
     @Test
-    void shouldReturnsBadRequest_whenNoPageSize() throws Exception {
+    void shouldReturnsBadRequest_whenNoSize() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/page")
-                        .param("pageNum", "1"))
+                        .param("page", "1"))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.header().string(
                         "Content-Type", "application/json"
@@ -86,17 +86,17 @@ class PageControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status")
                         .value(400))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.error")
-                        .value("参数值类型不匹配 [pageSize=null]"))
+                        .value("参数值类型不匹配 [size=null]"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.path")
                         .value("/page"));
     }
 
     @Test
-    void shouldReturnsBadRequest_whenInvalidSortColumn() throws Exception {
+    void shouldReturnsBadRequest_whenInvalidSortBy() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/page")
-                        .param("pageNum", "1")
-                        .param("pageSize", "10")
-                        .param("sortColumn", "invalid+column"))
+                        .param("page", "1")
+                        .param("size", "10")
+                        .param("sortBy", "invalid+column"))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.header().string(
                         "Content-Type", "application/json"
