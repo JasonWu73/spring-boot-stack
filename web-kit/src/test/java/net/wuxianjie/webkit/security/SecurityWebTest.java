@@ -33,7 +33,7 @@ class SecurityWebTest {
                 .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
         Assertions.assertThat(resHtml).isEqualTo("""
                 <!DOCTYPE html>
-                <html lang="zh-CN">
+                <html lang="cmn">
                     <head>
                         <meta charset="UTF-8">
                         <title>404 页面不存在</title>

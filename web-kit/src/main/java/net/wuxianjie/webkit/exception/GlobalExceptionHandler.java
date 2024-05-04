@@ -47,7 +47,7 @@ public class GlobalExceptionHandler {
 
     static final String SPA_NOT_FOUND_HTML = """
             <!DOCTYPE html>
-            <html lang="zh-CN">
+            <html lang="cmn">
                 <head>
                     <meta charset="UTF-8">
                     <title>404 页面不存在</title>
