@@ -60,7 +60,7 @@ public class JacksonConfig {
      * @return 自定义的 {@link MappingJackson2HttpMessageConverter} 实例
      */
     @Bean
-    public MappingJackson2HttpMessageConverter httpMessageJsonConverter(
+    public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter(
             ObjectMapper objectMapper
     ) {
         var converter = new MappingJackson2HttpMessageConverter();
