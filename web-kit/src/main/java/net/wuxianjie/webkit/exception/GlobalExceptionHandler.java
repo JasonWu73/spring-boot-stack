@@ -27,6 +27,7 @@ import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.bind.UnsatisfiedServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -258,6 +259,28 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> handleMultipartException(MultipartException e) {
         return handleApiException(new ApiException(
                 HttpStatus.BAD_REQUEST, "文件上传失败", e
+        ));
+    }
+
+    /**
+     * 处理请求参数与约束条件不匹配时抛出的异常。
+     *
+     * <pre>{@code
+     * @GetMapping(value = "/users", params = "version=1")
+     * public List<String> getUsers() {
+     *     return List.of("Jason", "Bruce");
+     * }
+     * }</pre>
+     *
+     * @param e 异常
+     * @return JSON 响应
+     */
+    @ExceptionHandler(UnsatisfiedServletRequestParameterException.class)
+    public ResponseEntity<ApiError> handleUnsatisfiedServletRequestParameterException(
+            UnsatisfiedServletRequestParameterException e
+    ) {
+        return handleApiException(new ApiException(
+                HttpStatus.BAD_REQUEST, "请求参数与约束条件不匹配", e
         ));
     }
 
