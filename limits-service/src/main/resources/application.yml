@@ -2,6 +2,8 @@ limits-service:
   minimum: 3
   maximum: 997
 spring:
+  application:
+    name: limits-service
   config:
     import: optional:configserver:http://localhost:8888
 web-kit:
