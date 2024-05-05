@@ -1,6 +1,8 @@
 server:
   port: 8081
 spring:
+  application:
+    name: rabbitmq-consumer
   rabbitmq:
     host: 127.0.0.1
     port: 5672
