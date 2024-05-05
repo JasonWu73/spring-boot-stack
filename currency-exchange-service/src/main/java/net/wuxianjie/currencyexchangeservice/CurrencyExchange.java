@@ -11,9 +11,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CurrencyExchange {
 
+    public CurrencyExchange(Long id, String from, String to, BigDecimal conversionMultiple) {
+        this(id, from, to, conversionMultiple, null);
+    }
+
     private Long id;
     private String from;
     private String to;
     private BigDecimal conversionMultiple;
+    private String environment;
 
 }
