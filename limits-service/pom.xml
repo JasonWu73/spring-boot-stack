@@ -13,7 +13,7 @@
     <version>0.0.1-SNAPSHOT</version>
   </parent>
 
-  <artifactId>limits-server</artifactId>
+  <artifactId>limits-service</artifactId>
 
   <dependencies>
     <dependency>
