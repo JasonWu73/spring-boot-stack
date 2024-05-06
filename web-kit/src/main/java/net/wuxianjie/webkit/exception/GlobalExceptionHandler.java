@@ -51,10 +51,11 @@ public class GlobalExceptionHandler {
             <html lang="cmn">
                 <head>
                     <meta charset="UTF-8">
-                    <title>404 页面不存在</title>
+                    <title>404 不存在</title>
                 </head>
                 <body>
-                    <h1>页面资源 [%s] 不存在</h1>
+                    <h1>资源不存在</h1>
+                    <p>请检查请求路径：%s</p>
                 </body>
             </html>""";
 
@@ -69,18 +70,15 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler({NoResourceFoundException.class, NoHandlerFoundException.class})
     public ResponseEntity<?> handleNotFoundException(HttpServletRequest req) {
-        var uri = req.getRequestURI();
+        var path = req.getRequestURI();
         if (isJsonRequest(req)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(new ApiError(
-                            HttpStatus.NOT_FOUND,
-                            "资源 [%s] 不存在".formatted(uri)
-                    ));
+                    .body(new ApiError(HttpStatus.NOT_FOUND, "资源不存在"));
         }
         return ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.TEXT_HTML)
-                .body(getHtml(uri));
+                .body(getHtml(path));
     }
 
     /**
@@ -334,21 +332,21 @@ public class GlobalExceptionHandler {
                 accept.contains(MediaType.APPLICATION_JSON_VALUE);
     }
 
-    private String getHtml(String uri) {
+    private String getHtml(String requestPath) {
         var spa = webKitProperties.getSpa().getFilePath();
         if (!StringUtils.hasText(spa)) {
-            return SPA_NOT_FOUND_HTML.formatted(uri);
+            return SPA_NOT_FOUND_HTML.formatted(requestPath);
         }
         var res = resourceLoader.getResource(spa);
         if (!res.exists()) {
-            log.error("SPA 文件 [{}] 不存在, 请求路径: {}", spa, uri);
-            return SPA_NOT_FOUND_HTML.formatted(uri);
+            log.error("SPA 文件 [{}] 不存在, 请求路径: {}", spa, requestPath);
+            return SPA_NOT_FOUND_HTML.formatted(requestPath);
         }
         try (var is = res.getInputStream()) {
             return StreamUtils.copyToString(is, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            log.error("SPA 文件 [{}] 读取失败, 请求路径: {}", spa, uri, e);
-            return SPA_NOT_FOUND_HTML.formatted(uri);
+            log.error("SPA 文件 [{}] 读取失败, 请求路径: {}", spa, requestPath, e);
+            return SPA_NOT_FOUND_HTML.formatted(requestPath);
         }
     }
 
