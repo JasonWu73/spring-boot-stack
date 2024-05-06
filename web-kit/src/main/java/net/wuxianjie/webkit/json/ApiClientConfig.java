@@ -35,7 +35,7 @@ public class ApiClientConfig {
      * <pre>{@code
      * var url = "http://192.168.2.42:8083/api/v1/users";
      * try {
-     *     var res = client
+     *     var res = restClient
      *             .get()
      *             .uri(url, b -> {
      *                 b.queryParam("page", 2);
@@ -49,11 +49,9 @@ public class ApiClientConfig {
      *             .toEntity(UserPageResponse.class);
      *     var status = res.getStatusCode().value();
      *     var userPage = res.getBody();
-     *     System.out.printf("HTTP 响应状态码：%s，响应结果：%s%n", status, userPage);
-     * } catch (RestClientResponseException e) {
-     *     var status = e.getStatusCode().value();
-     *     var errRes = e.getResponseBodyAsString(StandardCharsets.UTF_8);
-     *     System.out.printf("HTTP 响应状态码：%s，错误响应结果：%s%n", status, errRes);
+     *     System.out.printf("HTTP 响应状态码: %s，响应结果: %s%n", status, userPage);
+     * } catch (Exception e) {
+     *     throw new ApiException(HttpStatus.BAD_GATEWAY, "用户列表服务调用异常", e);
      * }
      * }</pre>
      *
@@ -63,7 +61,7 @@ public class ApiClientConfig {
      * var url = "http://192.168.2.42:8083/api/v1/auth/login";
      * var jsonParam = new Auth("username", "password");
      * try {
-     *     var res = client
+     *     var res = restClient
      *             .post()
      *             .uri(url)
      *             .body(jsonParam)
@@ -71,11 +69,9 @@ public class ApiClientConfig {
      *             .toEntity(AuthResponse.class);
      *     var status = res.getStatusCode().value();
      *     var userPage = res.getBody();
-     *     System.out.printf("HTTP 响应状态码：%s，响应结果：%s%n", status, userPage);
-     * } catch (RestClientResponseException e) {
-     *     var status = e.getStatusCode().value();
-     *     var errRes = e.getResponseBodyAsString(StandardCharsets.UTF_8);
-     *     System.out.printf("HTTP 响应状态码：%s，错误响应结果：%s%n", status, errRes);
+     *     System.out.printf("HTTP 响应状态码: %s，响应结果: %s%n", status, userPage);
+     * } catch (Exception e) {
+     *     throw new ApiException(HttpStatus.BAD_GATEWAY, "登录服务调用异常", e);
      * }
      * }</pre>
      *
@@ -86,7 +82,7 @@ public class ApiClientConfig {
      * var formData = new LinkedMultiValueMap<>();
      * formData.add("name", "张三");
      * try {
-     *     var res = client
+     *     var res = restClient
      *             .post()
      *             .uri(url)
      *             .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -95,11 +91,9 @@ public class ApiClientConfig {
      *             .toEntity(OuterData.class);
      *     var status = res.getStatusCode().value();
      *     var userPage = res.getBody();
-     *     System.out.printf("HTTP 响应状态码：%s，响应结果：%s%n", status, userPage);
-     * } catch (RestClientResponseException e) {
-     *     var status = e.getStatusCode().value();
-     *     var errRes = e.getResponseBodyAsString(StandardCharsets.UTF_8);
-     *     System.out.printf("HTTP 响应状态码：%s，错误响应结果：%s%n", status, errRes);
+     *     System.out.printf("HTTP 响应状态码: %s，响应结果: %s%n", status, userPage);
+     * } catch (Exception e) {
+     *     throw new ApiException(HttpStatus.BAD_GATEWAY, "传参测试服务调用异常", e);
      * }
      * }</pre>
      *
