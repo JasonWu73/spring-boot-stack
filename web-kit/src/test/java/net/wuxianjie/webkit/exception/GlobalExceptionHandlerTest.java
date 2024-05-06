@@ -40,7 +40,7 @@ class GlobalExceptionHandlerTest {
         var path = "/api/unknown";
         req.setRequestURI(path);
 
-        testHandleNotFoundException_returnsJson(req, path);
+        testHandleNotFoundException_returnsJson(req);
     }
 
     @Test
@@ -50,7 +50,7 @@ class GlobalExceptionHandlerTest {
         req.setRequestURI(path);
         req.addHeader("Accept", MediaType.APPLICATION_JSON_VALUE);
 
-        testHandleNotFoundException_returnsJson(req, path);
+        testHandleNotFoundException_returnsJson(req);
     }
 
     @Test
@@ -60,7 +60,7 @@ class GlobalExceptionHandlerTest {
         req.setRequestURI(path);
         req.addHeader("Accept", MediaType.APPLICATION_JSON_VALUE);
 
-        testHandleNotFoundException_returnsJson(req, path);
+        testHandleNotFoundException_returnsJson(req);
     }
 
     @Test
@@ -79,7 +79,7 @@ class GlobalExceptionHandlerTest {
                 .isEqualTo(MediaType.TEXT_HTML);
         var body = res.getBody();
         Assertions.assertThat(body).isInstanceOf(String.class);
-        Assertions.assertThat((String) body).contains("<h1>页面资源 [/unknown] 不存在</h1>");
+        Assertions.assertThat((String) body).contains("<h1>资源不存在</h1>");
     }
 
     @Test
@@ -101,9 +101,7 @@ class GlobalExceptionHandlerTest {
         Assertions.assertThat((String) body).contains("<h1>单元测试 SPA 页面</h1>");
     }
 
-    private void testHandleNotFoundException_returnsJson(
-            MockHttpServletRequest req, String path
-    ) {
+    private void testHandleNotFoundException_returnsJson(MockHttpServletRequest req) {
         try (var mocked = Mockito.mockStatic(RequestContextHolder.class)) {
             Mockito.when(webKitProperties.getSecurity())
                     .thenReturn(new WebKitProperties().getSecurity());
@@ -120,7 +118,7 @@ class GlobalExceptionHandlerTest {
             Assertions.assertThat(errRes).isNotNull();
             Assertions.assertThat(errRes.timestamp()).isBeforeOrEqualTo(LocalDateTime.now());
             Assertions.assertThat(errRes.status()).isEqualTo(HttpStatus.NOT_FOUND.value());
-            Assertions.assertThat(errRes.error()).isEqualTo("资源 [%s] 不存在".formatted(path));
+            Assertions.assertThat(errRes.error()).isEqualTo("资源不存在");
             Assertions.assertThat(errRes.path()).isEqualTo(req.getRequestURI());
         }
     }
