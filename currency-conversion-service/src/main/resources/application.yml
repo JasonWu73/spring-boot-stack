@@ -1,0 +1,10 @@
+web-kit:
+  security:
+    permit-all-paths: /**
+server:
+  port: 8100
+spring:
+  application:
+    name: currency-conversion-service
+  config:
+    import: optional:configserver:http://localhost:8888

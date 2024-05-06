@@ -36,6 +36,7 @@
     <module>web-kit</module>
     <module>web</module>
     <module>currency-exchange-service</module>
+    <module>currency-conversion-service</module>
   </modules>
 
   <!-- 统一管理依赖的版本号 -->

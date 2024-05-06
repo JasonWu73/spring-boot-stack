@@ -1,4 +1,4 @@
-package net.wuxianjie.currencyexchangeservice;
+package net.wuxianjie.currencyexchangeservice.controller;
 
 import org.apache.ibatis.annotations.Mapper;
 

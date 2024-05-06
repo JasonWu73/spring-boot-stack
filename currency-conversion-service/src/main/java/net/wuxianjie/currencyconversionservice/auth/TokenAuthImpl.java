@@ -1,4 +1,4 @@
-package net.wuxianjie.currencyexchangeservice.auth;
+package net.wuxianjie.currencyconversionservice.auth;
 
 import org.springframework.stereotype.Service;
 
