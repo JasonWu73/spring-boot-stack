@@ -3,6 +3,9 @@
 # 注意：一定要在外部 `config/application.yml` 写明需要覆盖的配置项，
 # 否则会使用 Jar 包内 `application.yml` 中已经有配置，这可能会导致程序未按预期执行
 
+web-kit:
+  security:
+    permit-all-paths: /api/*/public/**
 server:
   port: 8088
 spring:
