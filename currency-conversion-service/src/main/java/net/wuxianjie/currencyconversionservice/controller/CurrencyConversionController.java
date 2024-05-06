@@ -22,6 +22,7 @@ public class CurrencyConversionController {
 
     private final RestClient restClient;
     private final Environment environment;
+    private final CurrencyExchangeProxy currencyExchangeProxy;
 
     @GetMapping("/currency-conversion/from/{from}/to/{to}/quantity/{quantity}")
     public CurrencyConversion calculateCurrencyConversion(
@@ -32,7 +33,20 @@ public class CurrencyConversionController {
         return new CurrencyConversion(
                 1000L, from, to, conversionMultiple,
                 quantity, quantity.multiply(conversionMultiple),
-                environment.getProperty("local.server.port")
+                environment.getProperty("local.server.port") + " via RestClient"
+        );
+    }
+
+    @GetMapping("/currency-conversion-feign/from/{from}/to/{to}/quantity/{quantity}")
+    public CurrencyConversion calculateCurrencyConversionFeign(
+            @PathVariable String from, @PathVariable String to,
+            @PathVariable BigDecimal quantity
+    ) {
+        var conversionMultiple = getConversionMultipleByFeign(from, to);
+        return new CurrencyConversion(
+                1000L, from, to, conversionMultiple,
+                quantity, quantity.multiply(conversionMultiple),
+                environment.getProperty("local.server.port") + " via Feign"
         );
     }
 
@@ -47,6 +61,10 @@ public class CurrencyConversionController {
         } catch (Exception e) {
             throw new ApiException(HttpStatus.BAD_GATEWAY, "无法获取汇率数据", e);
         }
+    }
+
+    private BigDecimal getConversionMultipleByFeign(String from, String to) {
+        return currencyExchangeProxy.getCurrencyExchange(from, to).getConversionMultiple();
     }
 
 }
