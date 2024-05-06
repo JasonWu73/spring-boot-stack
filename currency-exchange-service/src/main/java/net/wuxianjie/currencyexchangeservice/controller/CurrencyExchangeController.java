@@ -3,6 +3,7 @@ package net.wuxianjie.currencyexchangeservice.controller;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import net.wuxianjie.webkit.exception.ApiException;
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
+@Slf4j
 public class CurrencyExchangeController {
 
     private final Environment environment;
@@ -25,6 +27,7 @@ public class CurrencyExchangeController {
     public CurrencyExchange getCurrencyExchange(
             @PathVariable String from, @PathVariable String to
     ) {
+        log.info("from: {}, to: {}", from, to);
         var exchange = Optional.ofNullable(currencyExchangeMapper.selectCurrencyExchangeByFromAndTo(from, to))
                 .orElseThrow(() -> new ApiException(
                         HttpStatus.NOT_FOUND,

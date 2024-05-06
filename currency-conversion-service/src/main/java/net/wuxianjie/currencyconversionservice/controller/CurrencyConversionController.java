@@ -5,7 +5,6 @@ import java.util.Objects;
 
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,7 +20,6 @@ import net.wuxianjie.webkit.exception.ApiException;
 public class CurrencyConversionController {
 
     private final RestClient restClient;
-    private final Environment environment;
     private final CurrencyExchangeProxy currencyExchangeProxy;
 
     @GetMapping("/currency-conversion/from/{from}/to/{to}/quantity/{quantity}")
@@ -29,11 +27,12 @@ public class CurrencyConversionController {
             @PathVariable String from, @PathVariable String to,
             @PathVariable BigDecimal quantity
     ) {
-        var conversionMultiple = getConversionMultipleFromApi(from, to);
+        var conversionConversion = getConversionMultipleFromApi(from, to);
+        var conversionMultiple = conversionConversion.getConversionMultiple();
         return new CurrencyConversion(
                 1000L, from, to, conversionMultiple,
                 quantity, quantity.multiply(conversionMultiple),
-                environment.getProperty("local.server.port") + " via RestClient"
+                conversionConversion.getEnvironment() + " via RestClient"
         );
     }
 
@@ -42,29 +41,34 @@ public class CurrencyConversionController {
             @PathVariable String from, @PathVariable String to,
             @PathVariable BigDecimal quantity
     ) {
-        var conversionMultiple = getConversionMultipleByFeign(from, to);
+        var currencyConversion = getConversionMultipleByFeign(from, to);
+        var currencyMultiple = currencyConversion.getConversionMultiple();
         return new CurrencyConversion(
-                1000L, from, to, conversionMultiple,
-                quantity, quantity.multiply(conversionMultiple),
-                environment.getProperty("local.server.port") + " via Feign"
+                1000L, from, to, currencyMultiple,
+                quantity, quantity.multiply(currencyMultiple),
+                currencyConversion.getEnvironment() + " via Feign"
         );
     }
 
-    private BigDecimal getConversionMultipleFromApi(String from, String to) {
+    private CurrencyConversion getConversionMultipleFromApi(String from, String to) {
         var url = "http://localhost:8000/api/v1/currency-exchange/from/{from}/to/{to}";
         try {
             var currencyConversion = restClient.get()
                     .uri(url, from, to)
                     .retrieve()
                     .toEntity(CurrencyConversion.class);
-            return Objects.requireNonNull(currencyConversion.getBody()).getConversionMultiple();
+            return Objects.requireNonNull(currencyConversion.getBody());
         } catch (Exception e) {
             throw new ApiException(HttpStatus.BAD_GATEWAY, "无法获取汇率数据", e);
         }
     }
 
-    private BigDecimal getConversionMultipleByFeign(String from, String to) {
-        return currencyExchangeProxy.getCurrencyExchange(from, to).getConversionMultiple();
+    private CurrencyConversion getConversionMultipleByFeign(String from, String to) {
+        try {
+            return currencyExchangeProxy.getCurrencyExchange(from, to);
+        } catch (Exception e) {
+            throw new ApiException(HttpStatus.BAD_GATEWAY, "无法获取汇率数据", e);
+        }
     }
 
 }
