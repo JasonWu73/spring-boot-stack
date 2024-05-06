@@ -36,10 +36,11 @@ class SecurityWebTest {
                 <html lang="cmn">
                     <head>
                         <meta charset="UTF-8">
-                        <title>404 页面不存在</title>
+                        <title>404 不存在</title>
                     </head>
                     <body>
-                        <h1>页面资源 [%s] 不存在</h1>
+                        <h1>资源不存在</h1>
+                        <p>请检查请求路径：%s</p>
                     </body>
                 </html>""".formatted(path));
     }
