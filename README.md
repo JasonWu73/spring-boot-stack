@@ -97,3 +97,19 @@ spring-boot-project
 │               └── wuxianjie
 └── README.md # 项目的描述文件
 ```
+
+## Gradle
+
+- `./gradlew clean` - 清理构建目录
+- `./gradlew build` - 构建项目
+- `./gradlew publishToMavenLocal` - 将工件发布到本地 Maven 仓库
+- `./gradlew nativeCompile` - 生成本地可执行文件
+
+## Maven
+
+- `mvn clean` - 清理构建目录
+- `mvn package` - 构建项目
+- `mvn install` - 将工件发布到本地 Maven 仓库
+- 在 Maven 多模块项目中，生成本地可执行文件必须分以下两步执行：
+    1. 先在父 POM 目录执行 `mvn install`
+    2. 再进入目标模块的 POM 目录执行 `mvn native:compile -Pnative`
