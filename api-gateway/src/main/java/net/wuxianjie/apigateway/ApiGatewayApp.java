@@ -1,13 +1,13 @@
-package net.wuxianjie.currencyexchangeservice;
+package net.wuxianjie.apigateway;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class CurrencyExchangeApplication {
+public class ApiGatewayApp {
 
     public static void main(String[] args) {
-        SpringApplication.run(CurrencyExchangeApplication.class, args);
+        SpringApplication.run(ApiGatewayApp.class, args);
     }
 
 }
