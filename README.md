@@ -102,6 +102,7 @@ spring-boot-project
 
 - `./gradlew clean` - 清理构建目录
 - `./gradlew build` - 构建项目
+    - `./gradlew build --warning-mode all` - 显示所有警告
 - `./gradlew publishToMavenLocal` - 将工件发布到本地 Maven 仓库
 - `./gradlew nativeCompile` - 生成本地可执行文件
 
