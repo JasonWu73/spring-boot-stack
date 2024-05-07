@@ -4,7 +4,7 @@ plugins {
 }
 
 dependencies {
-    api(project(":web-kit"))
+    implementation(project(":web-kit"))
 }
 
 graalvmNative {

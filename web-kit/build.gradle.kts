@@ -2,6 +2,7 @@ plugins {
     `maven-publish` // `./gradlew publishToMavenLocal` - 发布工件到本地 Maven 仓库
 }
 
+// 作为工具类 Jar，需要通过 `api` 配置传递依赖
 dependencies {
     api("org.springframework.boot:spring-boot-starter-web")
     api("org.springframework.boot:spring-boot-starter-security")
