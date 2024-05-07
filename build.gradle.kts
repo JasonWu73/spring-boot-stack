@@ -45,8 +45,8 @@ subprojects {
 
     dependencyManagement {
         imports {
-            mavenBom("org.springframework.boot:spring-boot-dependencies:${project.properties["springBootVersion"]}")
-            mavenBom("org.springframework.cloud:spring-cloud-dependencies:${project.properties["springCloudVersion"]}")
+            mavenBom("org.springframework.boot:spring-boot-dependencies:${project.property("springBootVersion")}")
+            mavenBom("org.springframework.cloud:spring-cloud-dependencies:${project.property("springCloudVersion")}")
         }
     }
 
