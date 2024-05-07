@@ -1,6 +1,6 @@
 plugins {
     java // `./gradlew build` - 用于构建 Java 项目
-    `java-library` // 支持 `api` 配置来传递依赖
+    `java-library` // 支持 `api` 配置传递依赖
     id("io.spring.dependency-management") version "1.1.4" // 支持 `dependencyManagement` 配置 Spring 依赖版本号
 }
 
@@ -54,6 +54,7 @@ subprojects {
         compileOnly("org.projectlombok:lombok")
         annotationProcessor("org.projectlombok:lombok")
         testImplementation("org.springframework.boot:spring-boot-starter-test")
+        testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     }
 
     tasks.withType<Test> {
