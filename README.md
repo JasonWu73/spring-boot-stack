@@ -13,6 +13,9 @@
 
 - 通用方法名
     - `select*` - 查询数据
+        - `count*` - 查询数据总数
+        - `exists*` - 查询数据是否存在
+            - `*Exists` - 命名变量
     - `insert*` - 插入数据
     - `update*` - 更新数据
     - `delete*` - 删除数据
