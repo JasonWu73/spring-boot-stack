@@ -17,7 +17,10 @@ import org.springframework.web.context.request.ServletRequestAttributes;
  * @param error 错误原因的简短描述
  * @param path 发生异常的请求路径
  */
-public record ApiError(LocalDateTime timestamp, int status, String error, String path) {
+public record ApiError(
+    LocalDateTime timestamp, int status, String error, String path
+) {
+
 
     /**
      * 构造 API 错误响应结果。
@@ -31,10 +34,10 @@ public record ApiError(LocalDateTime timestamp, int status, String error, String
 
     private static String getRequestPath() {
         return Optional.ofNullable(RequestContextHolder.getRequestAttributes())
-                .map(ServletRequestAttributes.class::cast)
-                .map(ServletRequestAttributes::getRequest)
-                .map(HttpServletRequest::getRequestURI)
-                .orElse(null);
+            .map(ServletRequestAttributes.class::cast)
+            .map(ServletRequestAttributes::getRequest)
+            .map(HttpServletRequest::getRequestURI)
+            .orElse(null);
     }
 
 }

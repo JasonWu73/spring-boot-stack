@@ -27,8 +27,8 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
+import net.wuxianjie.commonkit.exception.ApiException;
 import net.wuxianjie.webkit.config.WebKitProperties;
-import net.wuxianjie.webkit.exception.ApiException;
 
 /**
  * Spring Security 配置。
@@ -48,74 +48,92 @@ public class SecurityConfig {
      *
      * @param http Spring Security HTTP 配置
      * @return Spring Security 过滤器链
-     * @throws Exception 配置错误时抛出
+     * @throws Exception 配置出错时抛出
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         // 以下配置仅对 API 请求生效
-        http.securityMatcher(webKitProperties.getSecurity().getApiPathPrefix() + "**")
-                // 注意：顺序很重要，即前面的规则匹配后则不再进行后续比较
-                .authorizeHttpRequests(r -> {
-                    // 配置公共 API
-                    for (var p : webKitProperties.getSecurity().getPermitAllPaths()) {
-                        r.requestMatchers(p).permitAll();
-                    }
-                    // 默认其他 API 都需要登录才能访问
-                    r.requestMatchers("/**").authenticated();
-                })
-                // 添加自定义 Token 身份验证过滤器
-                .addFilterBefore(
-                        new TokenAuthFilter(handlerExceptionResolver, tokenAuth),
-                        UsernamePasswordAuthenticationFilter.class
-                );
+        String apiPathPrefix = webKitProperties.getSecurity().getApiPathPrefix();
+        String[] permitAllPaths = webKitProperties.getSecurity().getPermitAllPaths();
+
+        http.securityMatcher(apiPathPrefix + "**")
+            // 注意：顺序很重要，即前面的规则匹配后则不再进行后续比较
+            .authorizeHttpRequests(matcherRegistry -> {
+                // 配置公共 API
+                for (String path : permitAllPaths) {
+                    matcherRegistry.requestMatchers(path).permitAll();
+                }
+                // 默认其他 API 都需要登录才能访问
+                matcherRegistry.requestMatchers("/**").authenticated();
+            })
+            // 添加自定义 Token 身份验证过滤器
+            .addFilterBefore(
+                new TokenAuthFilter(handlerExceptionResolver, tokenAuth),
+                UsernamePasswordAuthenticationFilter.class
+            );
 
         // 以下配置对所有请求生效
-        http.authorizeHttpRequests(r -> {
-                    // 默认所有请求所有人都可访问（保证 SPA 前端资源可用）
-                    r.requestMatchers("/**").permitAll();
-                })
-                // 支持 CORS
-                .cors(Customizer.withDefaults())
-                // 禁用 CSRF
-                .csrf(AbstractHttpConfigurer::disable)
-                // 允许浏览器在同源策略下使用 `<frame>` 或 `<iframe>`
-                .headers(c -> c.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
-                // 不需要会话状态，即不向客户端发送 `JSESSIONID` Cookies
-                .sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // 身份验证失败和没有访问权限的处理
-                .exceptionHandling(c -> {
-                    // 未通过身份验证，对应 401 HTTP 状态码
-                    c.authenticationEntryPoint((req, res, e) -> handlerExceptionResolver
-                            .resolveException(req, res, null, new ApiException(
-                                    HttpStatus.UNAUTHORIZED, "身份验证失败", e
-                            )));
+        http.authorizeHttpRequests(matcherRegistry -> {
+                // 默认所有请求所有人都可访问（保证 SPA 前端资源可用）
+                matcherRegistry.requestMatchers("/**").permitAll();
+            })
+            // 支持 CORS
+            .cors(Customizer.withDefaults())
+            // 禁用 CSRF
+            .csrf(AbstractHttpConfigurer::disable)
+            // 允许浏览器在同源策略下使用 `<frame>` 或 `<iframe>`
+            .headers(config -> config.frameOptions(
+                    HeadersConfigurer.FrameOptionsConfig::sameOrigin
+                )
+            )
+            // 不需要会话状态，即不向客户端发送 `JSESSIONID` Cookies
+            .sessionManagement(config -> config.sessionCreationPolicy(
+                    SessionCreationPolicy.STATELESS
+                )
+            )
+            // 身份验证失败和没有访问权限的处理
+            .exceptionHandling(config -> {
+                // 未通过身份验证，对应 401 HTTP 状态码
+                config.authenticationEntryPoint((request, response, exception) ->
+                    handlerExceptionResolver.resolveException(
+                        request, response, null,
+                        new ApiException(
+                            HttpStatus.UNAUTHORIZED, "身份验证失败", exception
+                        )
+                    )
+                );
 
-                    // 通过身份验证，但没有访问权限，对应 403 HTTP 状态码
-                    c.accessDeniedHandler((req, res, e) -> handlerExceptionResolver
-                            .resolveException(req, res, null, new ApiException(
-                                    HttpStatus.FORBIDDEN, "没有访问权限", e
-                            )));
-                });
+                // 通过身份验证，但没有访问权限，对应 403 HTTP 状态码
+                config.accessDeniedHandler((request, response, exception) ->
+                    handlerExceptionResolver.resolveException(
+                        request, response, null,
+                        new ApiException(
+                            HttpStatus.FORBIDDEN, "没有访问权限", exception
+                        )
+                    )
+                );
+            });
         return http.build();
     }
 
     /**
      * 配置 Spring Security CORS。
      *
-     * @return CORS 配置
+     * @return CORS 配置实例
      */
     @Bean
-    public CorsConfigurationSource corsConfig() {
-        var cfg = new CorsConfiguration();
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
 
         // 以下配置缺一不可
-        cfg.setAllowedOriginPatterns(List.of("*"));
-        cfg.setAllowedMethods(List.of("*"));
-        cfg.setAllowCredentials(true);
-        cfg.setAllowedHeaders(List.of("*"));
+        config.setAllowedOriginPatterns(List.of("*"));
+        config.setAllowedMethods(List.of("*"));
+        config.setAllowCredentials(true);
+        config.setAllowedHeaders(List.of("*"));
 
-        var source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", cfg);
+        UrlBasedCorsConfigurationSource source =
+            new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
         return source;
     }
 
@@ -130,30 +148,32 @@ public class SecurityConfig {
     }
 
     /**
-     * 配置拥有上下级关系的功能权限。
-     *
-     * <p>Spring Boot 3.x（即 Spring Security 6.x）开始，还需要创建 {@link #expressionHandler()}。</p>
+     * 配置拥有上下级关系的功能权限 Bean。
      *
      * @return 拥有上下级关系的功能权限
      */
     @Bean
     public RoleHierarchy roleHierarchy() {
-        var hierarchy = new RoleHierarchyImpl();
-        hierarchy.setHierarchy(String.join(
-                "\n", webKitProperties.getSecurity().getHierarchies()
-        ));
+        RoleHierarchyImpl hierarchy = new RoleHierarchyImpl();
+        hierarchy.setHierarchy(
+            String.join("\n", webKitProperties.getSecurity().getHierarchies())
+        );
         return hierarchy;
     }
 
     /**
-     * Spring Boot 3.x（即 Spring Security 6）开始，这是配置 {@link #roleHierarchy()} 的必要 Bean。
+     * Spring Boot 3.x（即 Spring Security 6）开始，需要手动配置使用上下级关系的功能权限。
      *
-     * @return {@link #roleHierarchy()} 的必要 Bean
+     * @param roleHierarchy 自定义 {@link #roleHierarchy()} Bean
+     * @return 默认方法安全表达式处理器
      */
     @Bean
-    public DefaultMethodSecurityExpressionHandler expressionHandler() {
-        var handler = new DefaultMethodSecurityExpressionHandler();
-        handler.setRoleHierarchy(roleHierarchy());
+    public DefaultMethodSecurityExpressionHandler DefaultMethodSecurityExpressionHandler(
+        RoleHierarchy roleHierarchy
+    ) {
+        DefaultMethodSecurityExpressionHandler handler =
+            new DefaultMethodSecurityExpressionHandler();
+        handler.setRoleHierarchy(roleHierarchy);
         return handler;
     }
 

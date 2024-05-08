@@ -13,8 +13,8 @@ import java.util.List;
  * @param refreshToken 刷新令牌，用于刷新身份验证信息
  */
 public record CurrentUserInfo(
-        long userId, String username, String nickname,
-        List<String> authorities,
-        String accessToken, String refreshToken
+    long userId, String username, String nickname,
+    List<String> authorities,
+    String accessToken, String refreshToken
 ) {
 }
