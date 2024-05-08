@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import net.wuxianjie.webkit.exception.ApiException;
+import net.wuxianjie.commonkit.exception.ApiException;
 
 @RestController
 @RequestMapping("/api/v1")

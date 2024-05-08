@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClient;
 
-import net.wuxianjie.webkit.exception.ApiException;
+import net.wuxianjie.commonkit.exception.ApiException;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -59,7 +59,7 @@ public class CurrencyConversionController {
                     .toEntity(CurrencyConversion.class);
             return Objects.requireNonNull(currencyConversion.getBody());
         } catch (Exception e) {
-            throw new ApiException(HttpStatus.BAD_GATEWAY, "无法获取汇率数据", e);
+            throw new ApiException(HttpStatus.SERVICE_UNAVAILABLE, "无法获取汇率数据", e);
         }
     }
 
@@ -67,7 +67,7 @@ public class CurrencyConversionController {
         try {
             return currencyExchangeProxy.getCurrencyExchange(from, to);
         } catch (Exception e) {
-            throw new ApiException(HttpStatus.BAD_GATEWAY, "无法获取汇率数据", e);
+            throw new ApiException(HttpStatus.SERVICE_UNAVAILABLE, "无法获取汇率数据", e);
         }
     }
 

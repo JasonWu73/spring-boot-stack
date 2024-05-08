@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    api(project(":web-kit"))
+    implementation(project(":web-kit"))
     implementation("com.mysql:mysql-connector-j")
     implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:${project.property("mybatisSpringBootStarterVersion")}")
     implementation("org.springframework.cloud:spring-cloud-starter-config")

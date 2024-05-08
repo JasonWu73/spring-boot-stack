@@ -11,15 +11,15 @@
 
 ## MyBatis Mapper 方法命名
 
-- 通用方法名
+- 方法名前缀
     - `select*` - 查询数据
         - `count*` - 查询数据总数
         - `exists*` - 查询数据是否存在
-            - `*Exists` - 命名变量
+            - `*Exists` - 变量名后缀
     - `insert*` - 插入数据
     - `update*` - 更新数据
     - `delete*` - 删除数据
-- 通用方法名后缀
+- 方法名后缀
     - `By*And*OrderBy*`
     - `By*Or*OrderBy*`
 
@@ -53,14 +53,15 @@
     - 使用版本化的 URL，如 `/v1/users`
     - URL 中只使用小写字母和横线（不使用下划线）
     - URL 中不要包含文件扩展名
-    - 使用 query string 参数过滤、排序等操作，如 `/users?role=admin&sortBy=name`
+    - 使用 Query String 参数过滤、排序等操作，如 `/users?role=admin&sortBy=name`
 
 ### HTTP 响应状态码
 
 - `2xx` 成功状态码
     - `200 OK` - 一切正常，请求成功
     - `201 Created` - 新资源已成功创建，如 `POST` 请求创建资源成功
-    - `204 No Content` - 请求成功，但响应主体为空，如 `DELETE` 请求删除资源成功，`PUT` 或 `PATCH` 请求更新资源成功
+    - `204 No Content` - 请求成功，但响应主体为空，如 `DELETE`
+      请求删除资源成功，`PUT` 或 `PATCH` 请求更新资源成功
 - `4xx` 客户端错误状态码
     - `400 Bad Request` - 请求存在语法错误或参数错误，服务器无法理解
     - `401 Unauthorized` - 请求缺少身份验证信息或者身份验证失败
@@ -70,7 +71,7 @@
     - `409 Conflict` - 请求与服务器当前状态存在冲突，如修改时存在同名用户
 - `5xx` 服务器错误状态码
     - `500 Internal Server Error` - 服务器发生未知错误
-    - `502 Bad Gateway` - 服务器本身工作正常，但在将请求转发到上游服务器时出现了问题
+    - `503 SERVICE_UNAVAILABLE` - 外部服务不可用
 
 ## 目录结构
 

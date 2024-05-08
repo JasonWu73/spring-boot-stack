@@ -3,6 +3,6 @@ plugins {
 }
 
 dependencies {
-    api(project(":web-kit"))
+    implementation(project(":web-kit"))
     implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-server")
 }

@@ -3,9 +3,11 @@ import java.time.format.DateTimeFormatter
 
 plugins {
     id("org.springframework.boot") version "3.2.5"
-    id("org.graalvm.buildtools.native") version "0.9.28" // `./gradlew nativeCompile` - 编译本地可执行文件
+    // `./gradlew nativeCompile` - 编译本地可执行文件
+    id("org.graalvm.buildtools.native") version "0.9.28"
 }
 
+// 项目版本号，建议每次发布时更新，并使用 `git tag` 标记
 version = "v1.0.0"
 
 springBoot {

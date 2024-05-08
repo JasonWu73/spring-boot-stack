@@ -7,3 +7,9 @@ server:
 spring:
   application:
     name: api-gateway
+management:
+  endpoints:
+    web:
+      base-path: /gateway/actuator
+      exposure:
+        include: health,info,metrics
