@@ -1,5 +1,6 @@
 package net.wuxianjie.webkit.security;
 
+import java.util.List;
 import java.util.Optional;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,27 +23,34 @@ public class AuthUtils {
      * @return 当前登录用户信息
      */
     public static Optional<CurrentUserInfo> getCurrentUser() {
-        return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
-                .filter(a -> !(a instanceof AnonymousAuthenticationToken))
-                .map(a -> (CurrentUserInfo) a.getPrincipal());
+        return Optional
+            .ofNullable(SecurityContextHolder.getContext().getAuthentication())
+            .filter(authentication ->
+                !(authentication instanceof AnonymousAuthenticationToken)
+            )
+            .map(authentication ->
+                (CurrentUserInfo) authentication.getPrincipal()
+            );
     }
 
     /**
      * 将登录信息写入 Spring Security Context。
      *
      * @param user 已通过身份验证的用户信息
-     * @param req HTTP 请求对象
+     * @param request HTTP 请求对象
      */
     public static void setAuthenticatedContext(
-            CurrentUserInfo user, HttpServletRequest req
+        CurrentUserInfo user, HttpServletRequest request
     ) {
-        var authorities = user.authorities()
-                .stream()
-                .filter(StringUtils::hasText)
-                .map(SimpleGrantedAuthority::new)
-                .toList();
-        var token = new UsernamePasswordAuthenticationToken(user, null, authorities);
-        token.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
+        List<SimpleGrantedAuthority> authorities = user.authorities().stream()
+            .filter(StringUtils::hasText)
+            .map(SimpleGrantedAuthority::new)
+            .toList();
+        UsernamePasswordAuthenticationToken token =
+            new UsernamePasswordAuthenticationToken(user, null, authorities);
+        token.setDetails(
+            new WebAuthenticationDetailsSource().buildDetails(request)
+        );
         SecurityContextHolder.getContext().setAuthentication(token);
     }
 

@@ -1,7 +1,6 @@
 package net.wuxianjie.webkit.config;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -11,8 +10,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConfigurationProperties(prefix = "web-kit")
-@Getter
-@Setter
+@Data
 public class WebKitProperties {
 
     /**
@@ -28,8 +26,7 @@ public class WebKitProperties {
     /**
      * Web 安全配置。
      */
-    @Getter
-    @Setter
+    @Data
     public static class Security {
 
         /**
@@ -53,7 +50,8 @@ public class WebKitProperties {
          *
          * <p>使用 <code>></code> 符号创建上下级权限（角色）。</p>
          *
-         * <p>比如下面字符串代表 <code>root</code> 拥有所有 <code>admin</code> 的所有权限：</p>
+         * <p>比如下面字符串代表 <code>root</code> 拥有
+         *         <code>admin</code> 的所有权限：</p>
          *
          * <pre><code>
          * root > admin
@@ -71,8 +69,7 @@ public class WebKitProperties {
     /**
      * SPA 应用配置。
      */
-    @Getter
-    @Setter
+    @Data
     public static class Spa {
 
         /**

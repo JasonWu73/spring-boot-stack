@@ -15,16 +15,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
-import net.wuxianjie.webkit.exception.ApiException;
+import net.wuxianjie.commonkit.exception.ApiException;
 
 /**
- * 访问令牌（Access Token）身份验证过滤器。
+ * Access Token 身份验证过滤器。
  */
 @RequiredArgsConstructor
 public class TokenAuthFilter extends OncePerRequestFilter {
 
     /**
-     * 携带访问令牌（Access Token）的请求头值前缀：
+     * 携带 Access Token 的请求头值前缀。
      *
      * <pre>{@code
      * "Authorization: Bearer {{accessToken}}"
@@ -37,18 +37,22 @@ public class TokenAuthFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(
-            @NonNull HttpServletRequest req, @NonNull HttpServletResponse res,
-            @NonNull FilterChain chain
+        @NonNull HttpServletRequest request,
+        @NonNull HttpServletResponse response,
+        @NonNull FilterChain chain
     ) throws ServletException, IOException {
-        var bearer = req.getHeader(HttpHeaders.AUTHORIZATION);
+        String bearer = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (bearer == null) {
-            chain.doFilter(req, res);
+            chain.doFilter(request, response);
             return;
         }
         if (!bearer.startsWith(BEARER_PREFIX)) {
-            handlerExceptionResolver.resolveException(req, res, null, new ApiException(
-                    HttpStatus.UNAUTHORIZED, "accessToken 格式错误"
-            ));
+            handlerExceptionResolver.resolveException(
+                request, response, null,
+                new ApiException(
+                    HttpStatus.UNAUTHORIZED, "Access Token 格式错误"
+                )
+            );
             return;
         }
         var accessToken = bearer.substring(BEARER_PREFIX.length());
@@ -56,15 +60,18 @@ public class TokenAuthFilter extends OncePerRequestFilter {
         CurrentUserInfo user;
         try {
             user = tokenAuth.authenticate(accessToken);
-        } catch (AccessTokenAuthException e) {
-            handlerExceptionResolver.resolveException(req, res, null, new ApiException(
-                    HttpStatus.UNAUTHORIZED, "accessToken 验证失败", e
-            ));
+        } catch (TokenAuthException e) {
+            handlerExceptionResolver.resolveException(
+                request, response, null,
+                new ApiException(
+                    HttpStatus.UNAUTHORIZED, "Access Token 验证失败", e
+                )
+            );
             return;
         }
 
-        AuthUtils.setAuthenticatedContext(user, req);
-        chain.doFilter(req, res);
+        AuthUtils.setAuthenticatedContext(user, request);
+        chain.doFilter(request, response);
     }
 
 }

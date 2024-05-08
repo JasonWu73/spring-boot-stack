@@ -1,7 +1,9 @@
 rootProject.name = "spring-boot-stack"
 
 // 子模块
+include(":common-kit")
 include(":web-kit")
+include(":gateway-kit")
 include(":web")
 include(":rabbitmq-producer")
 include(":rabbitmq-consumer")

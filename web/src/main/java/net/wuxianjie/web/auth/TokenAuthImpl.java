@@ -13,8 +13,8 @@ public class TokenAuthImpl implements TokenAuth {
     @Override
     public CurrentUserInfo authenticate(String accessToken) {
         return new CurrentUserInfo(
-                1, "root", "超级管理员", List.of("root"),
-                "root-token", "root-refresh"
+            1, "root", "超级管理员", List.of("root"),
+            "root-token", "root-refresh"
         );
     }
 

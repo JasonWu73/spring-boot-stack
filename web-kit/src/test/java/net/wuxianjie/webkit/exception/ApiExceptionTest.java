@@ -1,41 +1,48 @@
 package net.wuxianjie.webkit.exception;
 
-import org.assertj.core.api.Assertions;
-
 import org.junit.jupiter.api.Test;
 
 import org.springframework.http.HttpStatus;
+
+import net.wuxianjie.commonkit.exception.ApiException;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class ApiExceptionTest {
 
     @Test
     void getMessage_withoutCause() {
-        var status = HttpStatus.BAD_REQUEST;
-        var error = "客户端请求错误";
+        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+        String error = "客户端请求错误";
 
-        var ex = new ApiException(status, error);
-        Assertions.assertThat(ex.getStatus()).isEqualTo(status);
-        Assertions.assertThat(ex.getMessage()).isEqualTo(error);
-        Assertions.assertThat(ex.getFullMessage())
-                .isEqualTo("%s \"%s\"".formatted(status, error));
+        ApiException apiException = new ApiException(httpStatus, error);
+        assertThat(apiException.getStatus()).isEqualTo(httpStatus);
+        assertThat(apiException.getMessage()).isEqualTo(error);
+        assertThat(apiException.getFullMessage())
+            .isEqualTo("%s \"%s\"".formatted(httpStatus, error));
     }
 
     @Test
     void getMessage_withCause() {
-        var status = HttpStatus.BAD_REQUEST;
-        var error = "客户端请求错误";
-        var innerCause = new IllegalStateException("异常 Inner");
-        var outerCause = new IllegalArgumentException("异常 Outer", innerCause);
+        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+        String error = "客户端请求错误";
+        IllegalStateException innerCause = new IllegalStateException(
+            "异常 Inner"
+        );
+        IllegalArgumentException outerCause = new IllegalArgumentException(
+            "异常 Outer", innerCause
+        );
 
-        var ex = new ApiException(status, error, outerCause);
-        Assertions.assertThat(ex.getStatus()).isEqualTo(status);
-        Assertions.assertThat(ex.getMessage()).isEqualTo(error);
-        Assertions.assertThat(ex.getFullMessage())
-                .isEqualTo("%s \"%s\"; 嵌套异常 [%s: %s]; 嵌套异常 [%s: %s]".formatted(
-                        status, error,
-                        IllegalArgumentException.class.getName(), "异常 Outer",
-                        IllegalStateException.class.getName(), "异常 Inner"
-                ));
+        ApiException apiException = new ApiException(httpStatus, error, outerCause);
+        assertThat(apiException.getStatus()).isEqualTo(httpStatus);
+        assertThat(apiException.getMessage()).isEqualTo(error);
+        assertThat(apiException.getFullMessage()).isEqualTo(
+            "%s \"%s\"; 嵌套异常 [%s: %s]; 嵌套异常 [%s: %s]".formatted(
+                httpStatus, error,
+                IllegalArgumentException.class.getName(), "异常 Outer",
+                IllegalStateException.class.getName(), "异常 Inner"
+            )
+        );
     }
 
 }
