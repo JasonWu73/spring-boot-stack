@@ -5,8 +5,6 @@ plugins {
     id("org.springframework.boot")
 }
 
-version = "v1.0.0"
-
 springBoot {
     buildInfo {
         properties {
