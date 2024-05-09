@@ -10,8 +10,8 @@ allprojects {
 
     group = "net.wuxianjie"
 
-    // 生产版本号，建议每次发布时更新，并使用 `git tag` 标记
-    version = "${project.property("productionVersion") ?: "v0.0.1-SNAPSHOT"}"
+    // 用于正式发布的版本号，每次发布时更新，并使用 `git tag` 标记
+    version = "${project.property("releaseVersion") ?: "v0.0.1-SNAPSHOT"}"
 
     java {
         sourceCompatibility = JavaVersion.VERSION_21
