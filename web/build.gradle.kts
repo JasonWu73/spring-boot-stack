@@ -2,13 +2,9 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 plugins {
-    id("org.springframework.boot") version "3.2.5"
-    // `./gradlew nativeCompile` - 编译本地可执行文件
-    id("org.graalvm.buildtools.native") version "0.9.28"
+    id("org.springframework.boot")
+    id("org.graalvm.buildtools.native")
 }
-
-// 项目版本号，建议每次发布时更新，并使用 `git tag` 标记
-version = "v1.0.0"
 
 springBoot {
     buildInfo {
