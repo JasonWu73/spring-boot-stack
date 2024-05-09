@@ -1,20 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  部署时将 `logback-spring.xml` 放于与 Jar 同级目录的 `config` 子目录下，
-  并通过如下命令运行程序（其中 `&#45;` 就是连字符 `-`）：
-  `java -jar xxx.jar &#45;&#45;logging.config=file:./config/logback-spring.xml`
+  如果要将 `logback-spring.xml` 放在 Jar 包之外，则要明确指定配置文件的路径：
+  `java -Dlogging.config=file:./config/logback-spring.xml -jar xxx.jar`
 -->
 <configuration>
-  <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
-  <include
-    resource="org/springframework/boot/logging/logback/console-appender.xml"
+  <!-- 先定义属性，防止被覆盖 -->
+  <property
+    name="CONSOLE_LOG_PATTERN"
+    value="${CONSOLE_LOG_PATTERN:-%clr(%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr(%applicationName[%15.15t]){faint} %clr(${LOG_CORRELATION_PATTERN:-}){faint}%clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"
   />
-
+  <property
+    name="FILE_LOG_PATTERN"
+    value="${FILE_LOG_PATTERN:-%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}} ${LOG_LEVEL_PATTERN:-%5p} ${PID:- } --- %applicationName[%t] ${LOG_CORRELATION_PATTERN:-}%-40.40logger{39} : %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"
+  />
   <property name="LOG_FILE_DIR" value="logs"/>
   <property name="LOG_FILE_NAME" value="web"/>
   <property name="MAX_FILE_SIZE" value="100MB"/>
   <property name="MAX_HISTORY" value="60"/>
   <property name="TOTAL_SIZE_CAP" value="20GB"/>
+
+  <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+  <include
+    resource="org/springframework/boot/logging/logback/console-appender.xml"
+  />
 
   <appender
     name="LOG_FILE"
