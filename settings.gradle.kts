@@ -26,11 +26,9 @@ pluginManagement {
         id("org.graalvm.buildtools.native") version graalvmBuildtoolsNativeVersion
     }
 
-    // 配置 Gradle 插件的下载源为阿里云 Maven 仓库
+    // 配置阿里云代理库作为 Gradle 插件的下载源
     repositories {
-        maven {
-            setUrl("https://maven.aliyun.com/repository/gradle-plugin")
-        }
+        maven { setUrl("https://maven.aliyun.com/repository/gradle-plugin") }
         gradlePluginPortal()
     }
 }

@@ -23,5 +23,5 @@ springBoot {
 dependencies {
     implementation(project(":gateway-kit"))
     implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
-    implementation("io.github.resilience4j:resilience4j-spring-boot3:")
+    implementation("org.springframework.cloud:spring-cloud-starter-circuitbreaker-reactor-resilience4j")
 }
