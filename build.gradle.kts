@@ -18,11 +18,9 @@ allprojects {
     }
 
     repositories {
-        // 配置项目依赖的下载源为阿里云 Maven 仓库
-        maven {
-            setUrl("https://maven.aliyun.com/repository/public")
-            setUrl("https://maven.aliyun.com/repository/spring")
-        }
+        // 配置阿里云代理库作为依赖的下载源
+        maven { setUrl("https://maven.aliyun.com/repository/public") }
+        maven { setUrl("https://maven.aliyun.com/repository/spring") }
 
         mavenLocal()
         mavenCentral()
