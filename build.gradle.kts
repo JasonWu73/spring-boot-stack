@@ -1,10 +1,7 @@
 plugins {
-    // `./gradlew build` - 用于构建 Java 项目
-    java
-    // 支持 `api` 配置传递依赖
-    `java-library`
-    // 支持 `dependencyManagement` 配置依赖版本号
-    id("io.spring.dependency-management") version "1.1.4"
+    java // `./gradlew build` - 用于构建 Java 项目
+    `java-library` // 添加以支持通过 `api` 配置传递依赖
+    id("io.spring.dependency-management")
 }
 
 allprojects {
@@ -12,17 +9,22 @@ allprojects {
     apply(plugin = "java-library")
 
     group = "net.wuxianjie"
-    version = "0.0.1-SNAPSHOT"
 
-    java { sourceCompatibility = JavaVersion.VERSION_21 }
+    // 生产版本号，建议每次发布时更新，并使用 `git tag` 标记
+    version = "${project.property("productionVersion") ?: "v0.0.1-SNAPSHOT"}"
 
-    // 配置项目依赖的下载源为阿里云 Maven 仓库
-    // `repositories` 的声明顺序非常重要，会直接影响 Gradle 查找和下载依赖包的顺序
+    java {
+        sourceCompatibility = JavaVersion.VERSION_21
+    }
+
     repositories {
-        // 本地 Maven 仓库中的依赖包放在第一位
+        // 配置项目依赖的下载源为阿里云 Maven 仓库
+        maven {
+            setUrl("https://maven.aliyun.com/repository/public")
+            setUrl("https://maven.aliyun.com/repository/spring")
+        }
+
         mavenLocal()
-        maven { setUrl("https://maven.aliyun.com/repository/public") }
-        maven { setUrl("https://maven.aliyun.com/repository/spring") }
         mavenCentral()
     }
 
@@ -48,21 +50,12 @@ subprojects {
     }
 
     dependencyManagement {
+        val springBootVersion: String by project
+        val springCloudVersion: String by project
+
         imports {
-            mavenBom(
-                "org.springframework.boot:spring-boot-dependencies:${
-                    project.property(
-                        "springBootVersion"
-                    )
-                }"
-            )
-            mavenBom(
-                "org.springframework.cloud:spring-cloud-dependencies:${
-                    project.property(
-                        "springCloudVersion"
-                    )
-                }"
-            )
+            mavenBom("org.springframework.boot:spring-boot-dependencies:$springBootVersion")
+            mavenBom("org.springframework.cloud:spring-cloud-dependencies:$springCloudVersion")
         }
     }
 
