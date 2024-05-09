@@ -9,7 +9,6 @@ dependencies {
     api("org.springframework.boot:spring-boot-starter-web")
     api("org.springframework.boot:spring-boot-starter-security")
     api("org.springframework.boot:spring-boot-starter-actuator")
-    api("org.springframework.boot:spring-boot-starter-aop")
     api("org.springframework.boot:spring-boot-configuration-processor")
 }
 
