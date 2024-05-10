@@ -28,7 +28,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
  * <p>自定义 Spring Boot 中对 JSON 数据的默认处理方式。</p>
  */
 @Configuration
-public class JacksonConfig {
+public class JsonConfig {
 
     /**
      * 系统中对于日期字符串的统一格式。
@@ -45,7 +45,7 @@ public class JacksonConfig {
         return JsonMapper.builder()
             .addModule(getJavaTimeModule())
             .defaultDateFormat(
-                new SimpleDateFormat(JacksonConfig.DATE_TIME_PATTERN)
+                new SimpleDateFormat(JsonConfig.DATE_TIME_PATTERN)
             )
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
@@ -75,7 +75,7 @@ public class JacksonConfig {
     private JavaTimeModule getJavaTimeModule() {
         JavaTimeModule timeModule = new JavaTimeModule();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(
-            JacksonConfig.DATE_TIME_PATTERN
+            JsonConfig.DATE_TIME_PATTERN
         );
         timeModule.addSerializer(LocalDateTime.class, new JsonSerializer<>() {
 

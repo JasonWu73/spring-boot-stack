@@ -14,7 +14,7 @@ import org.springframework.web.client.RestClient;
  */
 @Configuration
 @RequiredArgsConstructor
-public class ApiClientConfig {
+public class RestApiClientConfig {
 
     private final MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter;
 
