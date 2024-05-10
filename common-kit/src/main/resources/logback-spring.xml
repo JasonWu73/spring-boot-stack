@@ -14,7 +14,7 @@
     value="${FILE_LOG_PATTERN:-%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}} ${LOG_LEVEL_PATTERN:-%5p} ${PID:- } --- %applicationName[%t] ${LOG_CORRELATION_PATTERN:-}%-40.40logger{39} : %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"
   />
   <property name="LOG_FILE_DIR" value="logs"/>
-  <property name="LOG_FILE_NAME" value="web"/>
+  <property name="LOG_FILE_NAME" value="app"/>
   <property name="MAX_FILE_SIZE" value="100MB"/>
   <property name="MAX_HISTORY" value="60"/>
   <property name="TOTAL_SIZE_CAP" value="20GB"/>
@@ -55,6 +55,7 @@
 
   <root level="INFO">
     <appender-ref ref="CONSOLE"/>
+    <!-- 默认不需要记录日志文件 -->
     <!-- <appender-ref ref="LOG_FILE"/> -->
   </root>
 </configuration>
