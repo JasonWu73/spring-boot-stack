@@ -26,9 +26,9 @@ public class CircuitBreakerController {
     private final RestClient restClient;
 
     /**
-     * 测试断路器的接口。
+     * 测试断路器执行效果。
      *
-     * @return 表示接口调用成功的无意义信息
+     * @return 表示接口调用成功的信息
      */
     @GetMapping("/sample-api")
     // 默认重试 3 次
@@ -41,21 +41,23 @@ public class CircuitBreakerController {
                 .toEntity(String.class);
             return entity.getBody();
         } catch (Exception e) {
-            // 由于使用了 Resilience4j 的重试机制，这里抛出的异常并不会被打印，故需要手动打印
+            // 因为 Resilience4j 的重试机制，这里抛出的异常并不会被打印，故需要手动打印
             log.error("Sample API 调用失败: {}", e.getMessage());
-            throw new ApiException(HttpStatus.SERVICE_UNAVAILABLE, "Sample API 调用失败", e);
+            throw new ApiException(
+                HttpStatus.SERVICE_UNAVAILABLE, "Sample API 调用失败", e
+            );
         }
     }
 
     /**
-     * 断路器触发时的回调方法。
+     * 断路器触发时的备用响应（Fallback Response）方法。
      *
      * @param throwable 断路器触发时的异常
-     * @return 回调信息
+     * @return 备用响应
      */
     @SuppressWarnings("unused")
     private String sampleApiFallback(Throwable throwable) {
-        return "Fallback Response: " + throwable.getMessage();
+        return "备用响应: " + throwable.getMessage();
     }
 
 }
