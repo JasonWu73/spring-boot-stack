@@ -1,3 +1,1 @@
-net.wuxianjie.webkit.config.WebKitProperties
-net.wuxianjie.webkit.security.SecurityConfig
-net.wuxianjie.webkit.exception.GlobalExceptionHandler
+net.wuxianjie.webkit.WebKitAutoConfig

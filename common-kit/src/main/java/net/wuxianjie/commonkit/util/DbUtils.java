@@ -5,7 +5,7 @@ import org.springframework.util.StringUtils;
 /**
  * 数据库工具类。
  */
-public class DatabaseUtils {
+public class DbUtils {
 
     /**
      * 按如下规则生成用于数据库模糊查询的字符串值。
