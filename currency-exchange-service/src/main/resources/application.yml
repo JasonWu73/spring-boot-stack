@@ -16,5 +16,12 @@ spring:
     url: jdbc:mysql://localhost:3306/test_del?useSSL=false&serverTimezone=Asia/Shanghai
     username: root
     password: qwe@123
+resilience4j:
+  retry:
+    instances:
+      sample-api: # 重试实例名称
+        max-attempts: 5 # 最大重试次数
+        wait-duration: 1s # 重试间隔
+        enable-exponential-backoff: true # 是否启用指数退避
 mybatis:
   mapper-locations: classpath:mapper/*.xml

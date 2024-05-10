@@ -10,4 +10,5 @@ dependencies {
     implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:$mybatisSpringBootStarterVersion")
     implementation("org.springframework.cloud:spring-cloud-starter-config")
     implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
+    implementation("io.github.resilience4j:resilience4j-spring-boot3")
 }

@@ -25,15 +25,17 @@ public class CurrencyExchangeController {
 
     @GetMapping("/currency-exchange/from/{from}/to/{to}")
     public CurrencyExchange getCurrencyExchange(
-            @PathVariable String from, @PathVariable String to
+        @PathVariable String from, @PathVariable String to
     ) {
-        log.info("from: {}, to: {}", from, to);
-        var exchange = Optional.ofNullable(currencyExchangeMapper.selectCurrencyExchangeByFromAndTo(from, to))
-                .orElseThrow(() -> new ApiException(
-                        HttpStatus.NOT_FOUND,
-                        "从 [%s] 到 [%s] 的汇率数据不存在".formatted(from, to)
-                ));
-        var port = environment.getProperty("local.server.port");
+        log.info("{} 兑 {}", from, to);
+        CurrencyExchange exchange = Optional.ofNullable(
+                currencyExchangeMapper.selectExchangeByFromAndTo(from, to)
+            )
+            .orElseThrow(() -> new ApiException(
+                HttpStatus.NOT_FOUND,
+                "[%s] 兑 [%s] 的汇率信息不存在".formatted(from, to)
+            ));
+        String port = environment.getProperty("local.server.port");
         exchange.setEnvironment(port);
         return exchange;
     }

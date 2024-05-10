@@ -1,4 +1,4 @@
-package net.wuxianjie.apigateway.config;
+package net.wuxianjie.apigateway.filter;
 
 import lombok.extern.slf4j.Slf4j;
 
