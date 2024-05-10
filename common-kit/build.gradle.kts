@@ -8,6 +8,7 @@ dependencies {
     api("org.springframework.boot:spring-boot-starter-json")
     api("org.springframework.boot:spring-boot-starter-validation")
     api("org.springframework.boot:spring-boot-starter-aop")
+    api("com.github.ben-manes.caffeine:caffeine")
 }
 
 // 配置 Maven 发布工件
