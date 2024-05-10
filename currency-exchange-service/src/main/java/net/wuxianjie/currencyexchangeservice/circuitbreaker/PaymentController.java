@@ -1,5 +1,7 @@
 package net.wuxianjie.currencyexchangeservice.circuitbreaker;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -12,40 +14,37 @@ import org.springframework.web.client.RestClient;
 
 import net.wuxianjie.commonkit.exception.ApiException;
 
-import io.github.resilience4j.retry.annotation.Retry;
-
 /**
- * 用于测试 Resilience4j 断路器的控制器。
+ * 用于测试 Resilience4j 断路器功能的控制器。
  */
 @RestController
-@RequestMapping("/api/v1/circuit-breaker")
+@RequestMapping("/api/v1/payments")
 @RequiredArgsConstructor
 @Slf4j
-public class CircuitBreakerController {
+public class PaymentController {
 
     private final RestClient restClient;
 
     /**
-     * 测试断路器执行效果。
+     * 假设场景：应用需要调用一个外部的支付服务，这个服务偶尔会因为网络波动或服务升级而暂时无法访问。
      *
      * @return 表示接口调用成功的信息
      */
-    @GetMapping("/sample-api")
-    // 默认重试 3 次
-    @Retry(name = "sample-api", fallbackMethod = "sampleApiFallback")
-    public String sampleApi() {
+    @GetMapping
+    // @Retry(name = "paymentService", fallbackMethod = "makePaymentFallback")
+    @CircuitBreaker(name = "paymentService", fallbackMethod = "makePaymentFallback")
+    public String makePayment() {
         try {
             ResponseEntity<String> entity = restClient.get()
-                .uri("http://localhost:9090/fake-api")
+                .uri("http://localhost:9090/fake-payments")
                 .retrieve()
                 .toEntity(String.class);
             return entity.getBody();
         } catch (Exception e) {
             // 因为 Resilience4j 的重试机制，这里抛出的异常并不会被打印，故需要手动打印
-            log.error("Sample API 调用失败: {}", e.getMessage());
-            throw new ApiException(
-                HttpStatus.SERVICE_UNAVAILABLE, "Sample API 调用失败", e
-            );
+            String message = "支付 API 调用失败";
+            log.error("{}: {}", message, e.getMessage());
+            throw new ApiException(HttpStatus.SERVICE_UNAVAILABLE, message, e);
         }
     }
 
@@ -56,8 +55,8 @@ public class CircuitBreakerController {
      * @return 备用响应
      */
     @SuppressWarnings("unused")
-    private String sampleApiFallback(Throwable throwable) {
-        return "备用响应: " + throwable.getMessage();
+    private String makePaymentFallback(Throwable throwable) {
+        return "支付服务暂时不可用，请稍后再试";
     }
 
 }
