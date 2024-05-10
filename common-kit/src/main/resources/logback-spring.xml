@@ -24,6 +24,7 @@
     resource="org/springframework/boot/logging/logback/console-appender.xml"
   />
 
+  <!--
   <appender
     name="LOG_FILE"
     class="ch.qos.logback.core.rolling.RollingFileAppender"
@@ -46,6 +47,7 @@
       <cleanHistoryOnStart>true</cleanHistoryOnStart>
     </rollingPolicy>
   </appender>
+  -->
 
   <!--
   <logger name="com.zaxxer.hikari" level="TRACE" additivity="false">
