@@ -26,7 +26,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 
 @AutoConfiguration
 @ConditionalOnClass(ObjectMapper.class)
-public class JsonAutoConfig {
+public class JsonConfiguration {
 
     /**
      * 系统中对于日期字符串的统一格式。
@@ -38,7 +38,7 @@ public class JsonAutoConfig {
         return JsonMapper.builder()
             .addModule(getDateTimeModule()) // 针对 Java 8 的日期时间类型
             .defaultDateFormat(
-                new SimpleDateFormat(JsonAutoConfig.DATE_TIME_PATTERN)
+                new SimpleDateFormat(JsonConfiguration.DATE_TIME_PATTERN)
             ) // 针对 `java.util.Date` 类型
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
@@ -49,36 +49,36 @@ public class JsonAutoConfig {
 
     @Bean
     @Primary // 优先使用这个转换器，而非 Spring Boot 默认的
-    public MappingJackson2HttpMessageConverter jsonHttpMsgConv(
+    public MappingJackson2HttpMessageConverter jsonHttpMessageConverter(
         @Qualifier("jsonMapper") ObjectMapper jsonMapper
     ) {
-        MappingJackson2HttpMessageConverter conv = new MappingJackson2HttpMessageConverter();
-        conv.setObjectMapper(jsonMapper);
-        return conv;
+        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        converter.setObjectMapper(jsonMapper);
+        return converter;
     }
 
     private JavaTimeModule getDateTimeModule() {
         JavaTimeModule module = new JavaTimeModule();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(
-            JsonAutoConfig.DATE_TIME_PATTERN
+            JsonConfiguration.DATE_TIME_PATTERN
         );
         module.addSerializer(LocalDateTime.class, new JsonSerializer<>() {
 
             @Override
             public void serialize(
-                LocalDateTime val,
-                JsonGenerator jsonGen, SerializerProvider serProv
+                LocalDateTime value,
+                JsonGenerator generator, SerializerProvider provider
             ) throws IOException {
-                jsonGen.writeString(formatter.format(val));
+                generator.writeString(formatter.format(value));
             }
         });
         module.addDeserializer(LocalDateTime.class, new JsonDeserializer<>() {
 
             @Override
             public LocalDateTime deserialize(
-                JsonParser jsonPrs, DeserializationContext deseCtx
+                JsonParser jsonParser, DeserializationContext context
             ) throws IOException {
-                return LocalDateTime.parse(jsonPrs.getText(), formatter);
+                return LocalDateTime.parse(jsonParser.getText(), formatter);
             }
         });
         return module;

@@ -15,7 +15,7 @@ public class SocketUtils {
     /**
      * 默认缓冲区大小，单位：字节。
      */
-    private static final int BUF_SIZE = 1024;
+    private static final int BUFFER_SIZE = 1024;
 
     /**
      * 发送 TCP 数据包。
@@ -53,32 +53,32 @@ public class SocketUtils {
     /**
      * 发送 UDP 数据包。
      *
-     * <p>缓冲区 {@code bufSize} 的大小直接决定了能读取响应数据的最大长度。</p>
+     * <p>缓冲区 {@code bufferSize} 的大小直接决定了能读取响应数据的最大长度。</p>
      *
      * @param ip UDP 服务端 IP
      * @param port UDP 服务端端口
      * @param data 要发送的数据
      * @param readTimeout 读取超时时间，单位：毫秒
-     * @param bufSize 缓冲区大小（只有设置大于 {@link #BUF_SIZE} 才会使用该参数值），单位：字节。注意：UDP 中该值决定了读取的最大数据量
+     * @param bufferSize 缓冲区大小（只有设置大于 {@link #BUFFER_SIZE} 才会使用该参数值），单位：字节。注意：UDP 中该值决定了读取的最大数据量
      * @return UDP 服务端的响应结果
      */
     public static byte[] sendUdp(
         String ip, int port, byte[] data, int readTimeout,
-        int bufSize
+        int bufferSize
     ) {
         try (DatagramSocket socket = new DatagramSocket()) {
-            InetAddress inetAddr = InetAddress.getByName(ip);
-            DatagramPacket pkt = new DatagramPacket(
-                data, data.length, inetAddr, port
+            InetAddress inetAddress = InetAddress.getByName(ip);
+            DatagramPacket packet = new DatagramPacket(
+                data, data.length, inetAddress, port
             );
-            socket.send(pkt);
+            socket.send(packet);
 
             socket.setSoTimeout(readTimeout);
-            return receivePkt(socket, pkt, bufSize);
-        } catch (IOException ex) {
+            return receivePacket(socket, packet, bufferSize);
+        } catch (IOException e) {
             throw new RuntimeException(
                 "UDP 通信失败 [ip=%s; port=%s]：%s".formatted(
-                    ip, port, ex.getMessage()
+                    ip, port, e.getMessage()
                 )
             );
         }
@@ -87,26 +87,26 @@ public class SocketUtils {
     private static byte[] readSocket(Socket socket) throws IOException {
         InputStream input = socket.getInputStream();
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        byte[] buf = new byte[BUF_SIZE];
-        int lenRead;
-        while ((lenRead = input.read(buf)) != -1) {
-            output.write(buf, 0, lenRead);
+        byte[] buffer = new byte[BUFFER_SIZE];
+        int lengthRead;
+        while ((lengthRead = input.read(buffer)) != -1) {
+            output.write(buffer, 0, lengthRead);
         }
         return output.toByteArray();
     }
 
-    private static byte[] receivePkt(
-        DatagramSocket socket, DatagramPacket pkt, int bufSize
+    private static byte[] receivePacket(
+        DatagramSocket socket, DatagramPacket packet, int bufferSize
     ) throws IOException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         // ❗️因为只读取一次，故预设的缓冲区大小将影响能读取的最多数据量
-        if (bufSize < BUF_SIZE) {
-            bufSize = BUF_SIZE;
+        if (bufferSize < BUFFER_SIZE) {
+            bufferSize = BUFFER_SIZE;
         }
-        pkt.setData(new byte[bufSize]);
+        packet.setData(new byte[bufferSize]);
 
-        socket.receive(pkt);
-        output.write(pkt.getData(), pkt.getOffset(), pkt.getLength());
+        socket.receive(packet);
+        output.write(packet.getData(), packet.getOffset(), packet.getLength());
         return output.toByteArray();
     }
 }

@@ -8,7 +8,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@SpringBootTest(classes = {SpringUtils.class, SpringUtilsTest.Config.class})
+@SpringBootTest(
+    classes = {
+        SpringUtils.class,
+        SpringUtilsTest.ConfigurationTest.class
+    }
+)
 class SpringUtilsTest {
 
     @Autowired
@@ -27,7 +32,7 @@ class SpringUtilsTest {
     }
 
     @Configuration
-    static class Config {
+    static class ConfigurationTest {
 
         @Bean
         public BeanTest beanTest() {

@@ -1,8 +1,7 @@
 plugins {
-    id("org.springframework.boot")
+    id("app-conventions")
 }
 
 dependencies {
-    api(project(":web-kit"))
     implementation("org.springframework.boot:spring-boot-starter-amqp")
 }

@@ -11,9 +11,9 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.web.client.RestClient;
 
 @AutoConfiguration
-@AutoConfigureAfter(JsonAutoConfig.class)
+@AutoConfigureAfter(JsonConfiguration.class)
 @ConditionalOnBean(MappingJackson2HttpMessageConverter.class)
-public class ApiClientAutoConfig {
+public class ApiClientConfiguration {
 
     /**
      * 配置 HTTP 请求客户端。
@@ -32,24 +32,24 @@ public class ApiClientAutoConfig {
      * <pre>{@code
      * String url = "http://192.168.2.42:8083/api/v1/users";
      * try {
-     *     ResponseEntity<FakeData> res = restClient
+     *     ResponseEntity<FakeData> response = restClient
      *         .get()
-     *         .uri(url, uriBld -> {
-     *             uriBld.queryParam("offset", 10);
-     *             uriBld.queryParam("limit", 10);
-     *             return uriBld.build();
+     *         .uri(url, b -> {
+     *             b.queryParam("offset", 10);
+     *             b.queryParam("limit", 10);
+     *             return b.build();
      *         })
-     *         .headers(headers -> {
-     *             headers.setBearerAuth("bb67d0b217ec46aaa7918617b69ca021");
+     *         .headers(h -> {
+     *             h.setBearerAuth("bb67d0b217ec46aaa7918617b69ca021");
      *         })
      *         .retrieve()
      *         .toEntity(FakeData.class);
-     *     int status = res.getStatusCode().value();
-     *     FakeData dataRes = res.getBody();
-     *     System.out.printf("HTTP 响应状态码：%s，响应结果：%s%n", status, dataRes);
-     * } catch (Exception ex) {
+     *     int status = response.getStatusCode().value();
+     *     FakeData dataResponse = response.getBody();
+     *     System.out.printf("HTTP 响应状态码：%s，响应结果：%s%n", status, dataResponse);
+     * } catch (Exception e) {
      *     throw new ApiException(
-     *         HttpStatus.SERVICE_UNAVAILABLE, "外部服务不可用", ex
+     *         HttpStatus.SERVICE_UNAVAILABLE, "外部服务不可用", e
      *     );
      * }
      * }</pre>
@@ -58,20 +58,20 @@ public class ApiClientAutoConfig {
      *
      * <pre>{@code
      * String url = "http://192.168.2.42:8083/api/v1/auth/login";
-     * FakeAuth jsonParam = new FakeAuth("username", "password");
+     * FakeAuth authRequest = new FakeAuth("username", "password");
      * try {
-     *     ResponseEntity<FakeData> res = restClient
+     *     ResponseEntity<FakeData> response = restClient
      *         .post()
      *         .uri(url)
-     *         .body(jsonParam)
+     *         .body(authRequest)
      *         .retrieve()
      *         .toEntity(FakeData.class);
-     *     int status = res.getStatusCode().value();
-     *     FakeData dataRes = res.getBody();
-     *     System.out.printf("HTTP 响应状态码：%s，响应结果：%s%n", status, dataRes);
-     * } catch (Exception ex) {
+     *     int status = response.getStatusCode().value();
+     *     FakeData dataResponse = response.getBody();
+     *     System.out.printf("HTTP 响应状态码：%s，响应结果：%s%n", status, dataResponse);
+     * } catch (Exception e) {
      *     throw new ApiException(
-     *         HttpStatus.SERVICE_UNAVAILABLE, "外部服务不可用", ex
+     *         HttpStatus.SERVICE_UNAVAILABLE, "外部服务不可用", e
      *     );
      * }
      * }</pre>
@@ -80,19 +80,19 @@ public class ApiClientAutoConfig {
      *
      * <pre>{@code
      * String url = "http://localhost:8080/api/v1/public/params";
-     * LinkedMultiValueMap<Object, Object> formParams = new LinkedMultiValueMap<>();
-     * formParams.add("name", "张三");
+     * LinkedMultiValueMap<Object, Object> formRequest = new LinkedMultiValueMap<>();
+     * formRequest.add("name", "张三");
      * try {
-     *     ResponseEntity<FakeData> res = restClient
+     *     ResponseEntity<FakeData> response = restClient
      *         .post()
      *         .uri(url)
      *         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-     *         .body(formParams)
+     *         .body(formRequest)
      *         .retrieve()
      *         .toEntity(FakeData.class);
-     *     int status = res.getStatusCode().value();
-     *     FakeData dataRes = res.getBody();
-     *     System.out.printf("HTTP 响应状态码：%s，响应结果：%s%n", status, dataRes);
+     *     int status = response.getStatusCode().value();
+     *     FakeData dataResponse = response.getBody();
+     *     System.out.printf("HTTP 响应状态码：%s，响应结果：%s%n", status, dataResponse);
      * } catch (Exception e) {
      *     throw new ApiException(
      *         HttpStatus.SERVICE_UNAVAILABLE, "外部服务不可用", e
@@ -102,12 +102,13 @@ public class ApiClientAutoConfig {
      */
     @Bean
     public RestClient restClient(
-        @Qualifier("jsonHttpMsgConv") MappingJackson2HttpMessageConverter jsonConv
+        @Qualifier("jsonHttpMessageConverter")
+        MappingJackson2HttpMessageConverter jsonHttpMessageConverter
     ) {
         return RestClient.builder()
             .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .messageConverters(conv -> conv.addFirst(jsonConv))
+            .messageConverters(c -> c.addFirst(jsonHttpMessageConverter))
             .build();
     }
 }

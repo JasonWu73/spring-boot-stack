@@ -16,26 +16,26 @@ public class SpringUtils implements ApplicationContextAware {
     /**
      * Spring IoC 容器上下文。
      */
-    public static ApplicationContext ctx;
+    public static ApplicationContext context;
 
     /**
      * 获取 Spring 管理的 Bean 实例。
      */
     public static <T> T getBean(Class<T> beanClass) {
-        return ctx.getBean(beanClass);
+        return context.getBean(beanClass);
     }
 
     /**
      * 获取 Spring 管理的 Bean 实例。
      */
     public static Object getBean(String beanName) {
-        return ctx.getBean(beanName);
+        return context.getBean(beanName);
     }
 
     @Override
     public void setApplicationContext(
-        @SuppressWarnings("NullableProblems") ApplicationContext ctx
+        @SuppressWarnings("NullableProblems") ApplicationContext context
     ) throws BeansException {
-        SpringUtils.ctx = ctx;
+        SpringUtils.context = context;
     }
 }

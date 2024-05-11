@@ -17,29 +17,29 @@ public class AuthUtils {
     /**
      * 从 Spring Security Context 中获取当前登录用户信息。
      */
-    public static Optional<CurUser> getCurrentUser() {
+    public static Optional<CurrentUser> getCurrentUser() {
         return Optional.ofNullable(
                 SecurityContextHolder.getContext().getAuthentication()
             )
-            .filter(auth -> !(auth instanceof AnonymousAuthenticationToken))
-            .map(auth -> (CurUser) auth.getPrincipal());
+            .filter(u -> !(u instanceof AnonymousAuthenticationToken))
+            .map(u -> (CurrentUser) u.getPrincipal());
     }
 
     /**
      * 将登录信息写入 Spring Security Context。
      */
     public static void setAuthenticatedContext(
-        CurUser user, HttpServletRequest req
+        CurrentUser user, HttpServletRequest request
     ) {
-        List<SimpleGrantedAuthority> auths = user.authorities().stream()
+        List<SimpleGrantedAuthority> authorities = user.authorities().stream()
             .filter(StringUtils::hasText)
             .map(SimpleGrantedAuthority::new)
             .toList();
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-            user, null, auths
+            user, null, authorities
         );
         token.setDetails(
-            new WebAuthenticationDetailsSource().buildDetails(req)
+            new WebAuthenticationDetailsSource().buildDetails(request)
         );
         SecurityContextHolder.getContext().setAuthentication(token);
     }

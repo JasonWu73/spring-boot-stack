@@ -22,7 +22,7 @@ public class PageRequest {
         return offset;
     }
 
-    public void setOffset(@Min(value = 0, message = "偏移量不能小于 0") int offset) {
+    public void setOffset(int offset) {
         this.offset = offset;
     }
 
@@ -30,7 +30,7 @@ public class PageRequest {
         return limit;
     }
 
-    public void setLimit(@Min(value = 1, message = "每页条数不能小于 1") int limit) {
+    public void setLimit(int limit) {
         this.limit = limit;
     }
 

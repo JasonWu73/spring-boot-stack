@@ -1,9 +1,9 @@
-net.wuxianjie.myspringbootstarter.json.JsonAutoConfig
-net.wuxianjie.myspringbootstarter.json.ApiClientAutoConfig
-net.wuxianjie.myspringbootstarter.security.SecurityAutoConfig
-net.wuxianjie.myspringbootstarter.gateway.dns.GatewayAddressResolverAutoConfig
-net.wuxianjie.myspringbootstarter.gateway.exception.GatewayGlobalExceptionHandlerAutoConfig
+net.wuxianjie.myspringbootstarter.json.JsonConfiguration
+net.wuxianjie.myspringbootstarter.json.ApiClientConfiguration
+net.wuxianjie.myspringbootstarter.exception.GlobalWebExceptionHandler
+net.wuxianjie.myspringbootstarter.security.WebSecurityConfiguration
+net.wuxianjie.myspringbootstarter.gateway.dns.GatewayAddressResolverConfiguration
+net.wuxianjie.myspringbootstarter.gateway.exception.GatewayExceptionHandlerConfiguration
 
+net.wuxianjie.myspringbootstarter.shared.MyConfigurationProperties
 net.wuxianjie.myspringbootstarter.util.SpringUtils
-net.wuxianjie.myspringbootstarter.shared.MyProps
-net.wuxianjie.myspringbootstarter.exception.GlobalExceptionHandler
