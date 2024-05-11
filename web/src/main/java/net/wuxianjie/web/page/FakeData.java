@@ -23,19 +23,10 @@ public record FakeData(
     public FakeData {
         ObjectMapper jsonMapper = SpringUtils.getBean(ObjectMapper.class);
         try {
-            String dateTimeSerialize = jsonMapper.writeValueAsString(localDateTime);
-            LocalDateTime dateTimeDeserialize = jsonMapper.readValue(
-                dateTimeSerialize,
-                LocalDateTime.class
-            );
-            LOG.info(
-                "LocalDateTime JSON 序列化: {}",
-                dateTimeSerialize
-            );
-            LOG.info(
-                "日期时间字符串 JSON 反序列化（一个没有任何时区信息的日期和时间）: {}",
-                dateTimeDeserialize
-            );
+            String timeJson = jsonMapper.writeValueAsString(localDateTime);
+            LocalDateTime time = jsonMapper.readValue(timeJson, LocalDateTime.class);
+            LOG.info("LocalDateTime JSON 序列化：{}", timeJson);
+            LOG.info("日期时间字符串 JSON 反序列化（无时区信息）：{}", time);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

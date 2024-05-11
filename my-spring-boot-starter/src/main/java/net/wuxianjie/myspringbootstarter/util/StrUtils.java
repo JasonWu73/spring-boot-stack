@@ -9,18 +9,18 @@ public class StrUtils {
     /**
      * 按如下规则生成用于数据库模糊查询的字符串值。
      *
-     * <p>当 {@code val} 不为空时，则将字符串中任意数量的 {@code 空白字符} 替换为 {@code %}，例如：</p>
+     * <p>当 {@code value} 不为空时，则将字符串中任意数量的 {@code 空白字符} 替换为 {@code %}，例如：</p>
      *
      * <pre>{@code
      *  "  KeyOne    KeyTwo  " -> "%KeyOne%KeyTwo%"
      * }</pre>
      *
-     * @param val 原始值
-     * @return 如果 {@code val} 非空，则返回模糊查询字符串，否则返回 {@code null}
+     * @param value 原始值
+     * @return 如果 {@code value} 非空，则返回模糊查询字符串，否则返回 {@code null}
      */
-    public static String toLikeVal(String val) {
-        if (!StringUtils.hasText(val)) return null;
-        return "%" + val.trim().replaceAll(" +", "%") + "%";
+    public static String toLikeValue(String value) {
+        if (!StringUtils.hasText(value)) return null;
+        return "%" + value.trim().replaceAll(" +", "%") + "%";
     }
 
     /**

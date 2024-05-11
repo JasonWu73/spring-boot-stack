@@ -27,12 +27,13 @@ class SecurityWebTest {
     @Test
     void shouldReturnsHtml_whenRequestWebRootWithoutToken() throws Exception {
         String path = "/users";
-        String htmlRes = mockMvc.perform(MockMvcRequestBuilders.get(path))
+        String htmlResponse = mockMvc.perform(MockMvcRequestBuilders.get(path))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.header()
-                .string("Content-Type", "text/html"))
+                .string("Content-Type", "text/html")
+            )
             .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
-        Assertions.assertThat(htmlRes).isEqualTo("""
+        Assertions.assertThat(htmlResponse).isEqualTo("""
             <!DOCTYPE html>
             <html lang="cmn">
                 <head>
@@ -52,23 +53,27 @@ class SecurityWebTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/test-api/v1/public"))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.header()
-                .string("Content-Type", "text/plain;charset=UTF-8"))
+                .string("Content-Type", "text/plain;charset=UTF-8")
+            )
             .andExpect(MockMvcResultMatchers.content()
-                .string("公共接口可以访问"));
+                .string("公共接口可以访问")
+            );
     }
 
     @Test
     void shouldReturnsUnauthorized_whenWithoutToken() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/test-api/v1/root"))
             .andExpect(MockMvcResultMatchers.status().isUnauthorized())
-            .andExpect(MockMvcResultMatchers.header().string(
-                "Content-Type", "application/json"))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.status")
-                .value(401))
+            .andExpect(MockMvcResultMatchers.header()
+                .string("Content-Type", "application/json")
+            )
+            .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(401))
             .andExpect(MockMvcResultMatchers.jsonPath("$.error")
-                .value("身份验证失败"))
+                .value("身份验证失败")
+            )
             .andExpect(MockMvcResultMatchers.jsonPath("$.path")
-                .value("/test-api/v1/root"));
+                .value("/test-api/v1/root")
+            );
     }
 
     @Test
@@ -77,13 +82,15 @@ class SecurityWebTest {
                 .header("Authorization", "Bearerinvalid-token"))
             .andExpect(MockMvcResultMatchers.status().isUnauthorized())
             .andExpect(MockMvcResultMatchers.header()
-                .string("Content-Type", "application/json"))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.status")
-                .value(401))
+                .string("Content-Type", "application/json")
+            )
+            .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(401))
             .andExpect(MockMvcResultMatchers.jsonPath("$.error")
-                .value("Access Token 格式错误"))
+                .value("Access Token 格式错误")
+            )
             .andExpect(MockMvcResultMatchers.jsonPath("$.path")
-                .value("/test-api/v1/root"));
+                .value("/test-api/v1/root")
+            );
     }
 
     @Test
@@ -92,13 +99,15 @@ class SecurityWebTest {
                 .header("Authorization", "Bearer invalid-token"))
             .andExpect(MockMvcResultMatchers.status().isUnauthorized())
             .andExpect(MockMvcResultMatchers.header()
-                .string("Content-Type", "application/json"))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.status")
-                .value(401))
+                .string("Content-Type", "application/json")
+            )
+            .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(401))
             .andExpect(MockMvcResultMatchers.jsonPath("$.error")
-                .value("Access Token 验证失败"))
+                .value("Access Token 验证失败")
+            )
             .andExpect(MockMvcResultMatchers.jsonPath("$.path")
-                .value("/test-api/v1/root"));
+                .value("/test-api/v1/root")
+            );
     }
 
     @Test
@@ -107,36 +116,44 @@ class SecurityWebTest {
                 .header("Authorization", "Bearer admin-token"))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.header()
-                .string("Content-Type", "text/plain;charset=UTF-8"))
+                .string("Content-Type", "text/plain;charset=UTF-8")
+            )
             .andExpect(MockMvcResultMatchers.content()
-                .string("管理员可以访问 - admin"));
+                .string("管理员可以访问 - admin")
+            );
     }
 
     @Test
     void shouldReturnsForbidden_whenRequestRootResourceWithAdminToken()
         throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/test-api/v1/root")
-                .header("Authorization", "Bearer admin-token"))
+                .header("Authorization", "Bearer admin-token")
+            )
             .andExpect(MockMvcResultMatchers.status().isForbidden())
             .andExpect(MockMvcResultMatchers.header()
-                .string("Content-Type", "application/json"))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.status")
-                .value(403))
+                .string("Content-Type", "application/json")
+            )
+            .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(403))
             .andExpect(MockMvcResultMatchers.jsonPath("$.error")
-                .value("没有访问权限"))
+                .value("没有访问权限")
+            )
             .andExpect(MockMvcResultMatchers.jsonPath("$.path")
-                .value("/test-api/v1/root"));
+                .value("/test-api/v1/root")
+            );
     }
 
     @Test
     void shouldReturnsOk_whenRequestUserResourceWithAdminToken()
         throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/test-api/v1/user")
-                .header("Authorization", "Bearer admin-token"))
+                .header("Authorization", "Bearer admin-token")
+            )
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.header()
-                .string("Content-Type", "text/plain;charset=UTF-8"))
+                .string("Content-Type", "text/plain;charset=UTF-8")
+            )
             .andExpect(MockMvcResultMatchers.content()
-                .string("用户可以访问 - admin"));
+                .string("用户可以访问 - admin")
+            );
     }
 }

@@ -17,11 +17,11 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 
 import net.wuxianjie.myspringbootstarter.exception.ApiException;
 
-public class GatewayGlobalExceptionHandler extends DefaultErrorWebExceptionHandler {
+public class GatewayExceptionHandler extends DefaultErrorWebExceptionHandler {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GatewayGlobalExceptionHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GatewayExceptionHandler.class);
 
-    public GatewayGlobalExceptionHandler(
+    public GatewayExceptionHandler(
         ErrorAttributes errorAttributes, WebProperties.Resources resources,
         ErrorProperties errorProperties, ApplicationContext applicationContext
     ) {
@@ -30,36 +30,40 @@ public class GatewayGlobalExceptionHandler extends DefaultErrorWebExceptionHandl
 
     @Override
     protected Map<String, Object> getErrorAttributes(
-        ServerRequest req, ErrorAttributeOptions opts
+        ServerRequest request, ErrorAttributeOptions options
     ) {
         // 自定义异常响应内容
-        Map<String, Object> errAttrs = super.getErrorAttributes(req, opts);
-        Throwable th = super.getError(req);
-        if (th instanceof ApiException ex) {
-            logGatewayEx(ex);
-            errAttrs.put("status", ex.getStatus().value());
-            errAttrs.put("error", ex.getMessage());
+        Map<String, Object> errorAttributes = super.getErrorAttributes(request, options);
+        Throwable throwable = super.getError(request);
+        if (throwable instanceof ApiException ex) {
+            logGatewayException(ex);
+            errorAttributes.put("status", ex.getStatus().value());
+            errorAttributes.put("error", ex.getMessage());
         } else {
-            logDefaultEx(errAttrs, th);
+            logDefaultException(errorAttributes, throwable);
         }
-        return errAttrs;
+        return errorAttributes;
     }
 
-    private void logGatewayEx(ApiException ex) {
-        if (ex.getStatus().is4xxClientError()) {
-            LOG.warn("客户端错误：{}", ex.getFullMsg());
+    private void logGatewayException(ApiException e) {
+        if (e.getStatus().is4xxClientError()) {
+            LOG.warn("客户端错误：{}", e.getFullMessage());
             return;
         }
-        LOG.error("服务器错误：{}", ex.getFullMsg());
+        LOG.error("服务器错误：{}", e.getFullMessage());
     }
 
-    private void logDefaultEx(Map<String, Object> errAttrs, Throwable th) {
-        String msg = logErrMsg(errAttrs, th);
-        errAttrs.put("error", msg);
+    private void logDefaultException(
+        Map<String, Object> errorAttributes, Throwable t
+    ) {
+        String message = logMessage(errorAttributes, t);
+        errorAttributes.put("error", message);
     }
 
-    private String logErrMsg(Map<String, Object> errAttrs, Throwable th) {
-        HttpStatus status = Optional.ofNullable(errAttrs.get("status"))
+    private String logMessage(
+        Map<String, Object> errorAttributes, Throwable t
+    ) {
+        HttpStatus status = Optional.ofNullable(errorAttributes.get("status"))
             .map(Object::toString)
             .map(Integer::parseInt)
             .map(HttpStatus::valueOf)
@@ -67,16 +71,16 @@ public class GatewayGlobalExceptionHandler extends DefaultErrorWebExceptionHandl
         return switch (status) {
             case HttpStatus.NOT_FOUND -> "找不到指定的路径";
             case HttpStatus.SERVICE_UNAVAILABLE -> {
-                String msg = "目标服务不可用";
+                String message = "目标服务不可用";
                 LOG.warn(
-                    "{}：[{}] {}", msg,
-                    errAttrs.get("requestId"), th.getMessage()
+                    "{}：[{}] {}", message,
+                    errorAttributes.get("requestId"), t.getMessage()
                 );
-                yield msg;
+                yield message;
             }
             default -> {
                 String message = "网关发生未知错误";
-                LOG.error(message, th);
+                LOG.error(message, t);
                 yield message;
             }
         };

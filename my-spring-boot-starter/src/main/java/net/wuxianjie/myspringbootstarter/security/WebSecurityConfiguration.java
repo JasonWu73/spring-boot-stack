@@ -28,10 +28,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import net.wuxianjie.myspringbootstarter.exception.ApiException;
-import net.wuxianjie.myspringbootstarter.shared.MyProps;
+import net.wuxianjie.myspringbootstarter.shared.MyConfigurationProperties;
 
 /**
- * 令牌身份验证机制自动配置类。
+ * 基于 Spring Security 的令牌身份验证机制自动配置类。
  *
  * <p>注意：要激活该配置必须要在 Spring IoC 中存在实现了 {@link TokenAuth} 接口的 Bean，否则使用 Spring Security 默认配置。</p>
  */
@@ -40,28 +40,28 @@ import net.wuxianjie.myspringbootstarter.shared.MyProps;
 @ConditionalOnBean(TokenAuth.class)
 @EnableWebSecurity
 @EnableMethodSecurity
-public class SecurityAutoConfig {
+public class WebSecurityConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(
         HttpSecurity http,
         HandlerExceptionResolver handlerExceptionResolver,
-        MyProps myProps,
+        MyConfigurationProperties myConfigurationproperties,
         TokenAuth tokenAuth
     ) throws Exception {
         // 以下配置仅对 API 请求生效
-        String apiPathPre = myProps.getSecurity().getApiPathPrefix();
-        String[] permAllPaths = myProps.getSecurity().getPermitAllPaths();
+        String apiPathPrefix = myConfigurationproperties.getSecurity().getApiPathPrefix();
+        String[] permitAllPaths = myConfigurationproperties.getSecurity().getPermitAllPaths();
 
-        http.securityMatcher(apiPathPre + "**")
+        http.securityMatcher(apiPathPrefix + "**")
             // 注意：顺序很重要，即前面的规则匹配后则不再进行后续比较
-            .authorizeHttpRequests(mtchReg -> {
+            .authorizeHttpRequests(r -> {
                 // 配置公共 API
-                for (String path : permAllPaths) {
-                    mtchReg.requestMatchers(path).permitAll();
+                for (String path : permitAllPaths) {
+                    r.requestMatchers(path).permitAll();
                 }
                 // 默认其他 API 都需要登录才能访问
-                mtchReg.requestMatchers("/**").authenticated();
+                r.requestMatchers("/**").authenticated();
             })
             // 添加自定义 Token 身份验证过滤器
             .addFilterBefore(
@@ -70,27 +70,26 @@ public class SecurityAutoConfig {
             );
 
         // 以下配置对所有请求生效
-        http.authorizeHttpRequests(mtchReg -> {
+        http.authorizeHttpRequests(r -> {
                 // 默认所有请求所有人都可访问（保证 SPA 前端资源可用）
-                mtchReg.requestMatchers("/**").permitAll();
+                r.requestMatchers("/**").permitAll();
             })
             // 支持 CORS
             .cors(Customizer.withDefaults())
             // 禁用 CSRF
             .csrf(AbstractHttpConfigurer::disable)
             // 允许浏览器在同源策略下使用 `<frame>` 或 `<iframe>`
-            .headers(config -> config.frameOptions(
+            .headers(c -> c.frameOptions(
                 HeadersConfigurer.FrameOptionsConfig::sameOrigin
             ))
             // 不需要会话状态，即不向客户端发送 `JSESSIONID` Cookies
-            .sessionManagement(config -> config.sessionCreationPolicy(
-                    SessionCreationPolicy.STATELESS
-                )
-            )
+            .sessionManagement(c -> c.sessionCreationPolicy(
+                SessionCreationPolicy.STATELESS
+            ))
             // 身份验证失败和没有访问权限的处理
-            .exceptionHandling(config -> {
+            .exceptionHandling(c -> {
                 // 未通过身份验证，对应 401 HTTP 状态码
-                config.authenticationEntryPoint((req, res, authEx) ->
+                c.authenticationEntryPoint((req, res, authEx) ->
                     handlerExceptionResolver.resolveException(
                         req, res, null,
                         new ApiException(
@@ -100,7 +99,7 @@ public class SecurityAutoConfig {
                 );
 
                 // 通过身份验证，但没有访问权限，对应 403 HTTP 状态码
-                config.accessDeniedHandler((req, res, acsDenEx) ->
+                c.accessDeniedHandler((req, res, acsDenEx) ->
                     handlerExceptionResolver.resolveException(
                         req, res, null,
                         new ApiException(
@@ -136,10 +135,10 @@ public class SecurityAutoConfig {
     }
 
     @Bean
-    public RoleHierarchy roleHierarchy(MyProps myProps) {
+    public RoleHierarchy roleHierarchy(MyConfigurationProperties myConfigurationproperties) {
         RoleHierarchyImpl hierarchy = new RoleHierarchyImpl();
         hierarchy.setHierarchy(
-            String.join("\n", myProps.getSecurity().getHierarchies())
+            String.join("\n", myConfigurationproperties.getSecurity().getHierarchies())
         );
         return hierarchy;
     }
@@ -169,6 +168,6 @@ public class SecurityAutoConfig {
      */
     @Bean
     public AuthenticationManager authenticationManager() {
-        return auth -> auth;
+        return u -> u;
     }
 }

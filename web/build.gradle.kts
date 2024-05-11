@@ -3,6 +3,7 @@ import java.time.format.DateTimeFormatter
 
 plugins {
     id("app-conventions")
+    id("org.graalvm.buildtools.native")
 }
 
 // 用于正式发布的版本号，每次发布时更新，并使用 `git tag` 标记
@@ -27,6 +28,15 @@ springBoot {
                 )
             )
             name = "Web 项目"
+        }
+    }
+}
+
+graalvmNative {
+    binaries {
+        named("main") {
+            // 指定生成独立的可执行文件，而不是共享库（Shared Library）
+            sharedLibrary.set(false)
         }
     }
 }

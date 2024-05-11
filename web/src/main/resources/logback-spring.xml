@@ -20,9 +20,7 @@
   <property name="TOTAL_SIZE_CAP" value="20GB"/>
 
   <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
-  <include
-    resource="org/springframework/boot/logging/logback/console-appender.xml"
-  />
+  <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
 
   <appender
     name="LOG_FILE"
@@ -34,9 +32,7 @@
       <charset>${FILE_LOG_CHARSET}</charset>
     </encoder>
 
-    <rollingPolicy
-      class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy"
-    >
+    <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
       <fileNamePattern>
         ${LOG_FILE_DIR}/${LOG_FILE_NAME}-%d{yyyy-MM-dd}.%i.log
       </fileNamePattern>

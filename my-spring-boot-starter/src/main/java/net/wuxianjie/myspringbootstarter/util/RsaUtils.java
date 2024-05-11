@@ -27,9 +27,9 @@ public class RsaUtils {
      * @return Base64 编码的密钥对
      */
     public static KeyPair generateKeyPair() {
-        KeyPairGenerator gen = getKeyPairGenerator();
-        gen.initialize(RSA_KEY_LENGTH);
-        java.security.KeyPair keyPair = gen.generateKeyPair();
+        KeyPairGenerator generator = getKeyPairGenerator();
+        generator.initialize(RSA_KEY_LENGTH);
+        java.security.KeyPair keyPair = generator.generateKeyPair();
         String publicKey = Base64.getEncoder()
             .encodeToString(keyPair.getPublic().getEncoded());
         String privateKey = Base64.getEncoder()

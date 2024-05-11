@@ -38,18 +38,18 @@ public class TokenAuthFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(
-        HttpServletRequest req,
-        @SuppressWarnings("NullableProblems") HttpServletResponse res,
+        HttpServletRequest request,
+        @SuppressWarnings("NullableProblems") HttpServletResponse response,
         @SuppressWarnings("NullableProblems") FilterChain chain
     ) throws ServletException, IOException {
-        String bearer = req.getHeader(HttpHeaders.AUTHORIZATION);
+        String bearer = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (bearer == null) {
-            chain.doFilter(req, res);
+            chain.doFilter(request, response);
             return;
         }
         if (!bearer.startsWith(BEARER_PREFIX)) {
             handlerExceptionResolver.resolveException(
-                req, res, null,
+                request, response, null,
                 new ApiException(
                     HttpStatus.UNAUTHORIZED, "Access Token 格式错误"
                 )
@@ -58,12 +58,12 @@ public class TokenAuthFilter extends OncePerRequestFilter {
         }
         var accessToken = bearer.substring(BEARER_PREFIX.length());
 
-        CurUser user;
+        CurrentUser user;
         try {
-            user = tokenAuth.auth(accessToken);
+            user = tokenAuth.authenticate(accessToken);
         } catch (TokenAuthException ex) {
             handlerExceptionResolver.resolveException(
-                req, res, null,
+                request, response, null,
                 new ApiException(
                     HttpStatus.UNAUTHORIZED, "Access Token 验证失败", ex
                 )
@@ -71,7 +71,7 @@ public class TokenAuthFilter extends OncePerRequestFilter {
             return;
         }
 
-        AuthUtils.setAuthenticatedContext(user, req);
-        chain.doFilter(req, res);
+        AuthUtils.setAuthenticatedContext(user, request);
+        chain.doFilter(request, response);
     }
 }

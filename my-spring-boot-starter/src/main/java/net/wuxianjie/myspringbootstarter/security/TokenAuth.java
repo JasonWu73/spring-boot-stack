@@ -8,5 +8,5 @@ public interface TokenAuth {
     /**
      * 对访问令牌执行身份验证。
      */
-    CurUser auth(String accessToken) throws TokenAuthException;
+    CurrentUser authenticate(String accessToken) throws TokenAuthException;
 }
