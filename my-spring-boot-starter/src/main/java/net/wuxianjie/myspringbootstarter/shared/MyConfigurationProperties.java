@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ConfigurationProperties(prefix = "my")
-public class MyProps {
+public class MyConfigurationProperties {
 
     /**
      * Web 安全配置。
@@ -177,8 +177,8 @@ public class MyProps {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        MyProps myProps = (MyProps) o;
-        return Objects.equals(security, myProps.security) && Objects.equals(spa, myProps.spa);
+        MyConfigurationProperties myConfigurationproperties = (MyConfigurationProperties) o;
+        return Objects.equals(security, myConfigurationproperties.security) && Objects.equals(spa, myConfigurationproperties.spa);
     }
 
     @Override

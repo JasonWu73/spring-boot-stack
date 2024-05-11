@@ -3,12 +3,10 @@ plugins {
 }
 
 repositories {
-    // 使用阿里云的 Maven 镜像以加速下载依赖
-    maven { setUrl("https://maven.aliyun.com/repository/public") }
-    maven { setUrl("https://maven.aliyun.com/repository/spring") }
+    // 使用阿里云的 Maven 镜像以加速下载插件
+    maven { setUrl("https://maven.aliyun.com/repository/gradle-plugin") }
 
-    mavenLocal()
-    mavenCentral()
+    gradlePluginPortal()
 }
 
 dependencies {

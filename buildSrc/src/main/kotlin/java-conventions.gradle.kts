@@ -13,6 +13,10 @@ dependencyManagement {
         mavenBom(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
         mavenBom("org.springframework.cloud:spring-cloud-dependencies:2023.0.1")
     }
+
+    dependencies {
+        dependency("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3")
+    }
 }
 
 java {

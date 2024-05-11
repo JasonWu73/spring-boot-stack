@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Bean;
  */
 @AutoConfiguration
 @ConditionalOnClass(HttpClientCustomizer.class)
-public class GatewayAddressResolverAutoConfig {
+public class GatewayAddressResolverConfiguration {
 
     /**
      * 配置使用 Netty 的默认地址解析器组。

@@ -22,13 +22,13 @@ import org.springframework.http.codec.json.Jackson2JsonEncoder;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
 import org.springframework.web.reactive.result.view.ViewResolver;
 
-import net.wuxianjie.myspringbootstarter.json.JsonAutoConfig;
+import net.wuxianjie.myspringbootstarter.json.JsonConfiguration;
 
 @AutoConfiguration
-@AutoConfigureAfter(JsonAutoConfig.class)
+@AutoConfigureAfter(JsonConfiguration.class)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
 @ConditionalOnClass(WebFluxConfigurer.class)
-public class GatewayGlobalExceptionHandlerAutoConfig {
+public class GatewayExceptionHandlerConfiguration {
 
     /**
      * 覆盖 Spring Boot WebFlux 默认的全局异常处理器。
@@ -46,7 +46,7 @@ public class GatewayGlobalExceptionHandlerAutoConfig {
         ApplicationContext applicationContext,
         @Qualifier("jsonMapper") ObjectMapper objectMapper
     ) {
-        GatewayGlobalExceptionHandler handler = new GatewayGlobalExceptionHandler(
+        GatewayExceptionHandler handler = new GatewayExceptionHandler(
             errorAttributes, webProperties.getResources(),
             serverProperties.getError(), applicationContext
         );
@@ -56,16 +56,16 @@ public class GatewayGlobalExceptionHandlerAutoConfig {
     }
 
     private void setCustomJsonMapper(
-        GatewayGlobalExceptionHandler handler, ServerCodecConfigurer config,
+        GatewayExceptionHandler handler, ServerCodecConfigurer configurer,
         ObjectMapper objectMapper
     ) {
-        config.defaultCodecs().jackson2JsonDecoder(
+        configurer.defaultCodecs().jackson2JsonDecoder(
             new Jackson2JsonDecoder(objectMapper)
         );
-        config.defaultCodecs().jackson2JsonEncoder(
+        configurer.defaultCodecs().jackson2JsonEncoder(
             new Jackson2JsonEncoder(objectMapper)
         );
-        handler.setMessageWriters(config.getWriters());
-        handler.setMessageReaders(config.getReaders());
+        handler.setMessageWriters(configurer.getWriters());
+        handler.setMessageReaders(configurer.getReaders());
     }
 }
