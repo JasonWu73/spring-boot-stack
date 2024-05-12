@@ -11,5 +11,4 @@ public class NamingServerApp {
     public static void main(String[] args) {
         SpringApplication.run(NamingServerApp.class, args);
     }
-
 }

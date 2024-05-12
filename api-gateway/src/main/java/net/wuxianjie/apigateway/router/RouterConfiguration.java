@@ -1,4 +1,4 @@
-package net.wuxianjie.apigateway.config;
+package net.wuxianjie.apigateway.router;
 
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class ApiGatewayConfig {
+public class RouterConfiguration {
 
     @Bean
     public RouteLocator gatewayRouter(RouteLocatorBuilder builder) {
@@ -15,7 +15,8 @@ public class ApiGatewayConfig {
                 .filters(f -> f.addRequestHeader("WXJ-NAME", "JasonWu")
                     .addRequestParameter("myName", "吴仙杰")
                 )
-                .uri("http://httpbin.org:80"))
+                .uri("http://httpbin.org:80")
+            )
             .route(p -> p.path("/api/v1/currency-exchange/**")
                 .uri("lb://currency-exchange-service")
             )
@@ -28,10 +29,10 @@ public class ApiGatewayConfig {
             .route(p -> p.path("/api/v1/currency-conversion-new/**")
                 .filters(f -> f.rewritePath(
                     "/api/v1/currency-conversion-new/(?<segment>.*)",
-                    "/api/v1/currency-conversion-feign/${segment}"))
+                    "/api/v1/currency-conversion-feign/${segment}")
+                )
                 .uri("lb://currency-conversion-service")
             )
             .build();
     }
-
 }

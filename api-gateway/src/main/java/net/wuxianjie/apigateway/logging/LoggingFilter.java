@@ -1,6 +1,7 @@
-package net.wuxianjie.apigateway.filter;
+package net.wuxianjie.apigateway.logging;
 
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -10,13 +11,13 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 @Component
-@Slf4j
 public class LoggingFilter implements GlobalFilter {
+
+    private static final Logger LOG = LoggerFactory.getLogger(LoggingFilter.class);
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        log.info("自定义日志过滤器 - 请求路径: {}", exchange.getRequest().getPath());
+        LOG.info("自定义日志过滤器 - 请求路径：{}", exchange.getRequest().getPath());
         return chain.filter(exchange);
     }
-
 }

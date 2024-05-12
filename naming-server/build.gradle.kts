@@ -1,8 +1,7 @@
 plugins {
-    id("org.springframework.boot")
+    id("app-conventions")
 }
 
 dependencies {
-    implementation(project(":web-kit"))
     implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-server")
 }
