@@ -14,17 +14,19 @@ spring:
     username: root
     password: qwe@123
 resilience4j:
-  retry: # 重试
+  retry:
     instances:
-      paymentService: # 重试实例名称
-        max-attempts: 5 # 最大尝试次数
-        wait-duration: 1s # 重试间隔
-        enable-exponential-backoff: true # 是否启用指数退避
-  circuitbreaker: # 断路器
+      realtimeExchangeRatesService:
+        max-attempts: 5
+        wait-duration: 1s
+        enable-exponential-backoff: true
+  circuitbreaker:
     instances:
-      paymentService: # 断路器实例名称
-        failure-rate-threshold: 50 # 失败率阈值
-        wait-duration-in-open-state: 10s # 开启状态持续时间
-        permitted-number-of-calls-in-half-open-state: 3 # 半开状态下允许的调用次数
+      realtimeExchangeRatesService:
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+        record-exceptions:
+          - org.springframework.web.client.ResourceAccessException
 mybatis:
   mapper-locations: classpath:mapper/*.xml
