@@ -17,6 +17,9 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 
 import net.wuxianjie.myspringbootstarter.exception.ApiException;
 
+/**
+ * 网关全局异常处理器，注入逻辑请查看 {@link GatewayExceptionHandlerConfig}。
+ */
 public class GatewayExceptionHandler extends DefaultErrorWebExceptionHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(GatewayExceptionHandler.class);
@@ -33,54 +36,54 @@ public class GatewayExceptionHandler extends DefaultErrorWebExceptionHandler {
         ServerRequest request, ErrorAttributeOptions options
     ) {
         // 自定义异常响应内容
-        Map<String, Object> errorAttributes = super.getErrorAttributes(request, options);
+        Map<String, Object> attributes = super.getErrorAttributes(request, options);
         Throwable throwable = super.getError(request);
         if (throwable instanceof ApiException ex) {
             logGatewayException(ex);
-            errorAttributes.put("status", ex.getStatus().value());
-            errorAttributes.put("error", ex.getMessage());
+            attributes.put("status", ex.getStatus().value());
+            attributes.put("error", ex.getMessage());
         } else {
-            logDefaultException(errorAttributes, throwable);
+            logDefaultException(attributes, throwable);
         }
-        return errorAttributes;
+        return attributes;
     }
 
-    private void logGatewayException(ApiException e) {
-        if (e.getStatus().is4xxClientError()) {
-            LOG.warn("客户端错误：{}", e.getFullMessage());
+    private void logGatewayException(ApiException exception) {
+        if (exception.getStatus().is4xxClientError()) {
+            LOG.warn("客户端错误：{}", exception.getFullMessage());
             return;
         }
-        LOG.error("服务器错误：{}", e.getFullMessage());
+        LOG.error("服务器错误：{}", exception.getFullMessage());
     }
 
     private void logDefaultException(
-        Map<String, Object> errorAttributes, Throwable t
+        Map<String, Object> attributes, Throwable throwable
     ) {
-        String message = logMessage(errorAttributes, t);
-        errorAttributes.put("error", message);
+        String message = logAndGetError(attributes, throwable);
+        attributes.put("error", message);
     }
 
-    private String logMessage(
-        Map<String, Object> errorAttributes, Throwable t
+    private String logAndGetError(
+        Map<String, Object> attributes, Throwable throwable
     ) {
-        HttpStatus status = Optional.ofNullable(errorAttributes.get("status"))
+        HttpStatus status = Optional.ofNullable(attributes.get("status"))
             .map(Object::toString)
             .map(Integer::parseInt)
             .map(HttpStatus::valueOf)
             .orElse(HttpStatus.INTERNAL_SERVER_ERROR);
         return switch (status) {
-            case HttpStatus.NOT_FOUND -> "找不到指定的路径";
+            case HttpStatus.NOT_FOUND -> "请求的路径在网关上未找到";
             case HttpStatus.SERVICE_UNAVAILABLE -> {
                 String message = "目标服务不可用";
                 LOG.warn(
                     "{}：[{}] {}", message,
-                    errorAttributes.get("requestId"), t.getMessage()
+                    attributes.get("requestId"), throwable.getMessage()
                 );
                 yield message;
             }
             default -> {
                 String message = "网关发生未知错误";
-                LOG.error(message, t);
+                LOG.error(message, throwable);
                 yield message;
             }
         };

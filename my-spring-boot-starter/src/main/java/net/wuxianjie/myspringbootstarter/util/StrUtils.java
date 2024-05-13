@@ -16,7 +16,7 @@ public class StrUtils {
      * }</pre>
      *
      * @param value 原始值
-     * @return 如果 {@code value} 非空，则返回模糊查询字符串，否则返回 {@code null}
+     * @return 如果 {@code value} 非空则返回模糊查询字符串，否则返回 {@code null}
      */
     public static String toLikeValue(String value) {
         if (!StringUtils.hasText(value)) return null;

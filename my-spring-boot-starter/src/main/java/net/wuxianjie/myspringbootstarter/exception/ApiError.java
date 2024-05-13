@@ -21,7 +21,6 @@ public record ApiError(
     LocalDateTime timestamp, int status, String error, String path
 ) {
 
-
     public ApiError(HttpStatus status, String error) {
         this(LocalDateTime.now(), status.value(), error, getRequestPath());
     }

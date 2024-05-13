@@ -9,11 +9,13 @@ group = "net.wuxianjie"
 version = "0.0.1-SNAPSHOT"
 
 dependencyManagement {
+    // 引入 Spring Boot 和 Spring Cloud 的 BOM 文件来管理这两个框架及其相关依赖的版本
     imports {
         mavenBom(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
         mavenBom("org.springframework.cloud:spring-cloud-dependencies:2023.0.1")
     }
 
+    // 统一管理其他依赖的版本
     dependencies {
         dependency("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3")
     }
