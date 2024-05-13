@@ -63,10 +63,16 @@ public class WebMvcExceptionHandler {
             </body>
         </html>""";
 
+    private final HttpServletRequest request;
     private final ResourceLoader resourceLoader;
     private final MyConfig myConfig;
 
-    public WebMvcExceptionHandler(ResourceLoader resourceLoader, MyConfig myConfig) {
+    public WebMvcExceptionHandler(
+        HttpServletRequest request,
+        ResourceLoader resourceLoader,
+        MyConfig myConfig
+    ) {
+        this.request = request;
         this.resourceLoader = resourceLoader;
         this.myConfig = myConfig;
     }
@@ -82,16 +88,15 @@ public class WebMvcExceptionHandler {
         NoHandlerFoundException.class,
         NoResourceFoundException.class
     })
-    public ResponseEntity<?> handleNotFoundException(HttpServletRequest request) {
-        String path = request.getRequestURI();
-        if (isJsonRequest(request)) {
+    public ResponseEntity<?> handleNotFoundException() {
+        if (isJsonRequest()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new ApiError(HttpStatus.NOT_FOUND, "请求的资源在服务器上未找到"));
         }
         return ResponseEntity.status(HttpStatus.OK)
             .contentType(MediaType.TEXT_HTML)
-            .body(getHtml(path));
+            .body(getHtml());
     }
 
     /**
@@ -288,15 +293,20 @@ public class WebMvcExceptionHandler {
      * 其他未被明确处理的异常。
      */
     @ExceptionHandler(Throwable.class)
-    public ResponseEntity<ApiError> handleDefaultException(Throwable throwable) {
+    public ResponseEntity<ApiError> handleDefaultException(
+        Throwable throwable
+    ) {
         // 忽略 `org.springframework.security.access.AccessDeniedException` 异常
         // 否则将导致 Spring Security 框架无法处理 403 异常
-        if (ObjectUtils.isInstanceOf(
-            throwable,
-            "org.springframework.security.access.AccessDeniedException"
-        )) {
-            throw (RuntimeException) throwable;
+        checkAndThrowAccessDeniedException(throwable);
+
+        // 触发限流器
+        if (isTooManyRequestError(throwable)) {
+            return handleApiException(
+                new ApiException(HttpStatus.TOO_MANY_REQUESTS, "请求过于频繁", throwable)
+            );
         }
+
         String message = "服务器发生未知错误";
         LOG.error(message, throwable);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -304,7 +314,7 @@ public class WebMvcExceptionHandler {
             .body(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, message));
     }
 
-    private boolean isJsonRequest(HttpServletRequest request) {
+    private boolean isJsonRequest() {
         String path = request.getRequestURI();
         String accept = Optional.ofNullable(
                 request.getHeader(HttpHeaders.ACCEPT)
@@ -314,33 +324,40 @@ public class WebMvcExceptionHandler {
             accept.contains(MediaType.APPLICATION_JSON_VALUE);
     }
 
-    private String getHtml(String requestPath) {
+    private String getHtml() {
+        String path = request.getRequestURI();
         String filePath = myConfig.getSpa().getFilePath();
         if (!StringUtils.hasText(filePath)) {
-            return SPA_NOT_FOUND_HTML.formatted(requestPath);
+            return SPA_NOT_FOUND_HTML.formatted(path);
         }
         Resource resource = resourceLoader.getResource(filePath);
         if (!resource.exists()) {
-            LOG.error("SPA 文件 [{}] 不存在，请求路径：{}", filePath, requestPath);
-            return SPA_NOT_FOUND_HTML.formatted(requestPath);
+            LOG.error("SPA 文件 [{}] 不存在，请求路径：{}", filePath, path);
+            return SPA_NOT_FOUND_HTML.formatted(path);
         }
         try (InputStream input = resource.getInputStream()) {
             return StreamUtils.copyToString(input, StandardCharsets.UTF_8);
         } catch (IOException e) {
             LOG.error(
-                "SPA 文件 [{}] 读取失败，请求路径：{}", filePath, requestPath,
+                "SPA 文件 [{}] 读取失败，请求路径：{}", filePath, path,
                 e
             );
-            return SPA_NOT_FOUND_HTML.formatted(requestPath);
+            return SPA_NOT_FOUND_HTML.formatted(path);
         }
     }
 
     private void logApiException(ApiException exception) {
         if (exception.getStatus().is4xxClientError()) {
-            LOG.warn("客户端错误：{}", exception.getFullMessage());
+            LOG.warn(
+                "客户端 [ip={}] 错误：{}",
+                request.getRemoteAddr(), exception.getFullMessage()
+            );
             return;
         }
-        LOG.error("服务器错误：{}", exception.getFullMessage());
+        LOG.error(
+            "客户端 [ip={}] 请求服务器出错：{}",
+            request.getRemoteAddr(), exception.getFullMessage()
+        );
     }
 
     private String getParameterName(Exception exception) {
@@ -365,5 +382,21 @@ public class WebMvcExceptionHandler {
             );
         }
         return "不支持的媒体类型";
+    }
+
+    private void checkAndThrowAccessDeniedException(Throwable throwable) {
+        if (ObjectUtils.isInstanceOf(
+            throwable,
+            "org.springframework.security.access.AccessDeniedException"
+        )) {
+            throw (RuntimeException) throwable;
+        }
+    }
+
+    private boolean isTooManyRequestError(Throwable throwable) {
+        return ObjectUtils.isInstanceOf(
+            throwable,
+            "io.github.resilience4j.ratelimiter.RequestNotPermitted"
+        );
     }
 }
