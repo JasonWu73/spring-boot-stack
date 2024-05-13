@@ -1,9 +1,9 @@
-net.wuxianjie.myspringbootstarter.json.JsonConfiguration
-net.wuxianjie.myspringbootstarter.json.ApiClientConfiguration
-net.wuxianjie.myspringbootstarter.exception.GlobalWebExceptionHandler
-net.wuxianjie.myspringbootstarter.security.WebSecurityConfiguration
-net.wuxianjie.myspringbootstarter.gateway.dns.GatewayAddressResolverConfiguration
-net.wuxianjie.myspringbootstarter.gateway.exception.GatewayExceptionHandlerConfiguration
+net.wuxianjie.myspringbootstarter.json.JsonConfig
+net.wuxianjie.myspringbootstarter.json.RestClientConfig
+net.wuxianjie.myspringbootstarter.exception.WebMvcExceptionHandler
+net.wuxianjie.myspringbootstarter.security.WebSecurityConfig
+net.wuxianjie.myspringbootstarter.gateway.dns.GatewayAddressResolverConfig
+net.wuxianjie.myspringbootstarter.gateway.exception.GatewayExceptionHandlerConfig
 
-net.wuxianjie.myspringbootstarter.shared.MyConfigurationProperties
+net.wuxianjie.myspringbootstarter.shared.MyConfig
 net.wuxianjie.myspringbootstarter.util.SpringUtils

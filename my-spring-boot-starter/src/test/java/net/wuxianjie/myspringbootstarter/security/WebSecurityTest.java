@@ -19,7 +19,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
     }
 )
 @AutoConfigureMockMvc
-class SecurityWebTest {
+class WebSecurityTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -32,7 +32,9 @@ class SecurityWebTest {
             .andExpect(MockMvcResultMatchers.header()
                 .string("Content-Type", "text/html")
             )
-            .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+            .andReturn()
+            .getResponse()
+            .getContentAsString(StandardCharsets.UTF_8);
         Assertions.assertThat(htmlResponse).isEqualTo("""
             <!DOCTYPE html>
             <html lang="cmn">
@@ -86,7 +88,7 @@ class SecurityWebTest {
             )
             .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(401))
             .andExpect(MockMvcResultMatchers.jsonPath("$.error")
-                .value("Access Token 格式错误")
+                .value("Bearer Token 格式错误")
             )
             .andExpect(MockMvcResultMatchers.jsonPath("$.path")
                 .value("/test-api/v1/root")
@@ -103,7 +105,7 @@ class SecurityWebTest {
             )
             .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(401))
             .andExpect(MockMvcResultMatchers.jsonPath("$.error")
-                .value("Access Token 验证失败")
+                .value("Token 验证不通过")
             )
             .andExpect(MockMvcResultMatchers.jsonPath("$.path")
                 .value("/test-api/v1/root")

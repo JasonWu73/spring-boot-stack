@@ -24,9 +24,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 
+/**
+ * JSON 配置，仅在类路径中存在 {@code ObjectMapper} 时生效。
+ */
 @AutoConfiguration
 @ConditionalOnClass(ObjectMapper.class)
-public class JsonConfiguration {
+public class JsonConfig {
 
     /**
      * 系统中对于日期字符串的统一格式。
@@ -38,7 +41,7 @@ public class JsonConfiguration {
         return JsonMapper.builder()
             .addModule(getDateTimeModule()) // 针对 Java 8 的日期时间类型
             .defaultDateFormat(
-                new SimpleDateFormat(JsonConfiguration.DATE_TIME_PATTERN)
+                new SimpleDateFormat(JsonConfig.DATE_TIME_PATTERN)
             ) // 针对 `java.util.Date` 类型
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
@@ -60,7 +63,7 @@ public class JsonConfiguration {
     private JavaTimeModule getDateTimeModule() {
         JavaTimeModule module = new JavaTimeModule();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(
-            JsonConfiguration.DATE_TIME_PATTERN
+            JsonConfig.DATE_TIME_PATTERN
         );
         module.addSerializer(LocalDateTime.class, new JsonSerializer<>() {
 

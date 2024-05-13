@@ -28,40 +28,38 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import net.wuxianjie.myspringbootstarter.exception.ApiException;
-import net.wuxianjie.myspringbootstarter.shared.MyConfigurationProperties;
+import net.wuxianjie.myspringbootstarter.shared.MyConfig;
 
 /**
- * 基于 Spring Security 的令牌身份验证机制自动配置类。
- *
- * <p>注意：要激活该配置必须要在 Spring IoC 中存在实现了 {@link TokenAuth} 接口的 Bean，否则使用 Spring Security 默认配置。</p>
+ * 自定义 Spring Security 的身份验证机制，仅在类路径中存在 {@link SecurityFilterChain}，并且存在实现 {@link TokenAuth} 接口的 Spring Bean 时生效。
  */
 @AutoConfiguration
 @ConditionalOnClass(SecurityFilterChain.class)
 @ConditionalOnBean(TokenAuth.class)
 @EnableWebSecurity
 @EnableMethodSecurity
-public class WebSecurityConfiguration {
+public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(
         HttpSecurity http,
         HandlerExceptionResolver handlerExceptionResolver,
-        MyConfigurationProperties myConfigurationproperties,
+        MyConfig myConfig,
         TokenAuth tokenAuth
     ) throws Exception {
         // 以下配置仅对 API 请求生效
-        String apiPathPrefix = myConfigurationproperties.getSecurity().getApiPathPrefix();
-        String[] permitAllPaths = myConfigurationproperties.getSecurity().getPermitAllPaths();
+        String apiPathPrefix = myConfig.getSecurity().getApiPathPrefix();
+        String[] permitAllPaths = myConfig.getSecurity().getPermitAllPaths();
 
         http.securityMatcher(apiPathPrefix + "**")
             // 注意：顺序很重要，即前面的规则匹配后则不再进行后续比较
-            .authorizeHttpRequests(r -> {
+            .authorizeHttpRequests(registry -> {
                 // 配置公共 API
                 for (String path : permitAllPaths) {
-                    r.requestMatchers(path).permitAll();
+                    registry.requestMatchers(path).permitAll();
                 }
                 // 默认其他 API 都需要登录才能访问
-                r.requestMatchers("/**").authenticated();
+                registry.requestMatchers("/**").authenticated();
             })
             // 添加自定义 Token 身份验证过滤器
             .addFilterBefore(
@@ -70,40 +68,40 @@ public class WebSecurityConfiguration {
             );
 
         // 以下配置对所有请求生效
-        http.authorizeHttpRequests(r -> {
+        http.authorizeHttpRequests(registry -> {
                 // 默认所有请求所有人都可访问（保证 SPA 前端资源可用）
-                r.requestMatchers("/**").permitAll();
+                registry.requestMatchers("/**").permitAll();
             })
             // 支持 CORS
             .cors(Customizer.withDefaults())
             // 禁用 CSRF
             .csrf(AbstractHttpConfigurer::disable)
             // 允许浏览器在同源策略下使用 `<frame>` 或 `<iframe>`
-            .headers(c -> c.frameOptions(
+            .headers(config -> config.frameOptions(
                 HeadersConfigurer.FrameOptionsConfig::sameOrigin
             ))
             // 不需要会话状态，即不向客户端发送 `JSESSIONID` Cookies
-            .sessionManagement(c -> c.sessionCreationPolicy(
+            .sessionManagement(config -> config.sessionCreationPolicy(
                 SessionCreationPolicy.STATELESS
             ))
             // 身份验证失败和没有访问权限的处理
-            .exceptionHandling(c -> {
+            .exceptionHandling(config -> {
                 // 未通过身份验证，对应 401 HTTP 状态码
-                c.authenticationEntryPoint((req, res, authEx) ->
+                config.authenticationEntryPoint((request, response, exception) ->
                     handlerExceptionResolver.resolveException(
-                        req, res, null,
+                        request, response, null,
                         new ApiException(
-                            HttpStatus.UNAUTHORIZED, "身份验证失败", authEx
+                            HttpStatus.UNAUTHORIZED, "身份验证失败", exception
                         )
                     )
                 );
 
                 // 通过身份验证，但没有访问权限，对应 403 HTTP 状态码
-                c.accessDeniedHandler((req, res, acsDenEx) ->
+                config.accessDeniedHandler((request, response, exception) ->
                     handlerExceptionResolver.resolveException(
-                        req, res, null,
+                        request, response, null,
                         new ApiException(
-                            HttpStatus.FORBIDDEN, "没有访问权限", acsDenEx
+                            HttpStatus.FORBIDDEN, "没有访问权限", exception
                         )
                     )
                 );
@@ -127,7 +125,7 @@ public class WebSecurityConfiguration {
     }
 
     /**
-     * 密码哈希算法。
+     * 指定密码哈希算法。
      */
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -135,10 +133,10 @@ public class WebSecurityConfiguration {
     }
 
     @Bean
-    public RoleHierarchy roleHierarchy(MyConfigurationProperties myConfigurationproperties) {
+    public RoleHierarchy roleHierarchy(MyConfig myConfig) {
         RoleHierarchyImpl hierarchy = new RoleHierarchyImpl();
         hierarchy.setHierarchy(
-            String.join("\n", myConfigurationproperties.getSecurity().getHierarchies())
+            String.join("\n", myConfig.getSecurity().getHierarchies())
         );
         return hierarchy;
     }
@@ -147,7 +145,7 @@ public class WebSecurityConfiguration {
      * Spring Boot 3.x（即 Spring Security 6）开始，需要手动配置使用上下级关系的功能权限。
      */
     @Bean
-    public DefaultMethodSecurityExpressionHandler DefaultMethodSecurityExpressionHandler(
+    public DefaultMethodSecurityExpressionHandler defaultMethodSecurityExpressionHandler(
         RoleHierarchy roleHierarchy
     ) {
         DefaultMethodSecurityExpressionHandler handler = new DefaultMethodSecurityExpressionHandler();
@@ -168,6 +166,6 @@ public class WebSecurityConfiguration {
      */
     @Bean
     public AuthenticationManager authenticationManager() {
-        return u -> u;
+        return authentication -> authentication;
     }
 }

@@ -17,9 +17,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@SpringBootTest(classes = JsonConfiguration.class)
+@SpringBootTest(classes = JsonConfig.class)
 @ExtendWith(SpringExtension.class)
-class JsonConfigurationTest {
+class JsonConfigTest {
 
     @Autowired
     private ObjectMapper jsonMapper;

@@ -10,10 +10,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestClient;
 
+/**
+ * HTTP 请求客户端配置，仅在 {@link MappingJackson2HttpMessageConverter} Spring Bean 存在时生效。
+ */
 @AutoConfiguration
-@AutoConfigureAfter(JsonConfiguration.class)
+@AutoConfigureAfter(JsonConfig.class)
 @ConditionalOnBean(MappingJackson2HttpMessageConverter.class)
-public class ApiClientConfiguration {
+public class RestClientConfig {
 
     /**
      * 配置 HTTP 请求客户端。
@@ -30,17 +33,18 @@ public class ApiClientConfiguration {
      * <p><strong>GET 请求</strong></p>
      *
      * <pre>{@code
+     * RestClient restClient = new HttpClientConfig().restClient(null);
+     *
      * String url = "http://192.168.2.42:8083/api/v1/users";
      * try {
-     *     ResponseEntity<FakeData> response = restClient
-     *         .get()
-     *         .uri(url, b -> {
-     *             b.queryParam("offset", 10);
-     *             b.queryParam("limit", 10);
-     *             return b.build();
+     *     ResponseEntity<FakeData> response = restClient.get()
+     *         .uri(url, builder -> {
+     *             builder.queryParam("offset", 10);
+     *             builder.queryParam("limit", 10);
+     *             return builder.build();
      *         })
-     *         .headers(h -> {
-     *             h.setBearerAuth("bb67d0b217ec46aaa7918617b69ca021");
+     *         .headers(headers -> {
+     *             headers.setBearerAuth("bb67d0b217ec46aaa7918617b69ca021");
      *         })
      *         .retrieve()
      *         .toEntity(FakeData.class);
@@ -48,9 +52,7 @@ public class ApiClientConfiguration {
      *     FakeData dataResponse = response.getBody();
      *     System.out.printf("HTTP 响应状态码：%s，响应结果：%s%n", status, dataResponse);
      * } catch (Exception e) {
-     *     throw new ApiException(
-     *         HttpStatus.SERVICE_UNAVAILABLE, "外部服务不可用", e
-     *     );
+     *     throw new ApiException(HttpStatus.SERVICE_UNAVAILABLE, "外部服务不可用", e);
      * }
      * }</pre>
      *
@@ -60,8 +62,7 @@ public class ApiClientConfiguration {
      * String url = "http://192.168.2.42:8083/api/v1/auth/login";
      * FakeAuth authRequest = new FakeAuth("username", "password");
      * try {
-     *     ResponseEntity<FakeData> response = restClient
-     *         .post()
+     *     ResponseEntity<FakeData> response = restClient.post()
      *         .uri(url)
      *         .body(authRequest)
      *         .retrieve()
@@ -70,9 +71,7 @@ public class ApiClientConfiguration {
      *     FakeData dataResponse = response.getBody();
      *     System.out.printf("HTTP 响应状态码：%s，响应结果：%s%n", status, dataResponse);
      * } catch (Exception e) {
-     *     throw new ApiException(
-     *         HttpStatus.SERVICE_UNAVAILABLE, "外部服务不可用", e
-     *     );
+     *     throw new ApiException(HttpStatus.SERVICE_UNAVAILABLE, "外部服务不可用", e);
      * }
      * }</pre>
      *
@@ -83,8 +82,7 @@ public class ApiClientConfiguration {
      * LinkedMultiValueMap<Object, Object> formRequest = new LinkedMultiValueMap<>();
      * formRequest.add("name", "张三");
      * try {
-     *     ResponseEntity<FakeData> response = restClient
-     *         .post()
+     *     ResponseEntity<FakeData> response = restClient.post()
      *         .uri(url)
      *         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
      *         .body(formRequest)
@@ -94,9 +92,7 @@ public class ApiClientConfiguration {
      *     FakeData dataResponse = response.getBody();
      *     System.out.printf("HTTP 响应状态码：%s，响应结果：%s%n", status, dataResponse);
      * } catch (Exception e) {
-     *     throw new ApiException(
-     *         HttpStatus.SERVICE_UNAVAILABLE, "外部服务不可用", e
-     *     );
+     *     throw new ApiException(HttpStatus.SERVICE_UNAVAILABLE, "外部服务不可用", e);
      * }
      * }</pre>
      */

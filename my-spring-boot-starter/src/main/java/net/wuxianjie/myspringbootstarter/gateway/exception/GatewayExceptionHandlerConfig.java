@@ -22,18 +22,21 @@ import org.springframework.http.codec.json.Jackson2JsonEncoder;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
 import org.springframework.web.reactive.result.view.ViewResolver;
 
-import net.wuxianjie.myspringbootstarter.json.JsonConfiguration;
+import net.wuxianjie.myspringbootstarter.json.JsonConfig;
 
+/**
+ * 网关全局异常处理器配置，仅在 WebFlux 环境下生效。
+ */
 @AutoConfiguration
-@AutoConfigureAfter(JsonConfiguration.class)
+@AutoConfigureAfter(JsonConfig.class)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
 @ConditionalOnClass(WebFluxConfigurer.class)
-public class GatewayExceptionHandlerConfiguration {
+public class GatewayExceptionHandlerConfig {
 
     /**
      * 覆盖 Spring Boot WebFlux 默认的全局异常处理器。
      *
-     * <p>确保该 Bean 优先级比默认的 {@link ErrorWebFluxAutoConfiguration#errorWebExceptionHandler} 高。</p>
+     * <p>确保该 Bean 优先级比默认的 {@link ErrorWebFluxAutoConfiguration#errorWebExceptionHandler} 要高。</p>
      */
     @Bean
     @Order(-2)
@@ -44,28 +47,28 @@ public class GatewayExceptionHandlerConfiguration {
         ObjectProvider<ViewResolver> viewResolvers,
         ServerCodecConfigurer serverCodecConfigurer,
         ApplicationContext applicationContext,
-        @Qualifier("jsonMapper") ObjectMapper objectMapper
+        @Qualifier("jsonMapper") ObjectMapper jsonMapper
     ) {
         GatewayExceptionHandler handler = new GatewayExceptionHandler(
             errorAttributes, webProperties.getResources(),
             serverProperties.getError(), applicationContext
         );
         handler.setViewResolvers(viewResolvers.orderedStream().toList());
-        setCustomJsonMapper(handler, serverCodecConfigurer, objectMapper);
+        setCustomJsonMapper(handler, serverCodecConfigurer, jsonMapper);
         return handler;
     }
 
     private void setCustomJsonMapper(
-        GatewayExceptionHandler handler, ServerCodecConfigurer configurer,
-        ObjectMapper objectMapper
+        GatewayExceptionHandler handler, ServerCodecConfigurer config,
+        ObjectMapper jsonMapper
     ) {
-        configurer.defaultCodecs().jackson2JsonDecoder(
-            new Jackson2JsonDecoder(objectMapper)
+        config.defaultCodecs().jackson2JsonDecoder(
+            new Jackson2JsonDecoder(jsonMapper)
         );
-        configurer.defaultCodecs().jackson2JsonEncoder(
-            new Jackson2JsonEncoder(objectMapper)
+        config.defaultCodecs().jackson2JsonEncoder(
+            new Jackson2JsonEncoder(jsonMapper)
         );
-        handler.setMessageWriters(configurer.getWriters());
-        handler.setMessageReaders(configurer.getReaders());
+        handler.setMessageWriters(config.getWriters());
+        handler.setMessageReaders(config.getReaders());
     }
 }

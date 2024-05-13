@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/test-api/v1/")
-class SecurityTestController {
+class WebSecurityTestController {
 
     @GetMapping("/public")
     String publicApi() {

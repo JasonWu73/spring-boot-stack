@@ -51,10 +51,11 @@ public class ApiException extends RuntimeException {
     }
 
     private String buildFullMessage() {
-        return String.format("%s \"%s\"", status, error) +
+        return "%s \"%s\"".formatted(status, error) +
             Optional.ofNullable(getCause())
-                .map(t -> ApiException.MESSAGE_SEPARATOR
-                    + getNestedMessage(t))
+                .map(throwable ->
+                    ApiException.MESSAGE_SEPARATOR + getNestedMessage(throwable)
+                )
                 .orElse("");
     }
 

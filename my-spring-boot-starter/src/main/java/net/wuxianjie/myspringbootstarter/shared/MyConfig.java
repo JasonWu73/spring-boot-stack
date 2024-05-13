@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ConfigurationProperties(prefix = "my")
-public class MyConfigurationProperties {
+public class MyConfig {
 
     /**
      * Web 安全配置。
@@ -46,8 +46,7 @@ public class MyConfigurationProperties {
          *
          * <p>使用 <code>></code> 符号创建上下级权限（角色）。</p>
          *
-         * <p>比如下面字符串代表 <code>root</code> 拥有
-         *         <code>admin</code> 的所有权限：</p>
+         * <p>比如下面字符串代表 <code>root</code> 拥有 <code>admin</code> 的所有权限：</p>
          *
          * <pre><code>
          * root > admin
@@ -177,8 +176,8 @@ public class MyConfigurationProperties {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        MyConfigurationProperties myConfigurationproperties = (MyConfigurationProperties) o;
-        return Objects.equals(security, myConfigurationproperties.security) && Objects.equals(spa, myConfigurationproperties.spa);
+        MyConfig myConfig = (MyConfig) o;
+        return Objects.equals(security, myConfig.security) && Objects.equals(spa, myConfig.spa);
     }
 
     @Override

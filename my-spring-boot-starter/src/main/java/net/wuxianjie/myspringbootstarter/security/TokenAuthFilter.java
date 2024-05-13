@@ -42,31 +42,27 @@ public class TokenAuthFilter extends OncePerRequestFilter {
         @SuppressWarnings("NullableProblems") HttpServletResponse response,
         @SuppressWarnings("NullableProblems") FilterChain chain
     ) throws ServletException, IOException {
-        String bearer = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (bearer == null) {
+        String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (bearerToken == null) {
             chain.doFilter(request, response);
             return;
         }
-        if (!bearer.startsWith(BEARER_PREFIX)) {
+        if (!bearerToken.startsWith(BEARER_PREFIX)) {
             handlerExceptionResolver.resolveException(
                 request, response, null,
-                new ApiException(
-                    HttpStatus.UNAUTHORIZED, "Access Token 格式错误"
-                )
+                new ApiException(HttpStatus.UNAUTHORIZED, "Bearer Token 格式错误")
             );
             return;
         }
-        var accessToken = bearer.substring(BEARER_PREFIX.length());
+        var accessToken = bearerToken.substring(BEARER_PREFIX.length());
 
         CurrentUser user;
         try {
             user = tokenAuth.authenticate(accessToken);
-        } catch (TokenAuthException ex) {
+        } catch (TokenAuthException e) {
             handlerExceptionResolver.resolveException(
                 request, response, null,
-                new ApiException(
-                    HttpStatus.UNAUTHORIZED, "Access Token 验证失败", ex
-                )
+                new ApiException(HttpStatus.UNAUTHORIZED, "Token 验证不通过", e)
             );
             return;
         }
