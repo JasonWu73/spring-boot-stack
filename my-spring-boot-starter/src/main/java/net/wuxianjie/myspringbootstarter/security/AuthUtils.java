@@ -21,8 +21,10 @@ public class AuthUtils {
         return Optional.ofNullable(
                 SecurityContextHolder.getContext().getAuthentication()
             )
-            .filter(u -> !(u instanceof AnonymousAuthenticationToken))
-            .map(u -> (CurrentUser) u.getPrincipal());
+            .filter(authentication ->
+                !(authentication instanceof AnonymousAuthenticationToken)
+            )
+            .map(authentication -> (CurrentUser) authentication.getPrincipal());
     }
 
     /**

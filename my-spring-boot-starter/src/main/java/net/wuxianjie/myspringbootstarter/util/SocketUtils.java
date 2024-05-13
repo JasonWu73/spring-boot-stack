@@ -23,8 +23,8 @@ public class SocketUtils {
      * @param ip TCP 服务端 IP
      * @param port TCP 服务端端口
      * @param data 要发送的数据
-     * @param connectTimeout 连接超时时间，单位：毫秒
-     * @param readTimeout 读取超时时间，单位：毫秒
+     * @param connectTimeout 连接超时时间（单位：毫秒）
+     * @param readTimeout 读取超时时间（单位：毫秒）
      * @return TCP 服务端的响应结果
      */
     public static byte[] sendTcp(
@@ -41,10 +41,10 @@ public class SocketUtils {
 
             socket.setSoTimeout(readTimeout);
             return readSocket(socket);
-        } catch (IOException ex) {
+        } catch (IOException e) {
             throw new RuntimeException(
                 "TCP 通信失败 [ip=%s; port=%s]：%s".formatted(
-                    ip, port, ex.getMessage()
+                    ip, port, e.getMessage()
                 )
             );
         }
@@ -58,18 +58,23 @@ public class SocketUtils {
      * @param ip UDP 服务端 IP
      * @param port UDP 服务端端口
      * @param data 要发送的数据
-     * @param readTimeout 读取超时时间，单位：毫秒
-     * @param bufferSize 缓冲区大小（只有设置大于 {@link #BUFFER_SIZE} 才会使用该参数值），单位：字节。注意：UDP 中该值决定了读取的最大数据量
+     * @param readTimeout 读取超时时间（单位：毫秒）
+     * @param bufferSize 缓冲区大小（单位：字节，只有设置大于 {@link #BUFFER_SIZE} 才会使用该参数值）。注意：UDP 中该值决定了读取的最大数据量
      * @return UDP 服务端的响应结果
      */
     public static byte[] sendUdp(
         String ip, int port, byte[] data, int readTimeout,
         int bufferSize
     ) {
+        // ❗️ 因为 UDP 只读取一次，故预设的缓冲区大小将影响能读取的最大数据量
+        if (bufferSize < BUFFER_SIZE) {
+            bufferSize = BUFFER_SIZE;
+        }
+
         try (DatagramSocket socket = new DatagramSocket()) {
-            InetAddress inetAddress = InetAddress.getByName(ip);
+            InetAddress address = InetAddress.getByName(ip);
             DatagramPacket packet = new DatagramPacket(
-                data, data.length, inetAddress, port
+                data, data.length, address, port
             );
             socket.send(packet);
 
@@ -99,10 +104,6 @@ public class SocketUtils {
         DatagramSocket socket, DatagramPacket packet, int bufferSize
     ) throws IOException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        // ❗️因为只读取一次，故预设的缓冲区大小将影响能读取的最多数据量
-        if (bufferSize < BUFFER_SIZE) {
-            bufferSize = BUFFER_SIZE;
-        }
         packet.setData(new byte[bufferSize]);
 
         socket.receive(packet);

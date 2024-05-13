@@ -111,7 +111,7 @@ public class RsaUtils {
         try {
             return KeyPairGenerator.getInstance(RSA_CRYPTO_ALGORITHM);
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("密码算法不支持", e);
+            throw new RuntimeException("不支持的密码算法", e);
         }
     }
 
@@ -119,7 +119,7 @@ public class RsaUtils {
         try {
             return Cipher.getInstance(RSA_CRYPTO_ALGORITHM);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
-            throw new RuntimeException("密码算法不支持", e);
+            throw new RuntimeException("不支持的密码算法", e);
         }
     }
 
@@ -127,7 +127,7 @@ public class RsaUtils {
         try {
             return KeyFactory.getInstance(RSA_CRYPTO_ALGORITHM);
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("密码算法不支持", e);
+            throw new RuntimeException("不支持的密码算法", e);
         }
     }
 

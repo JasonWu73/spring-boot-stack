@@ -8,11 +8,11 @@ import org.springframework.cloud.gateway.config.HttpClientCustomizer;
 import org.springframework.context.annotation.Bean;
 
 /**
- * 修复 Spring Cloud Gateway 无法解析域名的问题。
+ * 修复 Spring Cloud Gateway 无法解析域名的问题，仅在类路径中存在 {@link HttpClientCustomizer} 类时生效。
  */
 @AutoConfiguration
 @ConditionalOnClass(HttpClientCustomizer.class)
-public class GatewayAddressResolverConfiguration {
+public class GatewayAddressResolverConfig {
 
     /**
      * 配置使用 Netty 的默认地址解析器组。

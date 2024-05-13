@@ -13,10 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SpringUtils implements ApplicationContextAware {
 
-    /**
-     * Spring IoC 容器上下文。
-     */
-    public static ApplicationContext context;
+    private static ApplicationContext context;
 
     /**
      * 获取 Spring 管理的 Bean 实例。

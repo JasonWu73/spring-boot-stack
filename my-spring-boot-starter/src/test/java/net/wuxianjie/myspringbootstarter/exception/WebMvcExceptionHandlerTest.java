@@ -22,19 +22,19 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import net.wuxianjie.myspringbootstarter.shared.MyConfigurationProperties;
+import net.wuxianjie.myspringbootstarter.shared.MyConfig;
 
 @ExtendWith(MockitoExtension.class)
-class GlobalWebExceptionHandlerTest {
+class WebMvcExceptionHandlerTest {
 
     @Mock
     private ResourceLoader resourceLoader;
 
     @Mock
-    private MyConfigurationProperties myConfigurationproperties;
+    private MyConfig myConfig;
 
     @InjectMocks
-    private GlobalWebExceptionHandler globalWebExceptionHandler;
+    private WebMvcExceptionHandler webMvcExceptionHandler;
 
     @Test
     void handleNotFoundException_returnsJson_whenRequestApiPath() {
@@ -69,14 +69,14 @@ class GlobalWebExceptionHandlerTest {
     void handleNotFoundException_returnsHtml_whenNotRequestJsonAndSpaNotExists() {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setRequestURI("/unknown");
-        MyConfigurationProperties props = new MyConfigurationProperties();
-        props.getSpa().setFilePath("static/not-exists.html");
-        Mockito.when(myConfigurationproperties.getSecurity()).thenReturn(props.getSecurity());
-        Mockito.when(myConfigurationproperties.getSpa()).thenReturn(props.getSpa());
-        Mockito.when(resourceLoader.getResource(props.getSpa().getFilePath()))
+        MyConfig config = new MyConfig();
+        config.getSpa().setFilePath("static/not-exists.html");
+        Mockito.when(myConfig.getSecurity()).thenReturn(config.getSecurity());
+        Mockito.when(myConfig.getSpa()).thenReturn(config.getSpa());
+        Mockito.when(resourceLoader.getResource(config.getSpa().getFilePath()))
             .thenReturn(new ClassPathResource("static/not-exists.html"));
 
-        ResponseEntity<?> response = globalWebExceptionHandler.handleNotFoundException(request);
+        ResponseEntity<?> response = webMvcExceptionHandler.handleNotFoundException(request);
         Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         Assertions.assertThat(response.getHeaders().getContentType())
             .isEqualTo(MediaType.TEXT_HTML);
@@ -89,13 +89,13 @@ class GlobalWebExceptionHandlerTest {
     void handleNotFoundException_returnsHtml_whenNotRequestJsonButSpaExists() {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setRequestURI("/unknown");
-        MyConfigurationProperties props = new MyConfigurationProperties();
-        Mockito.when(myConfigurationproperties.getSecurity()).thenReturn(props.getSecurity());
-        Mockito.when(myConfigurationproperties.getSpa()).thenReturn(props.getSpa());
-        Mockito.when(resourceLoader.getResource(props.getSpa().getFilePath()))
+        MyConfig config = new MyConfig();
+        Mockito.when(myConfig.getSecurity()).thenReturn(config.getSecurity());
+        Mockito.when(myConfig.getSpa()).thenReturn(config.getSpa());
+        Mockito.when(resourceLoader.getResource(config.getSpa().getFilePath()))
             .thenReturn(new ClassPathResource("static/index.html"));
 
-        ResponseEntity<?> response = globalWebExceptionHandler.handleNotFoundException(request);
+        ResponseEntity<?> response = webMvcExceptionHandler.handleNotFoundException(request);
         Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         Assertions.assertThat(response.getHeaders().getContentType())
             .isEqualTo(MediaType.TEXT_HTML);
@@ -104,14 +104,14 @@ class GlobalWebExceptionHandlerTest {
         Assertions.assertThat((String) body).contains("<h1>单元测试 SPA 页面</h1>");
     }
 
-    private void testHandleNotFoundException_returnsJson(MockHttpServletRequest req) {
+    private void testHandleNotFoundException_returnsJson(MockHttpServletRequest request) {
         try (MockedStatic<RequestContextHolder> mocked = Mockito.mockStatic(RequestContextHolder.class)) {
-            Mockito.when(myConfigurationproperties.getSecurity())
-                .thenReturn(new MyConfigurationProperties().getSecurity());
+            Mockito.when(myConfig.getSecurity())
+                .thenReturn(new MyConfig().getSecurity());
             mocked.when(RequestContextHolder::getRequestAttributes)
-                .thenReturn(new ServletRequestAttributes(req));
+                .thenReturn(new ServletRequestAttributes(request));
 
-            ResponseEntity<?> response = globalWebExceptionHandler.handleNotFoundException(req);
+            ResponseEntity<?> response = webMvcExceptionHandler.handleNotFoundException(request);
             Assertions.assertThat(response.getStatusCode())
                 .isEqualTo(HttpStatus.NOT_FOUND);
             Assertions.assertThat(response.getHeaders().getContentType())
@@ -124,8 +124,8 @@ class GlobalWebExceptionHandlerTest {
                 .isBeforeOrEqualTo(LocalDateTime.now());
             Assertions.assertThat(apiError.status())
                 .isEqualTo(HttpStatus.NOT_FOUND.value());
-            Assertions.assertThat(apiError.error()).isEqualTo("找不到指定的路径");
-            Assertions.assertThat(apiError.path()).isEqualTo(req.getRequestURI());
+            Assertions.assertThat(apiError.error()).isEqualTo("请求的资源在服务器上未找到");
+            Assertions.assertThat(apiError.path()).isEqualTo(request.getRequestURI());
         }
     }
 }

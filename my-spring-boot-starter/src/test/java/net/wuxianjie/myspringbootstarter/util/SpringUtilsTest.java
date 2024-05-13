@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 @SpringBootTest(
     classes = {
         SpringUtils.class,
-        SpringUtilsTest.ConfigurationTest.class
+        SpringUtilsTest.ConfigForTest.class
     }
 )
 class SpringUtilsTest {
@@ -32,7 +32,7 @@ class SpringUtilsTest {
     }
 
     @Configuration
-    static class ConfigurationTest {
+    static class ConfigForTest {
 
         @Bean
         public BeanTest beanTest() {

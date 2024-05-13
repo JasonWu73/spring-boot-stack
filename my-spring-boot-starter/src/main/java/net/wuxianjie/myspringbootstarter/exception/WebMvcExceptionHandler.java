@@ -38,14 +38,17 @@ import org.springframework.web.multipart.support.MissingServletRequestPartExcept
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import net.wuxianjie.myspringbootstarter.shared.MyConfigurationProperties;
+import net.wuxianjie.myspringbootstarter.shared.MyConfig;
 import net.wuxianjie.myspringbootstarter.util.ObjectUtils;
 
+/**
+ * Web MVC 全局异常处理器，仅在 Servlet 环境下生效。
+ */
 @ControllerAdvice
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-public class GlobalWebExceptionHandler {
+public class WebMvcExceptionHandler {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GlobalWebExceptionHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(WebMvcExceptionHandler.class);
 
     static final String SPA_NOT_FOUND_HTML = """
         <!DOCTYPE html>
@@ -61,29 +64,30 @@ public class GlobalWebExceptionHandler {
         </html>""";
 
     private final ResourceLoader resourceLoader;
-    private final MyConfigurationProperties myConfigurationProperties;
+    private final MyConfig myConfig;
 
-    public GlobalWebExceptionHandler(
-        ResourceLoader resourceLoader,
-        MyConfigurationProperties myConfigurationProperties
-    ) {
+    public WebMvcExceptionHandler(ResourceLoader resourceLoader, MyConfig myConfig) {
         this.resourceLoader = resourceLoader;
-        this.myConfigurationProperties = myConfigurationProperties;
+        this.myConfig = myConfig;
     }
 
     /**
      * 404 异常，根据请求返回 JSON 或 HTML 页面（SPA，单页应用）。
+     *
+     * <p>1、{@code NoHandlerFoundException} - 当 Spring 的 {@code DispatcherServlet} 在处理请求时找不到任何合适的处理器（Handler）时</p>
+     *
+     * <p>2、{@code NoResourceFoundException} - 无法找到请求的静态资源（如图片、CSS 文件、JavaScript 文件等）时</p>
      */
     @ExceptionHandler({
-        NoResourceFoundException.class,
-        NoHandlerFoundException.class
+        NoHandlerFoundException.class,
+        NoResourceFoundException.class
     })
     public ResponseEntity<?> handleNotFoundException(HttpServletRequest request) {
         String path = request.getRequestURI();
         if (isJsonRequest(request)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(new ApiError(HttpStatus.NOT_FOUND, "找不到指定的路径"));
+                .body(new ApiError(HttpStatus.NOT_FOUND, "请求的资源在服务器上未找到"));
         }
         return ResponseEntity.status(HttpStatus.OK)
             .contentType(MediaType.TEXT_HTML)
@@ -91,153 +95,160 @@ public class GlobalWebExceptionHandler {
     }
 
     /**
-     * 参数校验失败异常。
+     * 单参数校验失败。
      *
-     * <ol>
-     *     <li>Controller 类上有 {@code @Validated} 注解</li>
-     *     <li>对 Controller 方法上的单个参数使用校验注解</li>
-     * </ol>
+     * <p>1、对 Controller 使用了 {@code @Validated} 注解</p>
+     *
+     * <p>2、对方法的单个参数使用了 {@code @NotNull} 等校验注解，但参数未通过校验</p>
      */
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ApiError> handleInvalidParameterException(
-        ConstraintViolationException e
+        ConstraintViolationException exception
     ) {
         StringBuilder stringBuilder = new StringBuilder();
-        Optional.ofNullable(e.getConstraintViolations())
-            .ifPresent(v -> v.forEach(i -> {
+        Optional.ofNullable(exception.getConstraintViolations())
+            .ifPresent(violations -> violations.forEach(violation -> {
                 if (!stringBuilder.isEmpty()) {
                     stringBuilder.append(ApiException.MESSAGE_SEPARATOR);
                 }
-                stringBuilder.append(i.getMessage());
+                stringBuilder.append(violation.getMessage());
             }));
+        String message = stringBuilder.toString();
         return handleApiException(
-            new ApiException(HttpStatus.BAD_REQUEST, stringBuilder.toString(), e)
+            new ApiException(HttpStatus.BAD_REQUEST, message, exception)
         );
     }
 
     /**
-     * 参数校验失败异常。
-     *
-     * <ol>
-     *     <li>Controller 方法参数上有 {@code @Valid} 注解</li>
-     *     <li>方法参数为对象并使用 {@code @Valid} 注解</li>
-     * </ol>
+     * 请求体校验（{@code Valid} 或 {@code Validated}）失败。
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiError> handleInvalidParameterException(
-        MethodArgumentNotValidException e
+        MethodArgumentNotValidException exception
     ) {
         StringBuilder stringBuilder = new StringBuilder();
-        e.getBindingResult().getFieldErrors().forEach(fe -> {
+        exception.getBindingResult().getFieldErrors().forEach(fieldError -> {
             if (!stringBuilder.isEmpty()) {
                 stringBuilder.append(ApiException.MESSAGE_SEPARATOR);
             }
-            if (fe.isBindingFailure()) {
+            if (fieldError.isBindingFailure()) {
                 stringBuilder.append(
                     "参数值类型不匹配 [%s=%s]".formatted(
-                        fe.getField(), fe.getRejectedValue()
+                        fieldError.getField(), fieldError.getRejectedValue()
                     )
                 );
                 return;
             }
-            stringBuilder.append(fe.getDefaultMessage());
+            stringBuilder.append(fieldError.getDefaultMessage());
         });
+        String message = stringBuilder.toString();
         return handleApiException(
-            new ApiException(HttpStatus.BAD_REQUEST, stringBuilder.toString(), e)
+            new ApiException(HttpStatus.BAD_REQUEST, message, exception)
         );
     }
 
     /**
-     * 参数缺失异常。
+     * 缺少请求参数。
      *
-     * <ul>
-     *     <li>Controller 方法中使用 {@code @RequestParam} 接收的参数没有被传入</li>
-     *     <li>或使用 {@code @RequestPart} 接收的文件参数</li>
-     * </ul>
+     * <p>1、{@code MissingServletRequestParameterException} - 当方法使用 {@code @RequestParam} 注解来指定一个必需的请求参数，而实际的 HTTP 请求中未包含该参数</p>
+     *
+     * <p>2、{@code MissingServletRequestPartException} - 当方法使用 {@code @RequestPart} 注解来接收一个必须的文件请求参数，而实际的 HTTP `multipart/form-data` 请求中未包含该参数</p>
      */
     @ExceptionHandler({
         MissingServletRequestParameterException.class,
         MissingServletRequestPartException.class
     })
-    public ResponseEntity<ApiError> handleMissingParameterException(Exception e) {
-        String message = "参数缺失 [%s]".formatted(getParameterName(e));
+    public ResponseEntity<ApiError> handleMissingParameterException(
+        Exception exception
+    ) {
+        String parameterName = getParameterName(exception);
+        String message = "缺少请求参数 [%s]".formatted(parameterName);
         return handleApiException(
-            new ApiException(HttpStatus.BAD_REQUEST, message, e)
+            new ApiException(HttpStatus.BAD_REQUEST, message, exception)
         );
     }
 
     /**
-     * 参数类型不匹配异常。
+     * 客户端请求的参数类型与控制器中方法参数的预期类型不匹配。
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ApiError> handleParameterMismatchException(
-        MethodArgumentTypeMismatchException e
+    public ResponseEntity<ApiError> handleParameterTypeMismatchException(
+        MethodArgumentTypeMismatchException exception
     ) {
         String message = "参数值类型不匹配 [%s=%s]".formatted(
-            e.getName(), e.getValue()
+            exception.getName(), exception.getValue()
         );
         return handleApiException(
-            new ApiException(HttpStatus.BAD_REQUEST, message, e)
+            new ApiException(HttpStatus.BAD_REQUEST, message, exception)
         );
     }
 
     /**
-     * 请求体不可读（如格式错误的 JSON 数据）异常。
+     * 客户端发送的 HTTP 请求体无法被正确解析，或请求的内容类型（{@code Content-Type}）与控制器期望的类型不匹配。
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ApiError> handleInvalidHttpMessageException(
-        HttpMessageNotReadableException e
+    public ResponseEntity<ApiError> handleInvalidHttpBodyException(
+        HttpMessageNotReadableException exception
     ) {
         return handleApiException(
             new ApiException(
-                HttpStatus.BAD_REQUEST, "无法识别请求体的数据格式", e
+                HttpStatus.BAD_REQUEST, "无法解析请求体", exception
             )
         );
     }
 
     /**
-     * 请求方法不支持异常。
+     * HTTP 请求的方法不被服务器端的处理器支持。
      */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<ApiError> handleRequestMethodNotSupportedException(
-        HttpRequestMethodNotSupportedException e
+        HttpRequestMethodNotSupportedException exception
     ) {
-        String message = "请求方法 [%s] 不支持".formatted(e.getMethod());
+        String message = "不支持的请求方法 [%s]".formatted(exception.getMethod());
         return handleApiException(
-            new ApiException(HttpStatus.METHOD_NOT_ALLOWED, message, e)
+            new ApiException(HttpStatus.METHOD_NOT_ALLOWED, message, exception)
         );
     }
 
     /**
-     * 请求的媒体类型不支持异常。
+     * 处理媒体类型（即 {@code Content-Type} 和 {@code Accept} 头部）相关错误。
      *
-     * <ul>
-     *     <li>{@link HttpMediaTypeNotAcceptableException}：服务器 `produces` 与客户端 {@code Accept} 不匹配</li>
-     *     <li>{@link HttpMediaTypeNotSupportedException}：服务器不支持请求的 {@code Content-Type}</li>
-     * </ul>
+     * <p>1、{@code HttpMediaTypeNotSupportedException} - 客户端发送的请求中包含的 {@code Content-Type} 头部指定了服务器不支持的媒体类型</p>
+     *
+     * <p>2、{@code HttpMediaTypeNotAcceptableException} - 客户端发送的请求中包含的 {@code Accept} 头部指定了服务器无法提供的媒体类型</p>
      */
     @ExceptionHandler(HttpMediaTypeException.class)
     public ResponseEntity<ApiError> handleMimeException(
-        HttpMediaTypeException e, HttpServletRequest request
+        HttpMediaTypeException exception
     ) {
-        String message = getMimeError(e, request);
+        String message = getMimeError(exception);
         return handleApiException(
-            new ApiException(HttpStatus.UNSUPPORTED_MEDIA_TYPE, message, e)
+            new ApiException(HttpStatus.UNSUPPORTED_MEDIA_TYPE, message, exception)
         );
     }
 
     /**
-     * 文件上传异常。
+     * 文件上传失败。
+     *
+     * <ul>
+     *     <li>文件大小超出限制</li>
+     *     <li>请求格式错误</li>
+     *     <li>文件上传组件配置错误</li>
+     *     <li>服务器或依赖库问题</li>
+     *     <li>临时文件目录问题</li>
+     * </ul>
      */
     @ExceptionHandler(MultipartException.class)
-    public ResponseEntity<ApiError> handleMultipartException(MultipartException e) {
+    public ResponseEntity<ApiError> handleMultipartException(
+        MultipartException exception
+    ) {
         return handleApiException(
-            new ApiException(HttpStatus.BAD_REQUEST, "文件上传失败", e)
+            new ApiException(HttpStatus.BAD_REQUEST, "文件上传失败", exception)
         );
     }
 
     /**
-     * 参数与约束条件不匹配异常。
+     * 请求参数不满足某些条件。
      *
      * <pre>{@code
      * @GetMapping(value = "/users", params = "version=1")
@@ -248,15 +259,15 @@ public class GlobalWebExceptionHandler {
      */
     @ExceptionHandler(UnsatisfiedServletRequestParameterException.class)
     public ResponseEntity<ApiError> handleUnsatisfiedRequestParameterException(
-        UnsatisfiedServletRequestParameterException e
+        UnsatisfiedServletRequestParameterException exception
     ) {
         return handleApiException(
-            new ApiException(HttpStatus.BAD_REQUEST, "请求参数与约束条件不匹配", e)
+            new ApiException(HttpStatus.BAD_REQUEST, "请求参数不满足约束条件", exception)
         );
     }
 
     /**
-     * 客户端中断连接异常。
+     * 客户端关闭了连接或取消了请求，而服务器仍在尝试写入响应。
      */
     @ExceptionHandler(ClientAbortException.class)
     public void handleClientAbortException() {
@@ -266,27 +277,28 @@ public class GlobalWebExceptionHandler {
      * 自定义 API 异常。
      */
     @ExceptionHandler(ApiException.class)
-    public ResponseEntity<ApiError> handleApiException(ApiException e) {
-        logApiException(e);
-        return ResponseEntity.status(e.getStatus())
+    public ResponseEntity<ApiError> handleApiException(ApiException exception) {
+        logApiException(exception);
+        return ResponseEntity.status(exception.getStatus())
             .contentType(MediaType.APPLICATION_JSON)
-            .body(new ApiError(e.getStatus(), e.getMessage()));
+            .body(new ApiError(exception.getStatus(), exception.getMessage()));
     }
 
     /**
-     * 其他未被捕获的异常。
+     * 其他未被明确处理的异常。
      */
     @ExceptionHandler(Throwable.class)
-    public ResponseEntity<ApiError> handleTh(Throwable t) {
+    public ResponseEntity<ApiError> handleDefaultException(Throwable throwable) {
         // 忽略 `org.springframework.security.access.AccessDeniedException` 异常
         // 否则将导致 Spring Security 框架无法处理 403 异常
         if (ObjectUtils.isInstanceOf(
-            t, "org.springframework.security.access.AccessDeniedException"
+            throwable,
+            "org.springframework.security.access.AccessDeniedException"
         )) {
-            throw (RuntimeException) t;
+            throw (RuntimeException) throwable;
         }
         String message = "服务器发生未知错误";
-        LOG.error(message, t);
+        LOG.error(message, throwable);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
             .contentType(MediaType.APPLICATION_JSON)
             .body(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, message));
@@ -298,13 +310,12 @@ public class GlobalWebExceptionHandler {
                 request.getHeader(HttpHeaders.ACCEPT)
             )
             .orElse("");
-        return path.startsWith(
-            myConfigurationProperties.getSecurity().getApiPathPrefix()
-        ) || accept.contains(MediaType.APPLICATION_JSON_VALUE);
+        return path.startsWith(myConfig.getSecurity().getApiPathPrefix()) ||
+            accept.contains(MediaType.APPLICATION_JSON_VALUE);
     }
 
     private String getHtml(String requestPath) {
-        String filePath = myConfigurationProperties.getSpa().getFilePath();
+        String filePath = myConfig.getSpa().getFilePath();
         if (!StringUtils.hasText(filePath)) {
             return SPA_NOT_FOUND_HTML.formatted(requestPath);
         }
@@ -317,40 +328,42 @@ public class GlobalWebExceptionHandler {
             return StreamUtils.copyToString(input, StandardCharsets.UTF_8);
         } catch (IOException e) {
             LOG.error(
-                "SPA 文件 [{}] 读取失败，请求路径：{}", filePath, requestPath, e
+                "SPA 文件 [{}] 读取失败，请求路径：{}", filePath, requestPath,
+                e
             );
             return SPA_NOT_FOUND_HTML.formatted(requestPath);
         }
     }
 
-    private void logApiException(ApiException e) {
-        if (e.getStatus().is4xxClientError()) {
-            LOG.warn("客户端错误：{}", e.getFullMessage());
+    private void logApiException(ApiException exception) {
+        if (exception.getStatus().is4xxClientError()) {
+            LOG.warn("客户端错误：{}", exception.getFullMessage());
             return;
         }
-        LOG.error("服务器错误：{}", e.getFullMessage());
+        LOG.error("服务器错误：{}", exception.getFullMessage());
     }
 
-    private String getParameterName(Exception e) {
-        if (e instanceof MissingServletRequestParameterException ex) {
+    private String getParameterName(Exception exception) {
+        if (exception instanceof MissingServletRequestParameterException ex) {
             return ex.getParameterName();
         }
-        if (e instanceof MissingServletRequestPartException ex) {
+        if (exception instanceof MissingServletRequestPartException ex) {
             return ex.getRequestPartName();
         }
-        return "未知参数";
+        return "";
     }
 
-    private String getMimeError(
-        HttpMediaTypeException e, HttpServletRequest request
-    ) {
-        if (e instanceof HttpMediaTypeNotSupportedException ex) {
-            return "请求头 Content-Type [%s] 不支持".formatted(
+    private String getMimeError(HttpMediaTypeException exception) {
+        if (exception instanceof HttpMediaTypeNotSupportedException ex) {
+            return "不支持的请求头 Content-Type [%s]".formatted(
                 ex.getContentType()
             );
         }
-        return "请求头 Accept [%s] 不支持".formatted(
-            Optional.ofNullable(request.getHeader(HttpHeaders.ACCEPT)).orElse("")
-        );
+        if (exception instanceof HttpMediaTypeNotAcceptableException ex) {
+            return "不支持的请求头 Accept [%s]".formatted(
+                ex.getSupportedMediaTypes()
+            );
+        }
+        return "不支持的媒体类型";
     }
 }
