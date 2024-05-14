@@ -5,7 +5,7 @@
 
 my:
   security:
-    permit-all-paths: /api/*/public/**
+    apis: /api/*/public/**
 server:
   port: 8088
 spring:

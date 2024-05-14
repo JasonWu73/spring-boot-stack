@@ -160,6 +160,5 @@ spring-boot-stack
 
 ## 已规划的功能
 
-- 将 `my.security.permit-all-paths` 配置项改为 `my.security.permits`，支持精确的 REST 端点（如 `GET /api/v1/news`）配置
 - `microservices` 分支添加 Spring Cloud Config Server 服务
 - `docker-compose` 部署
