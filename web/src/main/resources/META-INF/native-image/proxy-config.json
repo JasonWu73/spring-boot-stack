@@ -1,0 +1,7 @@
+[
+  {
+    "interfaces": [
+      "jakarta.servlet.http.HttpServletRequest"
+    ]
+  }
+]

@@ -147,6 +147,7 @@ spring-boot-stack
 - `./gradlew build`：构建项目
 - `./gradlew publishToMavenLocal`：将工件发布到本地 Maven 仓库
 - `./gradlew nativeCompile`：生成本地可执行文件
+    - GraalVM Native Image 对 Java 反射的支持有限，需要在编译时指定所有使用反射的类和成员，参考 `web/src/main/resources/META-INF/native-image/proxy-config.json`
 
 ## Maven
 
