@@ -22,12 +22,15 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import net.wuxianjie.myspringbootstarter.exception.ApiException;
+import net.wuxianjie.myspringbootstarter.shared.ApiPair;
 import net.wuxianjie.myspringbootstarter.shared.MyConfig;
 
 /**
@@ -49,14 +52,28 @@ public class WebSecurityConfig {
     ) throws Exception {
         // 以下配置仅对 API 请求生效
         String apiPathPrefix = myConfig.getSecurity().getApiPathPrefix();
-        String[] permitAllPaths = myConfig.getSecurity().getPermitAllPaths();
+        List<ApiPair> apiPairs = myConfig.getApiPairs();
 
         http.securityMatcher(apiPathPrefix + "**")
             // 注意：顺序很重要，即前面的规则匹配后则不再进行后续比较
             .authorizeHttpRequests(registry -> {
-                // 配置公共 API
-                for (String path : permitAllPaths) {
-                    registry.requestMatchers(path).permitAll();
+                // 配置 API 权限
+                for (ApiPair api : apiPairs) {
+                    AntPathMatcher matcher = new AntPathMatcher();
+                    RequestMatcher customMatcher = request -> {
+                        boolean methodMatches = api.method() == null ||
+                            request.getMethod().equals(api.method());
+                        // 使用 `AntPathMatcher` 来支持通配符路径匹配
+                        boolean pathMatches = matcher.match(api.path(), request.getRequestURI());
+                        return methodMatches && pathMatches;
+                    };
+
+                    if (api.authority() == null) {
+                        registry.requestMatchers(customMatcher).permitAll();
+                    } else {
+                        registry.requestMatchers(customMatcher)
+                            .hasAuthority(api.authority());
+                    }
                 }
                 // 默认其他 API 都需要登录才能访问
                 registry.requestMatchers("/**").authenticated();
