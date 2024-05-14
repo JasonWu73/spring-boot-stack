@@ -1,4 +1,4 @@
-package net.wuxianjie.currencyconversionservice;
+package net.wuxianjie.namingserver;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

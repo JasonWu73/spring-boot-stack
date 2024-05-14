@@ -1,0 +1,13 @@
+server:
+  port: 8888
+spring:
+  application:
+    name: config-server
+  profiles:
+    active: native
+  cloud:
+    config:
+      server:
+        native:
+          # `http://localhost:8888/currency-exchange-service/default`
+          search-locations: file:/Users/wxj/Codes/spring-boot-stack/config-repo/
