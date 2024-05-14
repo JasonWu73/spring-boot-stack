@@ -51,14 +51,26 @@ class WebSecurityTest {
     }
 
     @Test
-    void shouldReturnsOk_whenRequestPublicApiWithoutToken() throws Exception {
+    void shouldReturnsOk_whenRequestPublicGetApiWithoutToken() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/test-api/v1/public"))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.header()
                 .string("Content-Type", "text/plain;charset=UTF-8")
             )
             .andExpect(MockMvcResultMatchers.content()
-                .string("公共接口可以访问")
+                .string("GET 公共接口可以访问")
+            );
+    }
+
+    @Test
+    void shouldReturnsOk_whenRequestPublicPostApiWithoutToken() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/test-api/v1/public"))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.header()
+                .string("Content-Type", "text/plain;charset=UTF-8")
+            )
+            .andExpect(MockMvcResultMatchers.content()
+                .string("POST 公共接口可以访问")
             );
     }
 
@@ -126,8 +138,7 @@ class WebSecurityTest {
     }
 
     @Test
-    void shouldReturnsForbidden_whenRequestRootResourceWithAdminToken()
-        throws Exception {
+    void shouldReturnsForbidden_whenRequestRootResourceWithAdminToken() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/test-api/v1/root")
                 .header("Authorization", "Bearer admin-token")
             )
@@ -145,8 +156,7 @@ class WebSecurityTest {
     }
 
     @Test
-    void shouldReturnsOk_whenRequestUserResourceWithAdminToken()
-        throws Exception {
+    void shouldReturnsOk_whenRequestUserResourceWithAdminToken() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/test-api/v1/user")
                 .header("Authorization", "Bearer admin-token")
             )
@@ -156,6 +166,79 @@ class WebSecurityTest {
             )
             .andExpect(MockMvcResultMatchers.content()
                 .string("用户可以访问 - admin")
+            );
+    }
+
+    @Test
+    void shouldReturnsOk_whenRequestPublicGetTokenWithoutToken() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/test-api/v1/token"))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.header()
+                .string("Content-Type", "text/plain;charset=UTF-8")
+            )
+            .andExpect(MockMvcResultMatchers.content()
+                .string("获取 GET TOKEN")
+            );
+    }
+
+    @Test
+    void shouldReturnsForbidden_whenRequestPostTokenWithoutToken() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/test-api/v1/token"))
+            .andExpect(MockMvcResultMatchers.status().isUnauthorized())
+            .andExpect(MockMvcResultMatchers.header()
+                .string("Content-Type", "application/json")
+            )
+            .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(401))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.error")
+                .value("身份验证失败"))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.path")
+                .value("/test-api/v1/token")
+            );
+    }
+
+    @Test
+    void shouldReturnsForbidden_whenRequestGuestWithoutToken() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/test-api/v1/guest"))
+            .andExpect(MockMvcResultMatchers.status().isUnauthorized())
+            .andExpect(MockMvcResultMatchers.header()
+                .string("Content-Type", "application/json")
+            )
+            .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(401))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.error")
+                .value("身份验证失败"))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.path")
+                .value("/test-api/v1/guest")
+            );
+    }
+
+    @Test
+    void shouldReturnsOk_whenRequestGuestWithGuestToken() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/test-api/v1/guest")
+                .header("Authorization", "Bearer guest-token")
+            )
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.header()
+                .string("Content-Type", "text/plain;charset=UTF-8")
+            )
+            .andExpect(MockMvcResultMatchers.content()
+                .string("游客可以访问")
+            );
+    }
+
+    @Test
+    void shouldReturnsForbidden_whenRequestGuestWithRootToken() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/test-api/v1/guest")
+                .header("Authorization", "Bearer root-token")
+            )
+            .andExpect(MockMvcResultMatchers.status().isForbidden())
+            .andExpect(MockMvcResultMatchers.header()
+                .string("Content-Type", "application/json")
+            )
+            .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(403))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.error")
+                .value("没有访问权限"))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.path")
+                .value("/test-api/v1/guest")
             );
     }
 }

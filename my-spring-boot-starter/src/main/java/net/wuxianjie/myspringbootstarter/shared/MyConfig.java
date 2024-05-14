@@ -1,6 +1,7 @@
 package net.wuxianjie.myspringbootstarter.shared;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -33,18 +34,24 @@ public class MyConfig {
         private String apiPathPrefix = "/api/";
 
         /**
-         * 公共（不需要身份验证）API 请求路径。
+         * API 权限配置。由以下三部分组成（其中 <code>[]</code> 中的配置代表是选项的）：
          *
-         * <p>支持通配符 <code>*</code>，例如：<code>/api/v1/public/**</code>。</p>
+         * <p><code>[请求方法] 请求路径 [功能权限]</code></p>
+         *
+         * <ul>
+         *     <li>若省略「请求方法」，则代表对所有请求方法都生效</li>
+         *     <li>若省略「功能权限」，则代表所有用户都可以访问</li>
+         *     <li>「请求路径」支持 Spring Security 中的通配符「*」（只匹配一层路径）和「**」（匹配多层路径）</li>
+         * </ul>
          *
          * <p>注意：顺序很重要，即前面的规则匹配后则不再进行后续比较。</p>
          */
-        private String[] permitAllPaths = {};
+        private String[] apis = {};
 
         /**
-         * 拥有上下级关系的功能权限（角色）。
+         * 拥有上下级关系的功能权限。
          *
-         * <p>使用 <code>></code> 符号创建上下级权限（角色）。</p>
+         * <p>使用 <code>></code> 符号创建上下级权限。</p>
          *
          * <p>比如下面字符串代表 <code>root</code> 拥有 <code>admin</code> 的所有权限：</p>
          *
@@ -67,12 +74,12 @@ public class MyConfig {
             this.apiPathPrefix = apiPathPrefix;
         }
 
-        public String[] getPermitAllPaths() {
-            return permitAllPaths;
+        public String[] getApis() {
+            return apis;
         }
 
-        public void setPermitAllPaths(String[] permitAllPaths) {
-            this.permitAllPaths = permitAllPaths;
+        public void setApis(String[] apis) {
+            this.apis = apis;
         }
 
         public String[] getHierarchies() {
@@ -96,19 +103,19 @@ public class MyConfig {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             Security security = (Security) o;
-            return Objects.equals(apiPathPrefix, security.apiPathPrefix) && Objects.deepEquals(permitAllPaths, security.permitAllPaths) && Objects.deepEquals(hierarchies, security.hierarchies) && Objects.equals(tokenExpiresInSeconds, security.tokenExpiresInSeconds);
+            return Objects.equals(apiPathPrefix, security.apiPathPrefix) && Objects.deepEquals(apis, security.apis) && Objects.deepEquals(hierarchies, security.hierarchies) && Objects.equals(tokenExpiresInSeconds, security.tokenExpiresInSeconds);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(apiPathPrefix, Arrays.hashCode(permitAllPaths), Arrays.hashCode(hierarchies), tokenExpiresInSeconds);
+            return Objects.hash(apiPathPrefix, Arrays.hashCode(apis), Arrays.hashCode(hierarchies), tokenExpiresInSeconds);
         }
 
         @Override
         public String toString() {
             return "Security{" +
                 "apiPathPrefix='" + apiPathPrefix + '\'' +
-                ", permitAllPaths=" + Arrays.toString(permitAllPaths) +
+                ", apis=" + Arrays.toString(apis) +
                 ", hierarchies=" + Arrays.toString(hierarchies) +
                 ", tokenExpiresInSeconds=" + tokenExpiresInSeconds +
                 '}';
@@ -154,6 +161,25 @@ public class MyConfig {
                 "filePath='" + filePath + '\'' +
                 '}';
         }
+    }
+
+    /**
+     * 获取 API 权限配置。
+     */
+    public List<ApiPair> getApiPairs() {
+        return Arrays.stream(security.apis)
+            .map(permit -> {
+                String[] parts = permit.split(" ");
+                if (parts.length == 1) {
+                    return new ApiPair(null, parts[0], null);
+                }
+                return new ApiPair(
+                    parts[0],
+                    parts[1],
+                    parts.length == 3 ? parts[2] : null
+                );
+            })
+            .toList();
     }
 
     public Security getSecurity() {
