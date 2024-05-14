@@ -301,7 +301,7 @@ public class WebMvcExceptionHandler {
         checkAndThrowAccessDeniedException(throwable);
 
         // 触发限流器
-        if (isTooManyRequestError(throwable)) {
+        if (isRequestNotPermitted(throwable) || isBulkheadFullException(throwable)) {
             return handleApiException(
                 new ApiException(HttpStatus.TOO_MANY_REQUESTS, "请求过于频繁", throwable)
             );
@@ -393,10 +393,17 @@ public class WebMvcExceptionHandler {
         }
     }
 
-    private boolean isTooManyRequestError(Throwable throwable) {
+    private boolean isRequestNotPermitted(Throwable throwable) {
         return ObjectUtils.isInstanceOf(
             throwable,
             "io.github.resilience4j.ratelimiter.RequestNotPermitted"
+        );
+    }
+
+    private boolean isBulkheadFullException(Throwable throwable) {
+        return ObjectUtils.isInstanceOf(
+            throwable,
+            "io.github.resilience4j.bulkhead.BulkheadFullException"
         );
     }
 }

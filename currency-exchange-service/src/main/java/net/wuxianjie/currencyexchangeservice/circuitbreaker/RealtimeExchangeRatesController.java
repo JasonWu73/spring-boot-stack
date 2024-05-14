@@ -1,10 +1,11 @@
 package net.wuxianjie.currencyexchangeservice.circuitbreaker;
 
-import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,15 +27,20 @@ public class RealtimeExchangeRatesController {
     @GetMapping("/realtime-exchange-rates")
     // @Retry(name = "#root.methodName", fallbackMethod = "realtimeExchangeRatesFallback")
     // @CircuitBreaker(name = "#root.methodName", fallbackMethod = "realtimeExchangeRatesFallback")
-    @RateLimiter(name = "#root.methodName")
+    // @RateLimiter(name = "#root.methodName")
+    @Bulkhead(name = "#root.methodName")
     public String getRealtimeExchangeRates() {
         LOG.info("调用实时汇率服务");
-        // ResponseEntity<String> entity = restClient.get()
-        //     .uri("http://127.0.0.1:9090/dummy-dummy")
-        //     .retrieve()
-        //     .toEntity(String.class);
-        // return entity.getBody();
         return "Ok";
+    }
+
+    @SuppressWarnings("unused")
+    private String requestDummyApi() {
+        ResponseEntity<String> entity = restClient.get()
+            .uri("http://127.0.0.1:9090/dummy-dummy")
+            .retrieve()
+            .toEntity(String.class);
+        return entity.getBody();
     }
 
     @SuppressWarnings("unused")
