@@ -10,4 +10,4 @@ spring:
       server:
         native:
           # `http://localhost:8888/currency-exchange-service/default`
-          search-locations: file:/Users/wxj/Codes/spring-boot-stack/config-repo/
+          search-locations: classpath:/config-repo/
