@@ -11,14 +11,15 @@ version = "0.0.1-SNAPSHOT"
 val springCloudVersion by extra("2023.0.1")
 val mybatisSpringBootVersion by extra("3.0.3")
 
+// 利用 Spring Dependency Management 插件提供的功能来管理依赖项的版本
 dependencyManagement {
-    // 引入 Spring Boot 和 Spring Cloud 的 BOM 文件来管理这两个框架及其相关依赖的版本
+    // 引入 Maven BOM 文件来管理相关依赖项的版本
     imports {
         mavenBom(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
         mavenBom("org.springframework.cloud:spring-cloud-dependencies:$springCloudVersion")
     }
 
-    // 统一管理其他依赖的版本
+    // 统一管理其他不在 Maven BOM 中的依赖项的版本
     dependencies {
         dependency("org.mybatis.spring.boot:mybatis-spring-boot-starter:$mybatisSpringBootVersion")
     }
