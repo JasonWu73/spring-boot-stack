@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="net.wuxianjie.currencyexchangeservice.controller.CurrencyExchangeMapper">
-
-  <select
-    id="selectExchangeByFromAndTo"
-    resultType="net.wuxianjie.currencyexchangeservice.controller.CurrencyExchange"
-  >
-    select
-      id, currency_from as `from`, currency_to as `to`,
-      exchange_rate as exchangeRate,
-      environment
-    from currency_exchange
-    where currency_from = #{from} and currency_to = #{to}
+    <select
+        id="selectExchangeByFromAndTo"
+        resultType="net.wuxianjie.currencyexchangeservice.controller.CurrencyExchange"
+    >
+    SELECT
+        id, currency_from AS `from`, currency_to AS `to`,
+        exchange_rate AS exchangeRate, environment
+    FROM currency_exchange
+    WHERE currency_from = #{from} AND currency_to = #{to}
   </select>
-
 </mapper>
