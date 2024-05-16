@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.boot.autoconfigure.web.ErrorProperties;
 import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.boot.autoconfigure.web.reactive.error.DefaultErrorWebExceptionHandler;
@@ -75,7 +74,7 @@ public class GatewayExceptionHandler extends DefaultErrorWebExceptionHandler {
             case HttpStatus.NOT_FOUND -> "请求的路径在网关上未找到";
             case HttpStatus.SERVICE_UNAVAILABLE -> {
                 String message = "目标服务不可用";
-                LOG.warn(
+                LOG.error(
                     "{}：[{}] {}", message,
                     attributes.get("requestId"), throwable.getMessage()
                 );
