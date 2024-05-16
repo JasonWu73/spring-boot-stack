@@ -171,5 +171,4 @@ spring-boot-stack
 
 ## 已规划的功能
 
-- `microservices` 分支添加 Spring Cloud Config Server 服务
 - `docker-compose` 部署

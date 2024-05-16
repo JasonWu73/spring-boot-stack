@@ -6,6 +6,8 @@
 my:
   security:
     apis: /api/*/public/**
+  spa:
+    file-path:
 server:
   port: 8088
 spring:

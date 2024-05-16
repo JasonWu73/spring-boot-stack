@@ -7,6 +7,8 @@ import java.util.Objects;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+import net.wuxianjie.myspringbootstarter.security.ApiPair;
+
 @Configuration
 @ConfigurationProperties(prefix = "my")
 public class MyConfig {
@@ -20,6 +22,25 @@ public class MyConfig {
      * SPA 应用配置。
      */
     private Spa spa = new Spa();
+
+    /**
+     * 获取 API 权限配置。
+     */
+    public List<ApiPair> getApiPairs() {
+        return Arrays.stream(security.apis)
+            .map(permit -> {
+                String[] parts = permit.split(" ");
+                if (parts.length == 1) {
+                    return new ApiPair(null, parts[0], null);
+                }
+                return new ApiPair(
+                    parts[0],
+                    parts[1],
+                    parts.length == 3 ? parts[2] : null
+                );
+            })
+            .toList();
+    }
 
     /**
      * Web 安全配置。
@@ -161,25 +182,6 @@ public class MyConfig {
                 "filePath='" + filePath + '\'' +
                 '}';
         }
-    }
-
-    /**
-     * 获取 API 权限配置。
-     */
-    public List<ApiPair> getApiPairs() {
-        return Arrays.stream(security.apis)
-            .map(permit -> {
-                String[] parts = permit.split(" ");
-                if (parts.length == 1) {
-                    return new ApiPair(null, parts[0], null);
-                }
-                return new ApiPair(
-                    parts[0],
-                    parts[1],
-                    parts.length == 3 ? parts[2] : null
-                );
-            })
-            .toList();
     }
 
     public Security getSecurity() {
