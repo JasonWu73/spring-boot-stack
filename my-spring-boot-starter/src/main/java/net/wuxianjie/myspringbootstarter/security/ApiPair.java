@@ -1,4 +1,4 @@
-package net.wuxianjie.myspringbootstarter.shared;
+package net.wuxianjie.myspringbootstarter.security;
 
 /**
  * API 权限配置。

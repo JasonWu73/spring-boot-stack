@@ -16,7 +16,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -39,10 +38,10 @@ public class JsonConfig {
     @Bean
     public ObjectMapper jsonMapper() {
         return JsonMapper.builder()
-            .addModule(getDateTimeModule()) // 针对 Java 8 的日期时间类型
-            .defaultDateFormat(
-                new SimpleDateFormat(JsonConfig.DATE_TIME_PATTERN)
-            ) // 针对 `java.util.Date` 类型
+            // 针对 Java 8 的日期时间类型
+            .addModule(getDateTimeModule())
+            // 针对 `java.util.Date` 类型
+            .defaultDateFormat(new SimpleDateFormat(JsonConfig.DATE_TIME_PATTERN))
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             .findAndAddModules()

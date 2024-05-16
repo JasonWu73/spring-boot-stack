@@ -1,7 +1,6 @@
 package net.wuxianjie.myspringbootstarter.util;
 
 import org.assertj.core.api.Assertions;
-
 import org.junit.jupiter.api.Test;
 
 class RsaUtilsTest {

@@ -24,17 +24,18 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.AntPathMatcher;
+import org.springframework.util.StringUtils;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import net.wuxianjie.myspringbootstarter.exception.ApiException;
-import net.wuxianjie.myspringbootstarter.shared.ApiPair;
 import net.wuxianjie.myspringbootstarter.shared.MyConfig;
 
 /**
- * 自定义 Spring Security 的身份验证机制，仅在类路径中存在 {@link SecurityFilterChain}，并且存在实现 {@link TokenAuth} 接口的 Spring Bean 时生效。
+ * 自定义 Spring Security 的身份验证机制，仅在类路径中存在
+ * {@link SecurityFilterChain}，并且存在实现 {@link TokenAuth} 接口的 Bean 时生效。
  */
 @AutoConfiguration
 @ConditionalOnClass(SecurityFilterChain.class)
@@ -59,20 +60,12 @@ public class WebSecurityConfig {
             .authorizeHttpRequests(registry -> {
                 // 配置 API 权限
                 for (ApiPair api : apiPairs) {
-                    AntPathMatcher matcher = new AntPathMatcher();
-                    RequestMatcher customMatcher = request -> {
-                        boolean methodMatches = api.method() == null ||
-                            request.getMethod().equals(api.method());
-                        // 使用 `AntPathMatcher` 来支持通配符路径匹配
-                        boolean pathMatches = matcher.match(api.path(), request.getRequestURI());
-                        return methodMatches && pathMatches;
-                    };
-
-                    if (api.authority() == null) {
-                        registry.requestMatchers(customMatcher).permitAll();
+                    RequestMatcher matcher = getRequestMatcher(api);
+                    String authority = api.authority();
+                    if (StringUtils.hasText(authority)) {
+                        registry.requestMatchers(matcher).hasAuthority(authority);
                     } else {
-                        registry.requestMatchers(customMatcher)
-                            .hasAuthority(api.authority());
+                        registry.requestMatchers(matcher).permitAll();
                     }
                 }
                 // 默认其他 API 都需要登录才能访问
@@ -94,13 +87,11 @@ public class WebSecurityConfig {
             // 禁用 CSRF
             .csrf(AbstractHttpConfigurer::disable)
             // 允许浏览器在同源策略下使用 `<frame>` 或 `<iframe>`
-            .headers(config -> config.frameOptions(
-                HeadersConfigurer.FrameOptionsConfig::sameOrigin
-            ))
+            .headers(config ->
+                config.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
             // 不需要会话状态，即不向客户端发送 `JSESSIONID` Cookies
-            .sessionManagement(config -> config.sessionCreationPolicy(
-                SessionCreationPolicy.STATELESS
-            ))
+            .sessionManagement(config ->
+                config.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             // 身份验证失败和没有访问权限的处理
             .exceptionHandling(config -> {
                 // 未通过身份验证，对应 401 HTTP 状态码
@@ -112,7 +103,6 @@ public class WebSecurityConfig {
                         )
                     )
                 );
-
                 // 通过身份验证，但没有访问权限，对应 403 HTTP 状态码
                 config.accessDeniedHandler((request, response, exception) ->
                     handlerExceptionResolver.resolveException(
@@ -184,5 +174,18 @@ public class WebSecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager() {
         return authentication -> authentication;
+    }
+
+    private static RequestMatcher getRequestMatcher(ApiPair api) {
+        AntPathMatcher matcher = new AntPathMatcher();
+        return request -> {
+            boolean methodMatches = (
+                api.method() == null ||
+                    request.getMethod().equalsIgnoreCase(api.method())
+            );
+            // 使用 `AntPathMatcher` 来支持通配符路径匹配
+            boolean pathMatches = matcher.match(api.path(), request.getRequestURI());
+            return methodMatches && pathMatches;
+        };
     }
 }

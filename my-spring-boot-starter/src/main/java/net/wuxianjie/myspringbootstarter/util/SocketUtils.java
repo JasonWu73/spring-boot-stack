@@ -105,7 +105,6 @@ public class SocketUtils {
     ) throws IOException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         packet.setData(new byte[bufferSize]);
-
         socket.receive(packet);
         output.write(packet.getData(), packet.getOffset(), packet.getLength());
         return output.toByteArray();

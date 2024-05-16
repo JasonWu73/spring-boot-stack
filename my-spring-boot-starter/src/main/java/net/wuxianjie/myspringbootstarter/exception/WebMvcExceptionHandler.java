@@ -65,8 +65,7 @@ public class WebMvcExceptionHandler {
     private final MyConfig myConfig;
 
     public WebMvcExceptionHandler(
-        HttpServletRequest request,
-        ResourceLoader resourceLoader,
+        HttpServletRequest request, ResourceLoader resourceLoader,
         MyConfig myConfig
     ) {
         this.request = request;
@@ -77,9 +76,16 @@ public class WebMvcExceptionHandler {
     /**
      * 404 异常，根据请求返回 JSON 或 HTML 页面（SPA，单页应用）。
      *
-     * <p>1、{@code NoHandlerFoundException} - 当 Spring 的 {@code DispatcherServlet} 在处理请求时找不到任何合适的处理器（Handler）时</p>
-     *
-     * <p>2、{@code NoResourceFoundException} - 无法找到请求的静态资源（如图片、CSS 文件、JavaScript 文件等）时</p>
+     * <ol>
+     *     <li>
+     *         {@code NoHandlerFoundException} -
+     *         当 {@code DispatcherServlet} 在处理请求时找不到任何合适的处理器
+     *     </li>
+     *     <li>
+     *         {@code NoResourceFoundException} -
+     *         无法找到请求的静态资源（如图片、CSS 文件、JavaScript 文件等）
+     *     </li>
+     * </ol>
      */
     @ExceptionHandler({
         NoHandlerFoundException.class,
@@ -89,7 +95,7 @@ public class WebMvcExceptionHandler {
         if (isJsonRequest()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(new ApiError(HttpStatus.NOT_FOUND, "请求的资源在服务器上未找到"));
+                .body(new ApiError(HttpStatus.NOT_FOUND, "未找到请求的资源"));
         }
         return ResponseEntity.status(HttpStatus.OK)
             .contentType(MediaType.TEXT_HTML)
@@ -99,9 +105,10 @@ public class WebMvcExceptionHandler {
     /**
      * 单参数校验失败。
      *
-     * <p>1、对 Controller 使用了 {@code @Validated} 注解</p>
-     *
-     * <p>2、对方法的单个参数使用了 {@code @NotNull} 等校验注解，但参数未通过校验</p>
+     * <ol>
+     *     <li>对 Controller 使用了 {@code @Validated} 注解</li>
+     *     <li>对方法的单个参数使用了 {@code @NotNull} 等校验注解，但参数未通过校验</li>
+     * </ol>
      */
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ApiError> handleInvalidParameterException(
@@ -152,9 +159,16 @@ public class WebMvcExceptionHandler {
     /**
      * 缺少请求参数。
      *
-     * <p>1、{@code MissingServletRequestParameterException} - 当方法使用 {@code @RequestParam} 注解来指定一个必需的请求参数，而实际的 HTTP 请求中未包含该参数</p>
-     *
-     * <p>2、{@code MissingServletRequestPartException} - 当方法使用 {@code @RequestPart} 注解来接收一个必须的文件请求参数，而实际的 HTTP `multipart/form-data` 请求中未包含该参数</p>
+     * <ol>
+     *     <li>
+     *         {@code MissingServletRequestParameterException} -
+     *         请求中缺少 {@code @RequestParam} 注解指定的一个必需的请求参数
+     *     </li>
+     *     <li>
+     *         {@code MissingServletRequestPartException} -
+     *         请求中缺少 {@code @RequestPart} 注解指定的一个必需的文件请求参数
+     *     </li>
+     * </ol>
      */
     @ExceptionHandler({
         MissingServletRequestParameterException.class,
@@ -186,7 +200,7 @@ public class WebMvcExceptionHandler {
     }
 
     /**
-     * 客户端发送的 HTTP 请求体无法被正确解析，或请求的内容类型（{@code Content-Type}）与控制器期望的类型不匹配。
+     * 客户端发送的 HTTP 请求体无法被正确解析。
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiError> handleInvalidHttpBodyException(
@@ -213,11 +227,18 @@ public class WebMvcExceptionHandler {
     }
 
     /**
-     * 处理媒体类型（即 {@code Content-Type} 和 {@code Accept} 头部）相关错误。
+     * 媒体类型（{@code Content-Type} 或 {@code Accept} 头部）不支持。
      *
-     * <p>1、{@code HttpMediaTypeNotSupportedException} - 客户端发送的请求中包含的 {@code Content-Type} 头部指定了服务器不支持的媒体类型</p>
-     *
-     * <p>2、{@code HttpMediaTypeNotAcceptableException} - 客户端发送的请求中包含的 {@code Accept} 头部指定了服务器无法提供的媒体类型</p>
+     * <ol>
+     *     <li>
+     *         {@code HttpMediaTypeNotSupportedException} -
+     *         请求头中 {@code Content-Type} 指定了服务器不支持的媒体类型
+     *     </li>
+     *     <li>
+     *         {@code HttpMediaTypeNotAcceptableException} -
+     *         请求头中 {@code Accept} 指定了服务器无法提供的媒体类型
+     *     </li>
+     * </ol>
      */
     @ExceptionHandler(HttpMediaTypeException.class)
     public ResponseEntity<ApiError> handleMimeException(
@@ -231,14 +252,6 @@ public class WebMvcExceptionHandler {
 
     /**
      * 文件上传失败。
-     *
-     * <ul>
-     *     <li>文件大小超出限制</li>
-     *     <li>请求格式错误</li>
-     *     <li>文件上传组件配置错误</li>
-     *     <li>服务器或依赖库问题</li>
-     *     <li>临时文件目录问题</li>
-     * </ul>
      */
     @ExceptionHandler(MultipartException.class)
     public ResponseEntity<ApiError> handleMultipartException(
@@ -250,7 +263,7 @@ public class WebMvcExceptionHandler {
     }
 
     /**
-     * 请求参数不满足某些条件。
+     * 请求参数不满足约束条件。
      *
      * <pre>{@code
      * @GetMapping(value = "/users", params = "version=1")
@@ -290,22 +303,20 @@ public class WebMvcExceptionHandler {
      * 其他未被明确处理的异常。
      */
     @ExceptionHandler(Throwable.class)
-    public ResponseEntity<ApiError> handleDefaultException(
-        Throwable throwable
-    ) {
+    public ResponseEntity<ApiError> handleDefaultException(Throwable throwable) {
         // 忽略 `org.springframework.security.access.AccessDeniedException` 异常
         // 否则将导致 Spring Security 框架无法处理 403 异常
         checkAndThrowAccessDeniedException(throwable);
 
         // 触发限流器
-        if (isRequestNotPermitted(throwable) || isBulkheadFullException(throwable)) {
+        if (isRateLimitException(throwable)) {
             return handleApiException(
                 new ApiException(HttpStatus.TOO_MANY_REQUESTS, "请求过于频繁", throwable)
             );
         }
 
         String message = "服务器发生未知错误";
-        LOG.error(message, throwable);
+        logServerError(message, throwable);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
             .contentType(MediaType.APPLICATION_JSON)
             .body(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, message));
@@ -314,9 +325,8 @@ public class WebMvcExceptionHandler {
     private boolean isJsonRequest() {
         String path = request.getRequestURI();
         String accept = Optional.ofNullable(
-                request.getHeader(HttpHeaders.ACCEPT)
-            )
-            .orElse("");
+            request.getHeader(HttpHeaders.ACCEPT)
+        ).orElse("");
         return path.startsWith(myConfig.getSecurity().getApiPathPrefix()) ||
             accept.contains(MediaType.APPLICATION_JSON_VALUE);
     }
@@ -329,32 +339,48 @@ public class WebMvcExceptionHandler {
         }
         Resource resource = resourceLoader.getResource(filePath);
         if (!resource.exists()) {
-            LOG.warn("SPA 文件 [{}] 不存在，请求路径：{}", filePath, path);
+            logServerError("SPA 文件 [%s] 不存在，请求路径：%s"
+                .formatted(filePath, path));
             return SPA_NOT_FOUND_HTML.formatted(path);
         }
         try (InputStream input = resource.getInputStream()) {
             return StreamUtils.copyToString(input, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            LOG.warn(
-                "SPA 文件 [{}] 读取失败，请求路径：{}", filePath, path,
-                e
-            );
+            logServerError("SPA 文件 [%s] 读取失败，请求路径：%s"
+                .formatted(filePath, path), e);
             return SPA_NOT_FOUND_HTML.formatted(path);
         }
     }
 
     private void logApiException(ApiException exception) {
         if (exception.getStatus().is4xxClientError()) {
-            LOG.warn(
-                "客户端 [ip={}] 错误：{}",
-                request.getRemoteAddr(), exception.getFullMessage()
-            );
+            logClientError(exception.getFullMessage());
             return;
         }
-        LOG.error(
-            "客户端 [ip={}] 请求服务器出错：{}",
-            request.getRemoteAddr(), exception.getFullMessage()
-        );
+        logServerError(exception.getFullMessage());
+    }
+
+    private void logClientError(String message) {
+        LOG.warn("客户端错误：{} -> {}", getClientIp(), message);
+    }
+
+    private void logServerError(String message) {
+        LOG.error("服务器错误：{} -> {}", getClientIp(), message);
+    }
+
+    private void logServerError(String message, Throwable throwable) {
+        LOG.error("服务器错误：{} -> {}", getClientIp(), message, throwable);
+    }
+
+    private String getClientIp() {
+        String ipAddress = request.getRemoteAddr();
+
+        // 如果应用程序部署在反向代理服务器后面，客户端的真实 IP 地址可能会包含在 `X-Forwarded-For` 头中
+        String xForwardedForHeader = request.getHeader("X-Forwarded-For");
+        if (xForwardedForHeader != null) {
+            ipAddress = xForwardedForHeader.split(",")[0].trim();
+        }
+        return ipAddress;
     }
 
     private String getParameterName(Exception exception) {
@@ -390,17 +416,10 @@ public class WebMvcExceptionHandler {
         }
     }
 
-    private boolean isRequestNotPermitted(Throwable throwable) {
+    private boolean isRateLimitException(Throwable throwable) {
         return ObjectUtils.isInstanceOf(
             throwable,
             "io.github.resilience4j.ratelimiter.RequestNotPermitted"
-        );
-    }
-
-    private boolean isBulkheadFullException(Throwable throwable) {
-        return ObjectUtils.isInstanceOf(
-            throwable,
-            "io.github.resilience4j.bulkhead.BulkheadFullException"
         );
     }
 }

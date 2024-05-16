@@ -18,7 +18,7 @@ class TokenAuthTestImpl implements TokenAuth {
     @Override
     public CurrentUser authenticate(String accessToken) throws TokenAuthException {
         return users.values().stream()
-            .filter(u -> u.accessToken().equals(accessToken))
+            .filter(user -> user.accessToken().equals(accessToken))
             .findFirst()
             .orElseThrow(() -> new TokenAuthException("无效的 Access Token"));
     }
