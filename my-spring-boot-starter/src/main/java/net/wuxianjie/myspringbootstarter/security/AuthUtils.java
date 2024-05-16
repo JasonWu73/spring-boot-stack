@@ -2,7 +2,6 @@ package net.wuxianjie.myspringbootstarter.security;
 
 import java.util.List;
 import java.util.Optional;
-
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -18,12 +17,8 @@ public class AuthUtils {
      * 从 Spring Security Context 中获取当前登录用户信息。
      */
     public static Optional<CurrentUser> getCurrentUser() {
-        return Optional.ofNullable(
-                SecurityContextHolder.getContext().getAuthentication()
-            )
-            .filter(authentication ->
-                !(authentication instanceof AnonymousAuthenticationToken)
-            )
+        return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
+            .filter(authentication -> !(authentication instanceof AnonymousAuthenticationToken))
             .map(authentication -> (CurrentUser) authentication.getPrincipal());
     }
 
@@ -40,9 +35,7 @@ public class AuthUtils {
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
             user, null, authorities
         );
-        token.setDetails(
-            new WebAuthenticationDetailsSource().buildDetails(request)
-        );
+        token.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(token);
     }
 }

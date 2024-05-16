@@ -1,7 +1,6 @@
 package net.wuxianjie.myspringbootstarter.page;
 
 import java.util.Objects;
-
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 

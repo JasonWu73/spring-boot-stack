@@ -7,11 +7,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -29,16 +27,12 @@ class JsonConfigTest {
 
     @Test
     void objectMapperConfigurations() {
-        Assertions.assertFalse(
-            jsonMapper.isEnabled(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-        );
-        Assertions.assertFalse(
-            jsonMapper.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-        );
-        Assertions.assertEquals(
-            "yyyy-MM-dd HH:mm:ss",
-            ((SimpleDateFormat) jsonMapper.getDateFormat()).toPattern()
-        );
+        Assertions.assertFalse(jsonMapper
+            .isEnabled(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS));
+        Assertions.assertFalse(jsonMapper
+            .isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES));
+        Assertions.assertEquals("yyyy-MM-dd HH:mm:ss",
+            ((SimpleDateFormat) jsonMapper.getDateFormat()).toPattern());
     }
 
     @Test

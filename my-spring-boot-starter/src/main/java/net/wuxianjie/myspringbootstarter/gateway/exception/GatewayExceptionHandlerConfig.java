@@ -1,7 +1,6 @@
 package net.wuxianjie.myspringbootstarter.gateway.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -39,7 +38,7 @@ public class GatewayExceptionHandlerConfig {
      * <p>确保该 Bean 优先级比默认的 {@link ErrorWebFluxAutoConfiguration#errorWebExceptionHandler} 要高。</p>
      */
     @Bean
-    @Order(-2)
+    @Order(-2) // 优先级比默认的 `DefaultErrorWebExceptionHandler` 高
     public DefaultErrorWebExceptionHandler defaultErrorWebExceptionHandler(
         ErrorAttributes errorAttributes,
         WebProperties webProperties,

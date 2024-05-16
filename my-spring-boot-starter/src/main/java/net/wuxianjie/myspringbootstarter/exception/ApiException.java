@@ -70,8 +70,8 @@ public class ApiException extends RuntimeException {
         // 递归调用以获取更深层次的异常信息
         String nestedMessage = getNestedMessage(throwable.getCause());
         if (!nestedMessage.isEmpty()) {
-            stringBuilder.append(ApiException.MESSAGE_SEPARATOR)
-                .append(nestedMessage);
+            stringBuilder
+                .append(ApiException.MESSAGE_SEPARATOR).append(nestedMessage);
         }
         return stringBuilder.toString();
     }

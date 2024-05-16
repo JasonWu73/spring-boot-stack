@@ -1,20 +1,16 @@
 package net.wuxianjie.myspringbootstarter.exception;
 
 import java.time.LocalDateTime;
-
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.assertj.core.api.Assertions;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
@@ -75,8 +71,7 @@ class WebMvcExceptionHandlerTest {
 
         ResponseEntity<?> response = webMvcExceptionHandler.handleNotFoundException();
         Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        Assertions.assertThat(response.getHeaders().getContentType())
-            .isEqualTo(MediaType.TEXT_HTML);
+        Assertions.assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.TEXT_HTML);
         Object body = response.getBody();
         Assertions.assertThat(body).isInstanceOf(String.class);
         Assertions.assertThat((String) body).contains("<h1>资源不存在</h1>");
@@ -93,8 +88,7 @@ class WebMvcExceptionHandlerTest {
 
         ResponseEntity<?> response = webMvcExceptionHandler.handleNotFoundException();
         Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        Assertions.assertThat(response.getHeaders().getContentType())
-            .isEqualTo(MediaType.TEXT_HTML);
+        Assertions.assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.TEXT_HTML);
         Object body = response.getBody();
         Assertions.assertThat(body).isInstanceOf(String.class);
         Assertions.assertThat((String) body).contains("<h1>单元测试 SPA 页面</h1>");
@@ -102,25 +96,20 @@ class WebMvcExceptionHandlerTest {
 
     private void testHandleNotFoundException_returnsJson() {
         try (MockedStatic<RequestContextHolder> mocked = Mockito.mockStatic(RequestContextHolder.class)) {
-            Mockito.when(myConfig.getSecurity())
-                .thenReturn(new MyConfig().getSecurity());
+            Mockito.when(myConfig.getSecurity()).thenReturn(new MyConfig().getSecurity());
             mocked.when(RequestContextHolder::getRequestAttributes)
                 .thenReturn(new ServletRequestAttributes(request));
 
             ResponseEntity<?> response = webMvcExceptionHandler.handleNotFoundException();
-            Assertions.assertThat(response.getStatusCode())
-                .isEqualTo(HttpStatus.NOT_FOUND);
-            Assertions.assertThat(response.getHeaders().getContentType())
-                .isEqualTo(MediaType.APPLICATION_JSON);
+            Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+            Assertions.assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
             Object body = response.getBody();
             Assertions.assertThat(body).isInstanceOf(ApiError.class);
             ApiError apiError = (ApiError) body;
             Assertions.assertThat(apiError).isNotNull();
-            Assertions.assertThat(apiError.timestamp())
-                .isBeforeOrEqualTo(LocalDateTime.now());
-            Assertions.assertThat(apiError.status())
-                .isEqualTo(HttpStatus.NOT_FOUND.value());
-            Assertions.assertThat(apiError.error()).isEqualTo("请求的资源在服务器上未找到");
+            Assertions.assertThat(apiError.timestamp()).isBeforeOrEqualTo(LocalDateTime.now());
+            Assertions.assertThat(apiError.status()).isEqualTo(HttpStatus.NOT_FOUND.value());
+            Assertions.assertThat(apiError.error()).isEqualTo("未找到请求的资源");
             Assertions.assertThat(apiError.path()).isEqualTo(request.getRequestURI());
         }
     }
