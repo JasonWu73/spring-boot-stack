@@ -60,8 +60,7 @@ public class CurrencyConversionController {
         try {
             var currencyConversion = restClient.get()
                 .uri(url, from, to)
-                .retrieve()
-                .toEntity(CurrencyConversion.class);
+                .retrieve().toEntity(CurrencyConversion.class);
             return Objects.requireNonNull(currencyConversion.getBody());
         } catch (Exception e) {
             throw new ApiException(HttpStatus.SERVICE_UNAVAILABLE, "无法获取汇率数据", e);
