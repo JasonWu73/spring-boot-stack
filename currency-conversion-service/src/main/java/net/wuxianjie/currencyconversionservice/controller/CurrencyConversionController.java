@@ -20,10 +20,10 @@ public class CurrencyConversionController {
     private final CurrencyExchangeProxy currencyExchangeProxy;
 
     public CurrencyConversionController(
-        RestClient restClient,
+        RestClient.Builder builder,
         CurrencyExchangeProxy currencyExchangeProxy
     ) {
-        this.restClient = restClient;
+        this.restClient = builder.build();
         this.currencyExchangeProxy = currencyExchangeProxy;
     }
 
