@@ -4,10 +4,10 @@
   `java -Dlogging.config=file:./config/logback-spring.xml -jar xxx.jar`
 -->
 <configuration>
-    <!-- 先定义属性，防止被引入的 Spring Boot 配置所覆盖 -->
+    <!-- 优先定义属性，以防止被引入的 Spring Boot Logback 配置所覆盖 -->
     <property
         name="CONSOLE_LOG_PATTERN"
-        value="${CONSOLE_LOG_PATTERN:-%clr(%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr(%applicationName[%15.15t]){faint} %clr(${LOG_CORRELATION_PATTERN:-}){faint}%clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"
+        value="${CONSOLE_LOG_PATTERN:-%clr(%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr(%applicationName[%t]){faint} %clr(${LOG_CORRELATION_PATTERN:-}){faint}%clr(%logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"
     />
 
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
