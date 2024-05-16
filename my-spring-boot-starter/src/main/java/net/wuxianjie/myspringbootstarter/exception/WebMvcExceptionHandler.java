@@ -4,15 +4,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 
 import org.apache.catalina.connector.ClientAbortException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -332,13 +329,13 @@ public class WebMvcExceptionHandler {
         }
         Resource resource = resourceLoader.getResource(filePath);
         if (!resource.exists()) {
-            LOG.error("SPA 文件 [{}] 不存在，请求路径：{}", filePath, path);
+            LOG.warn("SPA 文件 [{}] 不存在，请求路径：{}", filePath, path);
             return SPA_NOT_FOUND_HTML.formatted(path);
         }
         try (InputStream input = resource.getInputStream()) {
             return StreamUtils.copyToString(input, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            LOG.error(
+            LOG.warn(
                 "SPA 文件 [{}] 读取失败，请求路径：{}", filePath, path,
                 e
             );
