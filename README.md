@@ -9,16 +9,16 @@
     - `http://localhost:8888/currency-conversion-service/default`
 - 启动服务注册中心 `naming-server`
     - `http://localhost:8761`
-- 启动业务服务 `currency-exchange-service`，为了测试负载均衡，可以启动多个实例（`-Dserver.port=8001`）
-    - `http://localhost:8000/api/v1/currency-exchange/from/usd/to/cny`
-- 启动业务服务 `currency-conversion-service`
-    - `http://localhost:8100/api/v1/currency-conversion/from/usd/to/cny/quantity/100`
 - 启动网关服务 `api-gateway`
     - `http://localhost:8765/get`
     - `http://localhost:8765/api/v1/currency-exchange/from/usd/to/cny`
     - `http://localhost:8765/api/v1/currency-conversion/from/usd/to/cny/quantity/100`
     - `http://localhost:8765/api/v1/currency-conversion-feign/from/usd/to/cny/quantity/100`
     - `http://localhost:8765/api/v1/currency-conversion-new/from/usd/to/cny/quantity/100`
+- 汇率查询服务 `currency-exchange-service`，为了测试负载均衡，可以启动多个实例（`-Dserver.port=8001`）
+    - `http://localhost:8000/api/v1/currency-exchange/from/usd/to/cny`
+- 货币兑换服务 `currency-conversion-service`
+    - `http://localhost:8100/api/v1/currency-conversion/from/usd/to/cny/quantity/100`
 
 ## import 语句的组织和排序
 

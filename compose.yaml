@@ -2,49 +2,136 @@
 # `docker compose down`
 
 services:
-  mysql-server:
+  currency-zipkin:
+    image: openzipkin/zipkin
+    container_name: currency-zipkin
+    restart: always
+    ports:
+      - "9412:9411"
+    environment:
+      TZ: Asia/Shanghai
+    networks:
+      - currency-network
+
+  currency-mysql:
     image: mysql
-    container_name: mysql-server
+    container_name: currency-mysql
     restart: always
     ports:
       - "3307:3306"
     volumes:
-      - ./web/init.sql:/docker-entrypoint-initdb.d/init.sql
-      - ./web/mysql-data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./mysql-data:/var/lib/mysql
     environment:
       TZ: Asia/Shanghai
       MYSQL_ROOT_PASSWORD: qwe@123
       MYSQL_DATABASE: mydb
-    command: ['--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     networks:
-      - web-network
+      - currency-network
 
-  web:
+  config-server:
     image: amazoncorretto:21-alpine
-    container_name: web
+    container_name: config-server
     restart: always
     working_dir: /opt
     ports:
-      - "8081:8080"
+      - "8888:8888"
     volumes:
-      - ./web/build/libs/web-v0.0.1.jar:/opt/app.jar
-      - ./web/build/config:/opt/config
+      - ./config-server/build/libs/config-server-0.0.1-SNAPSHOT.jar:/opt/app.jar
+      - ./config-server/build/config:/opt/config
     environment:
       TZ: Asia/Shanghai
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-server:3306/mydb
+    command: java -jar app.jar
+    networks:
+      - currency-network
+
+  naming-server:
+    image: amazoncorretto:21-alpine
+    container_name: naming-server
+    restart: always
+    working_dir: /opt
+    ports:
+      - "8761:8761"
+    volumes:
+      - ./naming-server/build/libs/naming-server-0.0.1-SNAPSHOT.jar:/opt/app.jar
+      - ./naming-server/build/config:/opt/config
+    environment:
+      TZ: Asia/Shanghai
+    command: java -jar app.jar
+    networks:
+      - currency-network
+
+  api-gateway:
+    image: amazoncorretto:21-alpine
+    container_name: api-gateway
+    restart: always
+    working_dir: /opt
+    ports:
+      - "8765:8765"
+    volumes:
+      - ./api-gateway/build/libs/api-gateway-0.0.1-SNAPSHOT.jar:/opt/app.jar
+      - ./api-gateway/build/config:/opt/config
+    environment:
+      TZ: Asia/Shanghai
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://naming-server:8761/eureka
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://currency-zipkin:9411/api/v2/spans
+    # 等待 30 秒，确保服务注册中心启动成功
+    command: sh -c "sleep 30s && java -jar app.jar"
+    depends_on:
+      - naming-server
+    networks:
+      - currency-network
+
+  currency-exchange-service:
+    image: amazoncorretto:21-alpine
+    container_name: currency-exchange-service
+    restart: always
+    working_dir: /opt
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./currency-exchange-service/build/libs/currency-exchange-service-0.0.1-SNAPSHOT.jar:/opt/app.jar
+      - ./currency-exchange-service/build/config:/opt/config
+    environment:
+      TZ: Asia/Shanghai
+      SPRING_DATASOURCE_URL: jdbc:mysql://currency-mysql:3306/mydb
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: qwe@123
-    command: ['java', '-jar', '/opt/app.jar']
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://naming-server:8761/eureka
+      SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8888
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://currency-zipkin:9411/api/v2/spans
+    # 等待 30 秒，确保配置服务启动成功
+    command: sh -c "sleep 30s && java -jar app.jar"
     depends_on:
-      - mysql-server
+      - config-server
+      - currency-mysql
     networks:
-      - web-network
+      - currency-network
+
+  currency-conversion-service:
+    image: amazoncorretto:21-alpine
+    container_name: currency-conversion-service
+    restart: always
+    working_dir: /opt
+    ports:
+      - "8100:8100"
+    volumes:
+      - ./currency-conversion-service/build/libs/currency-conversion-service-0.0.1-SNAPSHOT.jar:/opt/app.jar
+      - ./currency-conversion-service/build/config:/opt/config
+    environment:
+      TZ: Asia/Shanghai
+      APP_CURRENCY-EXCHANGE-URL: http://currency-exchange-service:8000
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://naming-server:8761/eureka
+      SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8888
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://currency-zipkin:9411/api/v2/spans
+    # 等待 30 秒，确保配置服务启动成功
+    command: sh -c "sleep 30s && java -jar app.jar"
+    depends_on:
+      - config-server
+    networks:
+      - currency-network
 
 networks:
-  web-network:
+  currency-network:
     driver: bridge

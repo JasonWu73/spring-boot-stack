@@ -1,10 +1,10 @@
+my:
+  spa:
+    file-path:
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka
-my:
-  spa:
-    file-path:
 #server:
 #  port: 8000
 spring:

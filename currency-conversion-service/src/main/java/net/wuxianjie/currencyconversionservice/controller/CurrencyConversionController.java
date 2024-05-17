@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClient;
 
+import net.wuxianjie.currencyconversionservice.config.AppConfig;
 import net.wuxianjie.myspringbootstarter.exception.ApiException;
 
 @RestController
@@ -18,13 +19,16 @@ public class CurrencyConversionController {
 
     private final RestClient restClient;
     private final CurrencyExchangeProxy currencyExchangeProxy;
+    private final AppConfig appConfig;
 
     public CurrencyConversionController(
         RestClient.Builder builder,
-        CurrencyExchangeProxy currencyExchangeProxy
+        CurrencyExchangeProxy currencyExchangeProxy,
+        AppConfig appConfig
     ) {
         this.restClient = builder.build();
         this.currencyExchangeProxy = currencyExchangeProxy;
+        this.appConfig = appConfig;
     }
 
     @GetMapping("/currency-conversion/from/{from}/to/{to}/quantity/{quantity}")
@@ -56,7 +60,8 @@ public class CurrencyConversionController {
     }
 
     private CurrencyConversion getCurrencyExchangeFromApi(String from, String to) {
-        var url = "http://localhost:8000/api/v1/currency-exchange/from/{from}/to/{to}";
+        String url = appConfig.getCurrencyExchangeUrl() +
+            "/api/v1/currency-exchange/from/{from}/to/{to}";
         try {
             var currencyConversion = restClient.get()
                 .uri(url, from, to)
