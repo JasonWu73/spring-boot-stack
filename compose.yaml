@@ -1,50 +1,73 @@
 # `docker compose build`
-# `docker compose up --detach`
+# `docker compose up -d`
 
 services:
-  spring-boot-stack-web:
+  rabbitmq-server:
+    image: rabbitmq:3-management
+    container_name: rabbitmq-server
+    restart: always
+    hostname: docker-rabbitmq
+    ports:
+      - "5673:5672"
+      - "15673:15672"
+    volumes:
+      - ./rabbitmq-data:/var/lib/rabbitmq/mnesia
+    environment:
+      TZ: Asia/Shanghai
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: qwe@123
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - rabbitmq-network
+
+  rabbitmq-producer:
     image: amazoncorretto:21-alpine
-    container_name: spring-boot-stack-web
+    container_name: rabbitmq-producer
     restart: always
     working_dir: /opt
     ports:
-      - "8081:8080"
+      - "8080:8080"
     volumes:
-      - ./web/build/libs/web-v0.0.1.jar:/opt/app.jar
-      - ./web/build/config:/opt/config
+      - ./rabbitmq-producer/build/libs/rabbitmq-producer-0.0.1-SNAPSHOT.jar:/opt/app.jar
+      - ./rabbitmq-producer/build/config:/opt/config
     environment:
       TZ: Asia/Shanghai
-      SPRING_DATASOURCE_URL: jdbc:mysql://spring-boot-stack-mysql:3306/mydb
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: qwe@123
+      SPRING_RABBITMQ_HOST: rabbitmq-server
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: admin
+      SPRING_RABBITMQ_PASSWORD: qwe@123
     command: ['java', '-jar', '/opt/app.jar']
-    networks:
-      - spring-boot-stack-network
     depends_on:
-      - spring-boot-stack-mysql
+      - rabbitmq-server
+    networks:
+      - rabbitmq-network
 
-  spring-boot-stack-mysql:
-    image: mysql
-    container_name: spring-boot-stack-mysql
+  rabbitmq-consumer:
+    image: amazoncorretto:21-alpine
+    container_name: rabbitmq-consumer
     restart: always
+    working_dir: /opt
     ports:
-      - "3307:3306"
+      - "8081:8081"
     volumes:
-      - ./web/init.sql:/docker-entrypoint-initdb.d/init.sql
-      - ./web/mysql-data:/var/lib/mysql
+      - ./rabbitmq-consumer/build/libs/rabbitmq-consumer-0.0.1-SNAPSHOT.jar:/opt/app.jar
+      - ./rabbitmq-consumer/build/config:/opt/config
     environment:
       TZ: Asia/Shanghai
-      MYSQL_ROOT_PASSWORD: qwe@123
-      MYSQL_DATABASE: mydb
-    command: ['--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+      SPRING_RABBITMQ_HOST: rabbitmq-server
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: admin
+      SPRING_RABBITMQ_PASSWORD: qwe@123
+    command: ['java', '-jar', '/opt/app.jar']
+    depends_on:
+      - rabbitmq-server
     networks:
-      - spring-boot-stack-network
-    healthcheck:
-      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      - rabbitmq-network
 
 networks:
-  spring-boot-stack-network:
+  rabbitmq-network:
     driver: bridge
