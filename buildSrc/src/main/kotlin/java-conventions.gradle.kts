@@ -52,6 +52,8 @@ tasks.withType<JavaCompile>().configureEach {
     options.compilerArgs.add("-parameters")
     // 设置编译字符集为 UTF-8，而不是默认的系统字符集
     options.encoding = "UTF-8"
+    // 开启编译时的警告提示
+    options.compilerArgs.add("-Xlint:unchecked")
 }
 
 publishing {

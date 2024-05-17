@@ -41,8 +41,6 @@ resilience4j:
     instances:
       getRealtimeExchangeRates:
         max-concurrent-calls: 1
-mybatis:
-  mapper-locations: classpath:mapper/*.xml
 
 management:
   tracing:
@@ -54,3 +52,6 @@ management:
 logging:
   pattern:
     correlation: "[%X{traceId:-},%X{spanId:-}]"
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml

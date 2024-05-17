@@ -9,13 +9,19 @@ my:
   spa:
     file-path:
 server:
-  port: 8088
+  port: 8080
 spring:
   application:
     name: web
+  datasource:
+    url: jdbc:mysql://localhost:3306/test_del?useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: qwe@123
 management:
   endpoints:
     web:
       base-path: /api/v1/actuator
       exposure:
         include: health,info,metrics
+mybatis:
+  mapper-locations: classpath:mapper/*.xml

@@ -1,0 +1,49 @@
+# `docker compose build`
+# `docker compose up --detach`
+services:
+  spring-boot-stack-web:
+    image: amazoncorretto:21-alpine
+    container_name: spring-boot-stack-web
+    restart: always
+    working_dir: /opt
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./web/build/libs/web-v0.0.1.jar:/opt/app.jar
+      - ./web/build/config:/opt/config
+    environment:
+      TZ: Asia/Shanghai
+      SPRING_DATASOURCE_URL: jdbc:mysql://spring-boot-stack-mysql:3306/mydb
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: qwe@123
+    command: ['java', '-jar', '/opt/app.jar']
+    networks:
+      - spring-boot-stack-network
+    depends_on:
+      - spring-boot-stack-mysql
+
+  spring-boot-stack-mysql:
+    image: mysql
+    container_name: spring-boot-stack-mysql
+    restart: always
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./web/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./web/mysql-data:/var/lib/mysql
+    environment:
+      TZ: Asia/Shanghai
+      MYSQL_ROOT_PASSWORD: qwe@123
+      MYSQL_DATABASE: mydb
+    command: ['--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+    networks:
+      - spring-boot-stack-network
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  spring-boot-stack-network:
+    driver: bridge
