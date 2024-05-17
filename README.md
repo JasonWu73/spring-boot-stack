@@ -177,14 +177,9 @@ spring-boot-stack
 - `./gradlew clean`：清理构建目录
 - `./gradlew build`：构建项目
 - `./gradlew publishToMavenLocal`：将工件发布到本地 Maven 仓库
-- `./gradlew nativeCompile`：生成本地可执行文件
-    - GraalVM Native Image 对 Java 反射的支持有限，需要在编译时指定所有使用反射的类和成员，参考 `web/src/main/resources/META-INF/native-image/proxy-config.json`
 
 ## Maven
 
 - `mvn clean`：清理构建目录
 - `mvn package`：构建项目
 - `mvn install`：将工件发布到本地 Maven 仓库
-- 在 Maven 多模块项目中，生成本地可执行文件必须分以下两步执行：
-    1. 先在父 POM 目录执行 `mvn install`
-    2. 再进入目标模块的 POM 目录执行 `mvn native:compile -Pnative`
