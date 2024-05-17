@@ -13,7 +13,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 @SpringBootTest(
     properties = {
-        "spring.config.location=classpath:/application-test.yml"
+        "spring.config.location=classpath:/application-test.yaml"
     }
 )
 @AutoConfigureMockMvc
