@@ -1,5 +1,25 @@
 # Java 项目规范
 
+## 项目服务
+
+- 启动 Zipkin 服务（推荐 Docker 安装）
+    - `http://localhost:9411/zipkin`
+- 启动配置服务 `config-server`
+    - `http://localhost:8888/currency-exchange-service/default`
+    - `http://localhost:8888/currency-conversion-service/default`
+- 启动服务注册中心 `naming-server`
+    - `http://localhost:8761`
+- 启动业务服务 `currency-exchange-service`，为了测试负载均衡，可以启动多个实例（`-Dserver.port=8001`）
+    - `http://localhost:8000/api/v1/currency-exchange/from/usd/to/cny`
+- 启动业务服务 `currency-conversion-service`
+    - `http://localhost:8100/api/v1/currency-conversion/from/usd/to/cny/quantity/100`
+- 启动网关服务 `api-gateway`
+    - `http://localhost:8765/get`
+    - `http://localhost:8765/api/v1/currency-exchange/from/usd/to/cny`
+    - `http://localhost:8765/api/v1/currency-conversion/from/usd/to/cny/quantity/100`
+    - `http://localhost:8765/api/v1/currency-conversion-feign/from/usd/to/cny/quantity/100`
+    - `http://localhost:8765/api/v1/currency-conversion-new/from/usd/to/cny/quantity/100`
+
 ## import 语句的组织和排序
 
 > 在 Java 中，虽然`import *`和`import static`都有其优点，但为了代码的可读性和维护性，通常都不建议使用他们。
@@ -168,7 +188,3 @@ spring-boot-stack
 - 在 Maven 多模块项目中，生成本地可执行文件必须分以下两步执行：
     1. 先在父 POM 目录执行 `mvn install`
     2. 再进入目标模块的 POM 目录执行 `mvn native:compile -Pnative`
-
-## 已规划的功能
-
-- `docker-compose` 部署

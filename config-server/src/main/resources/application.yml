@@ -1,3 +1,6 @@
+my:
+  spa:
+    file-path:
 server:
   port: 8888
 spring:
