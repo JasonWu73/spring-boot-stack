@@ -15,12 +15,7 @@ services:
       TZ: Asia/Shanghai
       MYSQL_ROOT_PASSWORD: qwe@123
       MYSQL_DATABASE: mydb
-    command: ['--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     networks:
       - web-network
 
@@ -39,7 +34,8 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql-server:3306/mydb
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: qwe@123
-    command: ['java', '-jar', '/opt/app.jar']
+    # 等待 30 秒后启动，确保 MysQL 服务已经启动
+    command: sh -c "sleep 30s & java -jar app.jar"
     depends_on:
       - mysql-server
     networks:
