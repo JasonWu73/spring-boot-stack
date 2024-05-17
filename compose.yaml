@@ -1,31 +1,10 @@
-# `docker compose build`
-# `docker compose up --detach`
+# `docker compose up -d`
+# `docker compose down`
 
 services:
-  spring-boot-stack-web:
-    image: amazoncorretto:21-alpine
-    container_name: spring-boot-stack-web
-    restart: always
-    working_dir: /opt
-    ports:
-      - "8081:8080"
-    volumes:
-      - ./web/build/libs/web-v0.0.1.jar:/opt/app.jar
-      - ./web/build/config:/opt/config
-    environment:
-      TZ: Asia/Shanghai
-      SPRING_DATASOURCE_URL: jdbc:mysql://spring-boot-stack-mysql:3306/mydb
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: qwe@123
-    command: ['java', '-jar', '/opt/app.jar']
-    networks:
-      - spring-boot-stack-network
-    depends_on:
-      - spring-boot-stack-mysql
-
-  spring-boot-stack-mysql:
+  mysql-server:
     image: mysql
-    container_name: spring-boot-stack-mysql
+    container_name: mysql-server
     restart: always
     ports:
       - "3307:3306"
@@ -37,14 +16,35 @@ services:
       MYSQL_ROOT_PASSWORD: qwe@123
       MYSQL_DATABASE: mydb
     command: ['--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
-    networks:
-      - spring-boot-stack-network
     healthcheck:
-      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - web-network
+
+  web:
+    image: amazoncorretto:21-alpine
+    container_name: web
+    restart: always
+    working_dir: /opt
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./web/build/libs/web-v0.0.1.jar:/opt/app.jar
+      - ./web/build/config:/opt/config
+    environment:
+      TZ: Asia/Shanghai
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-server:3306/mydb
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: qwe@123
+    command: ['java', '-jar', '/opt/app.jar']
+    depends_on:
+      - mysql-server
+    networks:
+      - web-network
 
 networks:
-  spring-boot-stack-network:
+  web-network:
     driver: bridge

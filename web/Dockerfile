@@ -1,5 +1,5 @@
-# `docker image build --tag spring-boot-stack-web:v0.0.1 .`
-# `docker container run --name spring-boot-stack-web --detach --restart always --publish 8080:8080 spring-boot-stack-web:v0.0.1`
+# `docker build -t spring-boot-stack-web:v0.0.1 .`
+# `docker run --name spring-boot-stack-web -d --restart always -p 8080:8080 spring-boot-stack-web:v0.0.1`
 
 # 使用官方的 Amazon Corretto 作为基础镜像
 FROM amazoncorretto:21-al2-full
