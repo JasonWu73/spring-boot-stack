@@ -5,11 +5,11 @@ import java.util.List;
 import java.util.Objects;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 import net.wuxianjie.myspringbootstarter.security.ApiPair;
 
-@Configuration
+@Component
 @ConfigurationProperties(prefix = "my")
 public class MyConfig {
 

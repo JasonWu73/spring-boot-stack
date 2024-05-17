@@ -16,11 +16,6 @@ services:
       TZ: Asia/Shanghai
       RABBITMQ_DEFAULT_USER: admin
       RABBITMQ_DEFAULT_PASS: qwe@123
-    healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
     networks:
       - rabbitmq-network
 
@@ -40,7 +35,8 @@ services:
       SPRING_RABBITMQ_PORT: 5672
       SPRING_RABBITMQ_USERNAME: admin
       SPRING_RABBITMQ_PASSWORD: qwe@123
-    command: ['java', '-jar', '/opt/app.jar']
+    # 等待 30 秒后启动，确保 RabbitMQ 服务已经启动
+    command: sh -c "sleep 30s && java -jar app.jar"
     depends_on:
       - rabbitmq-server
     networks:
@@ -62,7 +58,8 @@ services:
       SPRING_RABBITMQ_PORT: 5672
       SPRING_RABBITMQ_USERNAME: admin
       SPRING_RABBITMQ_PASSWORD: qwe@123
-    command: ['java', '-jar', '/opt/app.jar']
+    # 等待 30 秒后启动，确保 RabbitMQ 服务已经启动
+    command: sh -c "sleep 30s && java -jar app.jar"
     depends_on:
       - rabbitmq-server
     networks:
