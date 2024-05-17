@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Optional;
 import jakarta.validation.Valid;
 
+import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,9 +23,11 @@ import net.wuxianjie.myspringbootstarter.page.PageResponse;
 public class PageController {
 
     private final RestClient restClient;
+    private final Environment environment;
 
-    public PageController(RestClient.Builder builder) {
+    public PageController(RestClient.Builder builder, Environment environment) {
         this.restClient = builder.build();
+        this.environment = environment;
     }
 
     @GetMapping("/test")
@@ -37,8 +40,10 @@ public class PageController {
 
     @GetMapping("/pages")
     public PageResponse<FakeData> getPages(@Valid PageRequest pageRequest) {
+        String port = environment.getProperty("server.port");
+        String url = "http://localhost:%s/api/v1/public/test".formatted(port);
         ResponseEntity<FakeData> response = restClient.get()
-            .uri("http://localhost:8088/api/v1/public/test", builder -> {
+            .uri(url, builder -> {
                 builder.queryParam("offset", pageRequest.getOffset());
                 builder.queryParam("limit", pageRequest.getLimit());
                 Optional.ofNullable(pageRequest.getSortBy())
