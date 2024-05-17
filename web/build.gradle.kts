@@ -3,7 +3,6 @@ import java.time.format.DateTimeFormatter
 
 plugins {
     id("app-conventions")
-    id("org.graalvm.buildtools.native")
 }
 
 // 用于正式发布的版本号，每次发布时更新，并使用 `git tag` 标记
@@ -12,6 +11,9 @@ version = "v0.0.1"
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+
+    implementation("com.mysql:mysql-connector-j")
+    implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter")
 
     // 若不想要使用 Spring Security，则注释掉下面这行
     implementation("org.springframework.boot:spring-boot-starter-security")
@@ -28,15 +30,6 @@ springBoot {
                 )
             )
             name = "Web 项目"
-        }
-    }
-}
-
-graalvmNative {
-    binaries {
-        named("main") {
-            // 指定生成独立的可执行文件，而不是共享库（Shared Library）
-            sharedLibrary.set(false)
         }
     }
 }
