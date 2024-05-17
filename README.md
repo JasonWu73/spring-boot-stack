@@ -168,7 +168,3 @@ spring-boot-stack
 - 在 Maven 多模块项目中，生成本地可执行文件必须分以下两步执行：
     1. 先在父 POM 目录执行 `mvn install`
     2. 再进入目标模块的 POM 目录执行 `mvn native:compile -Pnative`
-
-## 已规划的功能
-
-- `docker-compose` 部署
