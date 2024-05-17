@@ -53,6 +53,9 @@ public class WebSecurityConfig {
     ) throws Exception {
         // 以下配置仅对 API 请求生效
         String apiPathPrefix = myConfig.getSecurity().getApiPathPrefix();
+        if (!apiPathPrefix.endsWith("/")) {
+            apiPathPrefix += "/";
+        }
         List<ApiPair> apiPairs = myConfig.getApiPairs();
 
         http.securityMatcher(apiPathPrefix + "**")

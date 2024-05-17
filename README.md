@@ -120,7 +120,7 @@ spring-boot-stack
 │   │       │       └── wuxianjie
 │   │       │           └── myspringbootstarter
 │   │       └── resources
-│   │           ├── application-test.yml
+│   │           ├── application-test.yaml
 │   │           └── static
 │   │               └── index.html
 │   └── build.gradle.kts
@@ -142,7 +142,7 @@ spring-boot-stack
 │   │           ├── mapper
 │   │           │   └── XxxMapper
 │   │           ├── static
-│   │           ├── application.yml
+│   │           ├── application.yaml
 │   │           └── logback-spring.xml
 │   └── build.gradle.kts
 ├── .gitignore

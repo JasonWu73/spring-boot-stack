@@ -1,7 +1,7 @@
-# 部署时，可提取部分需要修改的配置项到与 Jar 同级目录的 `config/application.yml` 中
+# 部署时，可提取部分需要修改的配置项到与 Jar 同级目录的 `config/application.yaml` 中
 
-# 注意：一定要在外部 `config/application.yml` 写明需要覆盖的配置项，
-# 否则会使用 Jar 包内 `application.yml` 中已经有配置，这可能会导致程序未按预期执行
+# 注意：一定要在外部 `config/application.yaml` 写明需要覆盖的配置项，
+# 否则会使用 Jar 包内 `application.yaml` 中已经有配置，这可能会导致程序未按预期执行
 
 my:
   security:
