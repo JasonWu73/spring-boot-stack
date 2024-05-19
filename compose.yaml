@@ -121,7 +121,7 @@ services:
       - ./currency-conversion-service/build/config:/opt/config
     environment:
       TZ: Asia/Shanghai
-      APP_CURRENCY-EXCHANGE-URL: http://currency-exchange-service:8000
+      APP_CURRENCYEXCHANGEURL: http://currency-exchange-service:8000
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://naming-server:8761/eureka
       SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8888
       MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://currency-zipkin:9411/api/v2/spans
