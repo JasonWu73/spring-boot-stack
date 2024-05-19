@@ -11,6 +11,8 @@ services:
       - "5673:5672"
       - "15673:15672"
     volumes:
+      - ./rabbitmq-config/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+      - ./rabbitmq-config/definitions.json:/etc/rabbitmq/definitions.json
       - ./rabbitmq-data:/var/lib/rabbitmq/mnesia
     environment:
       TZ: Asia/Shanghai
