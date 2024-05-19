@@ -7,7 +7,8 @@ plugins {
 // 这就导致了无法根据类路径中是否存在指定 Jar 依赖来决定是否使用自动配置
 // 最终解决方案：对需要按条件自动配置的 Jar 依赖采用 `compileOnly`（用于编译）和 `testImplementation`（用于测试，如果需要的话）依赖配置
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-validation")
+    compileOnly("org.springframework.boot:spring-boot-starter-validation")
+    testImplementation("org.springframework.boot:spring-boot-starter-validation")
 
     compileOnly("org.springframework.boot:spring-boot-starter-web")
     testImplementation("org.springframework.boot:spring-boot-starter-web")
@@ -15,6 +16,7 @@ dependencies {
     compileOnly("org.springframework.boot:spring-boot-starter-security")
     testImplementation("org.springframework.boot:spring-boot-starter-security")
 
+    compileOnly("org.springframework.boot:spring-boot-starter-data-redis")
     compileOnly("org.springframework.cloud:spring-cloud-starter-gateway")
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
