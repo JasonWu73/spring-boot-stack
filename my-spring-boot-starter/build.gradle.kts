@@ -16,7 +16,6 @@ dependencies {
     compileOnly("org.springframework.boot:spring-boot-starter-security")
     testImplementation("org.springframework.boot:spring-boot-starter-security")
 
-    compileOnly("org.springframework.boot:spring-boot-starter-data-redis")
     compileOnly("org.springframework.cloud:spring-cloud-starter-gateway")
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
