@@ -1,4 +1,5 @@
 net.wuxianjie.myspringbootstarter.json.JsonConfig
+net.wuxianjie.myspringbootstarter.redis.RedisConfig
 net.wuxianjie.myspringbootstarter.exception.WebMvcExceptionHandler
 net.wuxianjie.myspringbootstarter.security.WebSecurityConfig
 net.wuxianjie.myspringbootstarter.gateway.dns.GatewayAddressResolverConfig
