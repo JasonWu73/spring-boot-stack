@@ -11,12 +11,7 @@ version = "v0.0.1"
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
-
-    implementation("com.mysql:mysql-connector-j")
-    implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter")
-
-    // 若不想要使用 Spring Security，则注释掉下面这行
-    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
 }
 
 springBoot {
@@ -29,7 +24,7 @@ springBoot {
                         .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
                 )
             )
-            name = "Web 项目"
+            name = "Redis 项目"
         }
     }
 }

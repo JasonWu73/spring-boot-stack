@@ -1,12 +1,12 @@
-package net.wuxianjie.web;
+package net.wuxianjie.redis;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class WebApp {
+public class RedisApp {
 
     public static void main(String[] args) {
-        SpringApplication.run(WebApp.class, args);
+        SpringApplication.run(RedisApp.class, args);
     }
 }

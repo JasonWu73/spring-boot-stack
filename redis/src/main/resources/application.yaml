@@ -4,24 +4,21 @@
 # 否则会使用 Jar 包内 `application.yaml` 中已经有配置，这可能会导致程序未按预期执行
 
 my:
-  security:
-    apis: /api/*/public/**
   spa:
     file-path:
 server:
-  port: 8080
+  port: 8081
 spring:
   application:
-    name: web
-  datasource:
-    url: jdbc:mysql://localhost:3306/test_del?useSSL=false&serverTimezone=Asia/Shanghai
-    username: root
-    password: qwe@123
+    name: redis
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: qwe@123
 management:
   endpoints:
     web:
       base-path: /api/v1/actuator
       exposure:
         include: health,info,metrics
-mybatis:
-  mapper-locations: classpath:mapper/*.xml
