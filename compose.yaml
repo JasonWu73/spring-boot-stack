@@ -2,45 +2,42 @@
 # `docker compose down`
 
 services:
-  mysql-server:
-    image: mysql
-    container_name: mysql-server
+  redis-server:
+    image: redis
+    container_name: redis-server
     restart: always
     ports:
-      - "3307:3306"
+      - "6380:6379"
     volumes:
-      - ./web/init.sql:/docker-entrypoint-initdb.d/init.sql
-      - ./web/mysql-data:/var/lib/mysql
+      - ./redis-data:/data
     environment:
       TZ: Asia/Shanghai
-      MYSQL_ROOT_PASSWORD: qwe@123
-      MYSQL_DATABASE: mydb
-    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    command: redis-server --save 60 1 --loglevel warning --requirepass qwe@123
     networks:
-      - web-network
+      - redis-network
 
-  web:
+  redis-web:
     image: amazoncorretto:21-alpine
-    container_name: web
+    container_name: redis-web
     restart: always
     working_dir: /opt
     ports:
       - "8081:8080"
     volumes:
-      - ./web/build/libs/web-v0.0.1.jar:/opt/app.jar
-      - ./web/build/config:/opt/config
+      - ./redis/build/libs/redis-v0.0.1.jar:/opt/app.jar
+      - ./redis/build/config:/opt/config
     environment:
       TZ: Asia/Shanghai
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-server:3306/mydb
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: qwe@123
-    # 等待 30 秒后启动，确保 MysQL 服务已经启动
+      SPRING_DATA_REDIS_HOST: redis-server
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_DATA_REDIS_PASSWORD: qwe@123
+    # 等待 30 秒后启动，确保 Redis 服务已经启动
     command: sh -c "sleep 30s && java -jar app.jar"
     depends_on:
-      - mysql-server
+      - redis-server
     networks:
-      - web-network
+      - redis-network
 
 networks:
-  web-network:
+  redis-network:
     driver: bridge
