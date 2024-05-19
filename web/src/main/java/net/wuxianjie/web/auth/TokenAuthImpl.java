@@ -13,10 +13,16 @@ public class TokenAuthImpl implements TokenAuth {
 
     @Override
     public CurrentUser authenticate(String accessToken) throws TokenAuthException {
-        if (accessToken.equals("root-token")) {
+        if ("root-token".equals(accessToken)) {
             return new CurrentUser(
-                1, "root", "超级管理员", List.of("root"),
+                0, "root", "超级管理员", List.of("root"),
                 "root-token", "root-refresh"
+            );
+        }
+        if ("admin-token".equals(accessToken)) {
+            return new CurrentUser(
+                1, "admin", "管理员", List.of("admin"),
+                "admin-token", "admin-refresh"
             );
         }
         throw new TokenAuthException("无效的令牌");

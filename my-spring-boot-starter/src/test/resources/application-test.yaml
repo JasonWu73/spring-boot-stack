@@ -4,7 +4,7 @@ my:
     apis:
       - /test-api/v1/public/**
       - GET /test-api/v1/token
-      - POST /test-api/*/guest/** guest
+      - /test-api/*/guest/** guest
     hierarchies:
       - root > admin
       - admin > user

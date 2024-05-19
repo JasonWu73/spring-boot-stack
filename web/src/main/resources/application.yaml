@@ -5,7 +5,9 @@
 
 my:
   security:
-    apis: /api/*/public/**
+    apis:
+      - /api/*/public/**
+      - /api/*/actuator/** root
   spa:
     file-path:
 server:

@@ -29,16 +29,22 @@ public class MyConfig {
     public List<ApiPair> getApiPairs() {
         return Arrays.stream(security.apis)
             .map(permit -> {
-                String[] parts = permit.split(" ");
+                String[] parts = permit.trim().split("\\s+");
+                if (parts.length == 0) {
+                    return null;
+                }
                 if (parts.length == 1) {
                     return new ApiPair(null, parts[0], null);
                 }
-                return new ApiPair(
-                    parts[0],
-                    parts[1],
-                    parts.length == 3 ? parts[2] : null
-                );
+                if (parts.length == 2) {
+                    String method = parts[1].startsWith("/") ? parts[0] : null;
+                    String path = parts[1].startsWith("/") ? parts[1] : parts[0];
+                    String authority = parts[1].startsWith("/") ? null : parts[1];
+                    return new ApiPair(method, path, authority);
+                }
+                return new ApiPair(parts[0], parts[1], parts[2]);
             })
+            .filter(Objects::nonNull)
             .toList();
     }
 
