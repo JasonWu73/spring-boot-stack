@@ -1,4 +1,4 @@
 rootProject.name = "spring-boot-stack"
 
 include(":my-spring-boot-starter")
-include(":redis")
+include(":elasticsearch")

@@ -1,12 +1,12 @@
-package net.wuxianjie.redis;
+package net.wuxianjie.elasticsearch;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class RedisApp {
+public class ElasticsearchApp {
 
     public static void main(String[] args) {
-        SpringApplication.run(RedisApp.class, args);
+        SpringApplication.run(ElasticsearchApp.class, args);
     }
 }
