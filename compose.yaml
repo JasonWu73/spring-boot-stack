@@ -40,6 +40,11 @@ services:
       SPRING_DATA_REDIS_PORT: 6379
       SPRING_DATA_REDIS_PASSWORD: qwe@123
     command: ["java", "-jar", "app.jar"]
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
     networks:
       - redis-network
 
