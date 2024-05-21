@@ -12,7 +12,9 @@ spring:
   application:
     name: elasticsearch
   elasticsearch:
-    # `keytool -importcert -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit -file ./es-certs/ca/ca.crt -alias elastic`
+    # 列出已有证书：`keytool -list -v -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit`
+    # 导入证书文件：`keytool -importcert -alias elastic -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit -file ./es-certs/ca/ca.crt`
+    # 删除证书：`keytool -delete -alias elastic -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit`
     uris: https://localhost:9200
     username: elastic
     password: wuxianjie

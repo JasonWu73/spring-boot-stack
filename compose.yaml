@@ -4,6 +4,7 @@
 services:
   setup:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+    container_name: setup
     volumes:
       - ./es-certs:/usr/share/elasticsearch/config/certs
     user: "0"
@@ -62,11 +63,12 @@ services:
       setup:
         condition: service_healthy
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+    container_name: es01
+    ports:
+      - ${ES_PORT}:9200
     volumes:
       - ./es-certs:/usr/share/elasticsearch/config/certs
       - ./es-data01:/usr/share/elasticsearch/data
-    ports:
-      - ${ES_PORT}:9200
     environment:
       - node.name=es01
       - cluster.name=${CLUSTER_NAME}
@@ -104,6 +106,7 @@ services:
     depends_on:
       - es01
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+    container_name: es02
     volumes:
       - ./es-certs:/usr/share/elasticsearch/config/certs
       - ./es-data02:/usr/share/elasticsearch/data
@@ -147,11 +150,12 @@ services:
       es02:
         condition: service_healthy
     image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
+    container_name: kibana
+    ports:
+      - ${KIBANA_PORT}:5601
     volumes:
       - ./es-certs:/usr/share/kibana/config/certs
       - ./kibana-data:/usr/share/kibana/data
-    ports:
-      - ${KIBANA_PORT}:5601
     environment:
       - SERVERNAME=kibana
       - ELASTICSEARCH_HOSTS=https://es01:9200
