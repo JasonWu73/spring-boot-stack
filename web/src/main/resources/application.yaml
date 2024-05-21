@@ -16,7 +16,7 @@ spring:
   application:
     name: web
   datasource:
-    url: jdbc:mysql://localhost:3306/test_del?serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://localhost:3306/mydb
     username: root
     password: qwe@123
 management:

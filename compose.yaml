@@ -2,12 +2,12 @@
 # `docker compose down`
 
 services:
-  mysql-server:
+  mysql:
     image: mysql
-    container_name: mysql-server
+    container_name: mysql
     restart: always
     ports:
-      - "3307:3306"
+      - "3306:3306"
     volumes:
       - ./web/init.sql:/docker-entrypoint-initdb.d/init.sql
       - ./web/mysql-data:/var/lib/mysql
@@ -15,29 +15,34 @@ services:
       TZ: Asia/Shanghai
       MYSQL_ROOT_PASSWORD: qwe@123
       MYSQL_DATABASE: mydb
-    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-pqwe@123"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
     networks:
       - web-network
 
   web:
+    depends_on:
+      mysql:
+        condition: service_healthy
     image: amazoncorretto:21-alpine
     container_name: web
     restart: always
     working_dir: /opt
     ports:
-      - "8081:8080"
+      - "8080:8080"
     volumes:
       - ./web/build/libs/web-v0.0.1.jar:/opt/app.jar
       - ./web/build/config:/opt/config
     environment:
       TZ: Asia/Shanghai
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-server:3306/mydb
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/mydb
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: qwe@123
-    # 等待 30 秒后启动，确保 MysQL 服务已经启动
-    command: sh -c "sleep 30s && java -jar app.jar"
-    depends_on:
-      - mysql-server
+    command: ["java", "-jar", "app.jar"]
     networks:
       - web-network
 
