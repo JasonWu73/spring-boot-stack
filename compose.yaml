@@ -7,9 +7,14 @@ services:
     container_name: currency-zipkin
     restart: always
     ports:
-      - "9412:9411"
+      - "9411:9411"
     environment:
       TZ: Asia/Shanghai
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:9411/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     networks:
       - currency-network
 
@@ -18,7 +23,7 @@ services:
     container_name: currency-mysql
     restart: always
     ports:
-      - "3307:3306"
+      - "3306:3306"
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
       - ./mysql-data:/var/lib/mysql
@@ -26,7 +31,12 @@ services:
       TZ: Asia/Shanghai
       MYSQL_ROOT_PASSWORD: qwe@123
       MYSQL_DATABASE: mydb
-    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-pqwe@123"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
     networks:
       - currency-network
 
@@ -42,7 +52,12 @@ services:
       - ./config-server/build/config:/opt/config
     environment:
       TZ: Asia/Shanghai
-    command: java -jar app.jar
+    command: ["java", "-jar", "app.jar"]
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:8888/actuator/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
     networks:
       - currency-network
 
@@ -58,11 +73,21 @@ services:
       - ./naming-server/build/config:/opt/config
     environment:
       TZ: Asia/Shanghai
-    command: java -jar app.jar
+    command: ["java", "-jar", "app.jar"]
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:8761/actuator/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
     networks:
       - currency-network
 
   api-gateway:
+    depends_on:
+      currency-zipkin:
+        condition: service_healthy
+      naming-server:
+        condition: service_healthy
     image: amazoncorretto:21-alpine
     container_name: api-gateway
     restart: always
@@ -76,14 +101,23 @@ services:
       TZ: Asia/Shanghai
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://naming-server:8761/eureka
       MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://currency-zipkin:9411/api/v2/spans
-    # 等待 30 秒，确保服务注册中心启动成功
-    command: sh -c "sleep 30s && java -jar app.jar"
-    depends_on:
-      - naming-server
+    command: ["java", "-jar", "app.jar"]
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:8765/gateway/actuator/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
     networks:
       - currency-network
 
   currency-exchange-service:
+    depends_on:
+      currency-zipkin:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      currency-mysql:
+        condition: service_healthy
     image: amazoncorretto:21-alpine
     container_name: currency-exchange-service
     restart: always
@@ -101,15 +135,23 @@ services:
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://naming-server:8761/eureka
       SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8888
       MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://currency-zipkin:9411/api/v2/spans
-    # 等待 30 秒，确保配置服务启动成功
-    command: sh -c "sleep 30s && java -jar app.jar"
-    depends_on:
-      - config-server
-      - currency-mysql
+    command: ["java", "-jar", "app.jar"]
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:8000/actuator/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
     networks:
       - currency-network
 
   currency-conversion-service:
+    depends_on:
+      currency-zipkin:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      currency-exchange-service:
+        condition: service_healthy
     image: amazoncorretto:21-alpine
     container_name: currency-conversion-service
     restart: always
@@ -125,10 +167,12 @@ services:
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://naming-server:8761/eureka
       SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8888
       MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://currency-zipkin:9411/api/v2/spans
-    # 等待 30 秒，确保配置服务启动成功
-    command: sh -c "sleep 30s && java -jar app.jar"
-    depends_on:
-      - config-server
+    command: ["java", "-jar", "app.jar"]
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:8100/actuator/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
     networks:
       - currency-network
 
