@@ -2,39 +2,44 @@
 # `docker compose down`
 
 services:
-  redis-server:
+  redis:
     image: redis
-    container_name: redis-server
+    container_name: redis
     restart: always
     ports:
-      - "6380:6379"
+      - "6379:6379"
     volumes:
       - ./redis-data:/data
     environment:
       TZ: Asia/Shanghai
-    command: redis-server --save 60 1 --loglevel warning --requirepass qwe@123
+    command: ["redis-server", "--save", "60", "1", "--loglevel", "warning", "--requirepass", "qwe@123"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
     networks:
       - redis-network
 
   redis-web:
+    depends_on:
+      redis:
+        condition: service_healthy
     image: amazoncorretto:21-alpine
     container_name: redis-web
     restart: always
     working_dir: /opt
     ports:
-      - "8081:8080"
+      - "8080:8080"
     volumes:
       - ./redis/build/libs/redis-v0.0.1.jar:/opt/app.jar
       - ./redis/build/config:/opt/config
     environment:
       TZ: Asia/Shanghai
-      SPRING_DATA_REDIS_HOST: redis-server
+      SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
       SPRING_DATA_REDIS_PASSWORD: qwe@123
-    # 等待 30 秒后启动，确保 Redis 服务已经启动
-    command: sh -c "sleep 30s && java -jar app.jar"
-    depends_on:
-      - redis-server
+    command: ["java", "-jar", "app.jar"]
     networks:
       - redis-network
 
