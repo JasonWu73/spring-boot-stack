@@ -2,14 +2,14 @@
 # `docker compose down`
 
 services:
-  rabbitmq-server:
+  rabbitmq:
     image: rabbitmq:3-management
-    container_name: rabbitmq-server
+    container_name: rabbitmq
     restart: always
     hostname: docker-rabbitmq
     ports:
-      - "5673:5672"
-      - "15673:15672"
+      - "5672:5672"
+      - "15672:15672"
     volumes:
       - ./rabbitmq-config/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
       - ./rabbitmq-config/definitions.json:/etc/rabbitmq/definitions.json
@@ -18,10 +18,18 @@ services:
       TZ: Asia/Shanghai
       RABBITMQ_DEFAULT_USER: admin
       RABBITMQ_DEFAULT_PASS: qwe@123
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
     networks:
       - rabbitmq-network
 
   rabbitmq-producer:
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
     image: amazoncorretto:21-alpine
     container_name: rabbitmq-producer
     restart: always
@@ -33,18 +41,23 @@ services:
       - ./rabbitmq-producer/build/config:/opt/config
     environment:
       TZ: Asia/Shanghai
-      SPRING_RABBITMQ_HOST: rabbitmq-server
+      SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_RABBITMQ_PORT: 5672
       SPRING_RABBITMQ_USERNAME: admin
       SPRING_RABBITMQ_PASSWORD: qwe@123
-    # 等待 30 秒后启动，确保 RabbitMQ 服务已经启动
-    command: sh -c "sleep 30s && java -jar app.jar"
-    depends_on:
-      - rabbitmq-server
+    command: ["java", "-jar", "app.jar"]
+    healthcheck:
+      test: ["CMD-SHELL", "curl --silent --fail http://localhost:8080/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
     networks:
       - rabbitmq-network
 
   rabbitmq-consumer:
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
     image: amazoncorretto:21-alpine
     container_name: rabbitmq-consumer
     restart: always
@@ -56,14 +69,11 @@ services:
       - ./rabbitmq-consumer/build/config:/opt/config
     environment:
       TZ: Asia/Shanghai
-      SPRING_RABBITMQ_HOST: rabbitmq-server
+      SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_RABBITMQ_PORT: 5672
       SPRING_RABBITMQ_USERNAME: admin
       SPRING_RABBITMQ_PASSWORD: qwe@123
-    # 等待 30 秒后启动，确保 RabbitMQ 服务已经启动
-    command: sh -c "sleep 30s && java -jar app.jar"
-    depends_on:
-      - rabbitmq-server
+    command: ["java", "-jar", "app.jar"]
     networks:
       - rabbitmq-network
 
