@@ -10,11 +10,12 @@ server:
   port: 8080
 spring:
   application:
-    name: redis
+    name: elasticsearch
   elasticsearch:
-    uris: http://localhost:9200
+    # `keytool -importcert -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit -file ./es-certs/ca/ca.crt -alias elastic`
+    uris: https://localhost:9200
     username: elastic
-    password: qwe@123
+    password: wuxianjie
 management:
   endpoints:
     web:
