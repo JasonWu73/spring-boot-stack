@@ -47,7 +47,7 @@ services:
       SPRING_RABBITMQ_PASSWORD: qwe@123
     command: ["java", "-jar", "app.jar"]
     healthcheck:
-      test: ["CMD-SHELL", "curl --silent --fail http://localhost:8080/actuator/health || exit 1"]
+      test: ["CMD", "wget", "--spider", "http://localhost:8080/actuator/health"]
       interval: 30s
       timeout: 3s
       retries: 3
@@ -56,7 +56,7 @@ services:
 
   rabbitmq-consumer:
     depends_on:
-      rabbitmq:
+      rabbitmq-producer:
         condition: service_healthy
     image: amazoncorretto:21-alpine
     container_name: rabbitmq-consumer
