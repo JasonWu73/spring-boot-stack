@@ -3,6 +3,8 @@ package net.wuxianjie.myspringbootstarter.util;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -23,6 +25,7 @@ public class RedisLockUtils {
         end""";
 
     private static final ConcurrentHashMap<String, Boolean> RENEW_KEYS = new ConcurrentHashMap<>();
+    private static final ExecutorService THREAD_POOL = Executors.newCachedThreadPool();
 
     /**
      * 上锁，支持对锁的自动续期。
@@ -56,7 +59,7 @@ public class RedisLockUtils {
         RENEW_KEYS.put(key, true);
 
         StringRedisTemplate redisTemplate = SpringUtils.getBean(StringRedisTemplate.class);
-        new Thread(() -> {
+        THREAD_POOL.execute(() -> {
             while (RENEW_KEYS.getOrDefault(key, false)) {
                 waitRenew();
 
@@ -69,7 +72,7 @@ public class RedisLockUtils {
                 // 续期
                 redisTemplate.expire(key, LOCK_TIMEOUT_SECONDS, TimeUnit.SECONDS);
             }
-        }).start();
+        });
     }
 
     private static void waitRenew() {
